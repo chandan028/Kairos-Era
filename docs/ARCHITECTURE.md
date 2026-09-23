@@ -1,0 +1,53 @@
+# Architecture
+
+Kairos Era is a single Android app with no backend. Every byte of user data lives in the app's private storage.
+
+## Layers
+
+```
+UI (Jetpack Compose screens)
+  ↓
+ViewModel (StateFlow of UiState: Loading / Ready / Error)
+  ↓
+Use cases (:domain, pure Kotlin)
+  ↓
+Repository interfaces (:domain)  ←  Room / DataStore implementations (:app data layer)
+  ↓
+Local storage (Room database, DataStore preferences, bundled assets)
+```
+
+## Modules
+
+| Module | What it holds | Why separate |
+|---|---|---|
+| `:domain` | Models, recurrence engine, reminder planner, quote selection, validation, use cases, repository interfaces | Pure Kotlin with no Android dependency, so the time-critical logic is unit-tested on the JVM in seconds |
+| `:app` | Room database, repositories, notification scheduler, Compose UI, resources | Everything that touches Android |
+
+## Packages in `:app` (`com.kairosera`)
+
+- `core/database` – Room entities, DAOs, the database and its migration list.
+- `core/notifications` – `NotificationScheduler` (the only owner of alarms and notifications), channels, receivers.
+- `core/settings` – DataStore preferences (theme, language-independent settings, Home card order).
+- `core/diagnostics` – `SafeLog`, the only logging entry point (redacted by design).
+- `core/ui` – theme and shared components.
+- `data/repository` – Room implementations of the domain repositories plus mappers.
+- `data/quotes` – loads the 365 bundled quotes.
+- `data/sample` – default categories and optional example content.
+- `feature/*` – one package per screen group (home, planner, tasks, more, onboarding).
+- `AppContainer` – manual dependency wiring; small enough that a DI framework isn't worth the dependency.
+
+Features never read another feature's tables directly: they go through repositories and use cases.
+
+## Key design decisions
+
+- **Tasks are definitions; occurrences are computed.** A recurring task stores its rule once. Per-date state (done / moved) is stored in `occurrence_states`. The rule and history never overwrite each other, yesterday stays intact, and no "daily reset" ever deletes anything.
+- **Dates are local calendar dates; reminder times are floating local times.** "08:00" means 08:00 wherever the phone is. Only trigger instants depend on the time zone, and they are recomputed on every rebuild.
+- **The reminder schedule is derived, not remembered.** `ReminderPlanner` is a pure function of the database and the clock. See `docs/NOTIFICATIONS.md`.
+- **Enums are stored by name, dates as epoch days, times as minutes of day.** Reordering an enum can't corrupt data and range queries use indexes.
+- **Soft delete everywhere.** Deleting moves an item to Trash. Permanent deletion needs an explicit confirmation.
+- **Adaptive layout.** `NavigationSuiteScaffold` shows a bottom bar on phones and a navigation rail on tablets, foldables and landscape. Content is capped at a readable width and centred. The app draws edge to edge and respects system bar and cutout insets.
+- **Languages.** English and Kannada. The in-app switch uses AppCompat per-app locales, so it works on Android 8+ and appears in Android 13+'s per-app language settings. All UI text lives in `tools/strings_source.py`, which generates both `strings.xml` files and fails the build script if a key or placeholder is missing in either language.
+
+## Dependencies
+
+Each dependency in `gradle/libs.versions.toml` has a one-line reason. There are no analytics, ads, crash-reporting SDKs or network libraries.
