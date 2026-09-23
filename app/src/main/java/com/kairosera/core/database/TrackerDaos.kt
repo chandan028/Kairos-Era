@@ -56,6 +56,12 @@ interface TrackerDao {
     suspend fun clearDay(trackerId: Long, date: Long)
 
     @Upsert suspend fun upsertValues(values: List<TrackerValueEntity>)
+
+    @Query("SELECT EXISTS(SELECT 1 FROM trackers WHERE isSample = 1 AND deletedAt IS NULL)")
+    suspend fun hasSamples(): Boolean
+
+    @Query("UPDATE trackers SET deletedAt = :at, updatedAt = :at WHERE isSample = 1 AND deletedAt IS NULL")
+    suspend fun trashSamples(at: Long)
 }
 
 @Dao
@@ -142,4 +148,10 @@ interface BookDao {
 
     @Query("DELETE FROM book_notes WHERE id = :id")
     suspend fun deleteNote(id: Long)
+
+    @Query("SELECT EXISTS(SELECT 1 FROM books WHERE isSample = 1 AND deletedAt IS NULL)")
+    suspend fun hasSamples(): Boolean
+
+    @Query("UPDATE books SET deletedAt = :at, updatedAt = :at WHERE isSample = 1 AND deletedAt IS NULL")
+    suspend fun trashSamples(at: Long)
 }

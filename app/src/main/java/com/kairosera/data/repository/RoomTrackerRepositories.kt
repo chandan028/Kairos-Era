@@ -95,6 +95,9 @@ class RoomTrackerRepository(private val db: KairosDatabase) : TrackerRepository 
         idsInOrder.forEachIndexed { index, id -> dao.setPosition(id, index) }
     }
 
+    suspend fun hasSamples(): Boolean = dao.hasSamples()
+    suspend fun trashSamples(at: Instant) = dao.trashSamples(at.toEpochMilli())
+
     private companion object { const val MAX_TEXT = 4000 }
 }
 
@@ -205,6 +208,9 @@ class RoomBookRepository(private val db: KairosDatabase) : BookRepository {
     }
 
     override suspend fun deletePermanently(id: Long) = dao.deleteTrashed(id)
+
+    suspend fun hasSamples(): Boolean = dao.hasSamples()
+    suspend fun trashSamples(at: Instant) = dao.trashSamples(at.toEpochMilli())
 }
 
 /** Marks a book finished (or reopens it) without touching its notes or insights. */

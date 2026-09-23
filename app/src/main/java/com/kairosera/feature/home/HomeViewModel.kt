@@ -5,6 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.kairosera.AppContainer
 import com.kairosera.core.ui.components.UiState
 import com.kairosera.domain.model.TaskOccurrence
+import com.kairosera.domain.reading.Book
+import com.kairosera.domain.reading.BookStatus
+import com.kairosera.feature.track.TrackerSummaries
+import com.kairosera.feature.track.TrackerSummary
 import com.kairosera.domain.quote.DailyQuote
 import com.kairosera.domain.time.DayPart
 import com.kairosera.domain.time.Greeting
@@ -33,7 +37,14 @@ data class HomeData(
     val nextUp: List<TaskOccurrence>,
     val quote: DailyQuote,
     val hasSamples: Boolean,
-)
+    val trackers: List<TrackerSummary> = emptyList(),
+    val pagesToday: Int = 0,
+    val currentBook: Book? = null,
+) {
+    val trackersDue: List<TrackerSummary> get() = trackers.filter { it.dueToday }
+}
+
+private data class Extras(val trackers: List<TrackerSummary>, val pagesToday: Int, val currentBook: Book?)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel(private val c: AppContainer) : ViewModel() {
@@ -50,7 +61,14 @@ class HomeViewModel(private val c: AppContainer) : ViewModel() {
     val state: StateFlow<UiState<HomeData>> = retry.flatMapLatest {
         now.map { it.toLocalDate() }.distinctUntilChanged().flatMapLatest { date ->
             val quoteFlow = flow { emit(c.quotes.forDate(date)) }
-            combine(c.observeDayPlan(date), now, quoteFlow) { plan, time, quote ->
+            val trackerFlow = combine(c.trackers.observeActive(), c.trackers.observeEntries(date.minusDays(TrackerSummaries.HISTORY_DAYS), date)) { list, entries ->
+                list.map { TrackerSummaries.summarize(it, entries, date) }
+            }
+            val readingFlow = combine(c.books.observeBooks(), c.books.observeSessionsBetween(date, date)) { books, sessions ->
+                sessions.sumOf { it.pages } to books.firstOrNull { it.status == BookStatus.READING }
+            }
+            val extras = combine(trackerFlow, readingFlow) { t, r -> Extras(t, r.first, r.second) }
+            combine(c.observeDayPlan(date), now, quoteFlow, extras) { plan, time, quote, ex ->
                 val today = plan[date].orEmpty()
                 UiState.Ready(
                     HomeData(
@@ -60,6 +78,9 @@ class HomeViewModel(private val c: AppContainer) : ViewModel() {
                         nextUp = DaySummary.nextUp(today, time.toLocalTime()),
                         quote = quote,
                         hasSamples = today.any { it.task.isSample },
+                        trackers = ex.trackers,
+                        pagesToday = ex.pagesToday,
+                        currentBook = ex.currentBook,
                     ),
                 ) as UiState<HomeData>
             }

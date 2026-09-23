@@ -9,7 +9,17 @@ import com.kairosera.domain.model.Priority
 import com.kairosera.domain.model.RepeatRule
 import com.kairosera.domain.model.Subtask
 import com.kairosera.domain.model.Task
+import com.kairosera.data.repository.RoomBookRepository
+import com.kairosera.data.repository.RoomStudyRepository
+import com.kairosera.data.repository.RoomTrackerRepository
+import com.kairosera.data.tracker.TrackerTemplates
+import com.kairosera.domain.reading.Book
+import com.kairosera.domain.reading.BookStatus
 import com.kairosera.domain.repository.TaskRepository
+import com.kairosera.domain.tracker.StudyTarget
+import com.kairosera.domain.tracker.StudyTopic
+import com.kairosera.domain.tracker.TopicStatus
+import com.kairosera.domain.tracker.TrackerTemplate
 import java.time.Clock
 import java.time.DayOfWeek
 import java.time.Instant
@@ -63,5 +73,40 @@ object SampleData {
             task(R.string.sample_read, LocalTime.of(21, 30), LocalTime.of(22, 0), CATEGORY_READING, daily),
             task(R.string.sample_reflection, null, null, CATEGORY_PERSONAL, daily),
         ).forEach { repo.saveTask(it) }
+    }
+
+    suspend fun insertTrackerExamples(
+        context: Context,
+        trackers: RoomTrackerRepository,
+        study: RoomStudyRepository,
+        books: RoomBookRepository,
+        today: LocalDate,
+        clock: Clock,
+    ) {
+        val now = Instant.now(clock)
+        if (!trackers.hasSamples()) {
+            trackers.save(TrackerTemplates.create(context, TrackerTemplate.FITNESS).copy(
+                why = context.getString(R.string.sample_fitness_why), createdAt = now, updatedAt = now, isSample = true,
+            ))
+            val javaId = trackers.save(TrackerTemplates.create(context, TrackerTemplate.STUDY).copy(
+                name = context.getString(R.string.sample_study_name), icon = "🧑‍💻",
+                why = context.getString(R.string.sample_study_why), createdAt = now, updatedAt = now, isSample = true,
+            ))
+            val core = study.saveTopic(StudyTopic(trackerId = javaId, title = context.getString(R.string.sample_topic_core), updatedAt = now))
+            val collections = study.saveTopic(StudyTopic(trackerId = javaId, parentId = core, title = context.getString(R.string.sample_topic_collections), status = TopicStatus.LEARNING, confidence = 3, updatedAt = now))
+            study.saveTopic(StudyTopic(trackerId = javaId, parentId = core, title = context.getString(R.string.sample_topic_oop), status = TopicStatus.DONE, confidence = 4, updatedAt = now))
+            study.saveTopic(StudyTopic(trackerId = javaId, parentId = core, title = context.getString(R.string.sample_topic_streams), updatedAt = now))
+            study.saveTopic(StudyTopic(trackerId = javaId, title = context.getString(R.string.sample_topic_spring), updatedAt = now))
+            study.saveTarget(StudyTarget(trackerId = javaId, date = today, topicId = collections, title = context.getString(R.string.sample_target_1), position = 0))
+            study.saveTarget(StudyTarget(trackerId = javaId, date = today, topicId = collections, title = context.getString(R.string.sample_target_2), position = 1))
+        }
+        if (!books.hasSamples()) {
+            books.save(Book(
+                title = context.getString(R.string.sample_book_title), author = context.getString(R.string.sample_book_author),
+                totalPages = 320, currentPage = 48, status = BookStatus.READING, startDate = today.minusDays(6),
+                targetDate = today.plusDays(30), whyStarted = context.getString(R.string.sample_book_why),
+                createdAt = now, updatedAt = now, isSample = true,
+            ))
+        }
     }
 }

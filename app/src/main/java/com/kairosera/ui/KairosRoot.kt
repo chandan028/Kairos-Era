@@ -57,9 +57,16 @@ import com.kairosera.feature.more.PrivacyScreen
 import com.kairosera.feature.more.SettingsScreen
 import com.kairosera.feature.more.TrashScreen
 import com.kairosera.feature.onboarding.OnboardingScreen
-import com.kairosera.feature.placeholder.ComingSoonScreen
 import com.kairosera.feature.planner.PlannerScreen
 import com.kairosera.feature.planner.RescheduleDialog
+import com.kairosera.feature.read.BookDetailScreen
+import com.kairosera.feature.read.BookEditorScreen
+import com.kairosera.feature.read.ReadScreen
+import com.kairosera.feature.track.TemplatePickerSheet
+import com.kairosera.feature.track.TrackScreen
+import com.kairosera.feature.track.TrackerDetailScreen
+import com.kairosera.feature.track.TrackerEditorScreen
+import com.kairosera.domain.tracker.TrackerTemplate
 import com.kairosera.feature.tasks.TaskEditorScreen
 import java.time.LocalDate
 
@@ -89,9 +96,17 @@ object Routes {
     const val PRIVACY = "privacy"
     const val ABOUT = "about"
     const val HOME_CARDS = "home_cards"
+    const val TRACKER = "tracker"
+    const val TRACKER_EDIT = "tracker_edit"
+    const val BOOK = "book"
+    const val BOOK_EDIT = "book_edit"
 
     fun today(date: LocalDate?) = if (date == null) TODAY else "$TODAY?date=${date.toEpochDay()}"
     fun task(id: Long? = null, date: LocalDate? = null) = "$TASK?id=${id ?: -1}&date=${date?.toEpochDay() ?: Long.MIN_VALUE}"
+    fun tracker(id: Long) = "$TRACKER/$id"
+    fun trackerEdit(id: Long? = null, template: TrackerTemplate = TrackerTemplate.CUSTOM) = "$TRACKER_EDIT?id=${id ?: -1}&template=${template.name}"
+    fun book(id: Long) = "$BOOK/$id"
+    fun bookEdit(id: Long? = null) = "$BOOK_EDIT?id=${id ?: -1}"
 }
 
 @Composable
@@ -103,6 +118,7 @@ fun KairosRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchReq
     val nav = rememberNavController()
     var reschedule by remember { mutableStateOf<LaunchRequest.Reschedule?>(null) }
     var quickAdd by rememberSaveable { mutableStateOf(false) }
+    var pickTemplate by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(launchRequest) {
         when (val r = launchRequest) {
@@ -115,7 +131,14 @@ fun KairosRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchReq
     }
 
     val backStack by nav.currentBackStackEntryAsState()
-    val currentRoute = backStack?.destination?.route?.substringBefore('?')
+    // Detail screens keep their tab highlighted, so people always know where they are.
+    val rawRoute = backStack?.destination?.route?.substringBefore('?')
+    val currentRoute = when (val r = rawRoute?.substringBefore('/')) {
+        Routes.TRACKER, Routes.TRACKER_EDIT -> Routes.TRACK
+        Routes.BOOK, Routes.BOOK_EDIT -> Routes.READ
+        Routes.SETTINGS, Routes.TRASH, Routes.PRIVACY, Routes.ABOUT -> Routes.MORE
+        else -> r
+    }
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
@@ -123,7 +146,14 @@ fun KairosRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchReq
                 val selected = currentRoute == dest.route
                 item(
                     selected = selected,
-                    onClick = { if (!selected) nav.navigateTopLevel(dest.route) },
+                    onClick = {
+                        when {
+                            rawRoute == dest.route -> Unit
+                            // Re-tapping the current tab from a detail screen goes back to the tab's root.
+                            selected -> if (!nav.popBackStack(dest.route, inclusive = false)) nav.navigateTopLevel(dest.route)
+                            else -> nav.navigateTopLevel(dest.route)
+                        }
+                    },
                     icon = { Icon(if (selected) dest.selectedIcon else dest.icon, contentDescription = null) },
                     label = { Text(stringResource(dest.label)) },
                 )
@@ -138,7 +168,13 @@ fun KairosRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchReq
         QuickAddSheet(
             onDismiss = { quickAdd = false },
             onTask = { quickAdd = false; nav.navigate(Routes.task(date = LocalDate.now())) },
+            onTracker = { quickAdd = false; pickTemplate = true },
+            onBook = { quickAdd = false; nav.navigate(Routes.bookEdit()) },
+            onStudy = { quickAdd = false; nav.navigate(Routes.trackerEdit(template = TrackerTemplate.STUDY)) },
         )
+    }
+    if (pickTemplate) {
+        TemplatePickerSheet(onDismiss = { pickTemplate = false }, onPick = { pickTemplate = false; nav.navigate(Routes.trackerEdit(template = it)) })
     }
 }
 
@@ -152,6 +188,9 @@ private fun KairosNavHost(nav: NavHostController, settings: AppSettings, onQuick
                 onOpenTask = { id, date -> nav.navigate(Routes.task(id, date)) },
                 onQuickAdd = onQuickAdd,
                 onCustomize = { nav.navigate(Routes.HOME_CARDS) },
+                onOpenTracker = { nav.navigate(Routes.tracker(it)) },
+                onOpenTrack = { nav.navigateTopLevel(Routes.TRACK) },
+                onOpenBook = { nav.navigate(Routes.book(it)) },
             )
         }
         composable(
@@ -165,8 +204,53 @@ private fun KairosNavHost(nav: NavHostController, settings: AppSettings, onQuick
                 onNewTask = { date -> nav.navigate(Routes.task(date = date)) },
             )
         }
-        composable(Routes.TRACK) { ComingSoonScreen(kind = ComingSoonKind.TRACK) }
-        composable(Routes.READ) { ComingSoonScreen(kind = ComingSoonKind.READ) }
+        composable(Routes.TRACK) {
+            TrackScreen(
+                onOpenTracker = { nav.navigate(Routes.tracker(it)) },
+                onNewTracker = { nav.navigate(Routes.trackerEdit(template = it)) },
+            )
+        }
+        composable(Routes.READ) {
+            ReadScreen(onOpenBook = { nav.navigate(Routes.book(it)) }, onNewBook = { nav.navigate(Routes.bookEdit()) })
+        }
+        composable("${Routes.TRACKER}/{id}", arguments = listOf(navArgument("id") { type = NavType.LongType })) { entry ->
+            val id = entry.arguments?.getLong("id") ?: -1L
+            TrackerDetailScreen(trackerId = id, onBack = { nav.popBackStack() }, onEdit = { nav.navigate(Routes.trackerEdit(id)) })
+        }
+        composable(
+            "${Routes.TRACKER_EDIT}?id={id}&template={template}",
+            arguments = listOf(
+                navArgument("id") { type = NavType.LongType; defaultValue = -1L },
+                navArgument("template") { type = NavType.StringType; defaultValue = TrackerTemplate.CUSTOM.name },
+            ),
+        ) { entry ->
+            val id = entry.arguments?.getLong("id")?.takeIf { it > 0 }
+            val template = TrackerTemplate.entries.firstOrNull { it.name == entry.arguments?.getString("template") } ?: TrackerTemplate.CUSTOM
+            TrackerEditorScreen(
+                trackerId = id,
+                template = template,
+                onClose = { nav.popBackStack() },
+                onSaved = { savedId, isNew ->
+                    nav.popBackStack()
+                    if (isNew) nav.navigate(Routes.tracker(savedId))
+                },
+            )
+        }
+        composable("${Routes.BOOK}/{id}", arguments = listOf(navArgument("id") { type = NavType.LongType })) { entry ->
+            val id = entry.arguments?.getLong("id") ?: -1L
+            BookDetailScreen(bookId = id, onBack = { nav.popBackStack() }, onEdit = { nav.navigate(Routes.bookEdit(id)) })
+        }
+        composable("${Routes.BOOK_EDIT}?id={id}", arguments = listOf(navArgument("id") { type = NavType.LongType; defaultValue = -1L })) { entry ->
+            val id = entry.arguments?.getLong("id")?.takeIf { it > 0 }
+            BookEditorScreen(
+                bookId = id,
+                onClose = { nav.popBackStack() },
+                onSaved = { savedId, isNew ->
+                    nav.popBackStack()
+                    if (isNew) nav.navigate(Routes.book(savedId))
+                },
+            )
+        }
         composable(Routes.MORE) {
             MoreScreen(
                 onSettings = { nav.navigate(Routes.SETTINGS) },
@@ -199,8 +283,6 @@ private fun KairosNavHost(nav: NavHostController, settings: AppSettings, onQuick
     }
 }
 
-enum class ComingSoonKind { TRACK, READ }
-
 private fun NavHostController.navigateTopLevel(route: String) {
     navigate(route) {
         popUpTo(graph.findStartDestination().id) { saveState = true }
@@ -211,7 +293,7 @@ private fun NavHostController.navigateTopLevel(route: String) {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-private fun QuickAddSheet(onDismiss: () -> Unit, onTask: () -> Unit) {
+private fun QuickAddSheet(onDismiss: () -> Unit, onTask: () -> Unit, onTracker: () -> Unit, onBook: () -> Unit, onStudy: () -> Unit) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 24.dp).navigationBarsPadding()) {
             Text(stringResource(R.string.quick_add_title), style = MaterialTheme.typography.titleLarge)
@@ -223,10 +305,10 @@ private fun QuickAddSheet(onDismiss: () -> Unit, onTask: () -> Unit) {
             )
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 AssistChip(onClick = onTask, label = { Text(stringResource(R.string.quick_add_task)) }, leadingIcon = { Icon(Icons.Outlined.CheckCircle, null) })
-                AssistChip(onClick = {}, enabled = false, label = { Text(stringResource(R.string.quick_add_tracker)) }, leadingIcon = { Icon(Icons.Outlined.Insights, null) })
-                AssistChip(onClick = {}, enabled = false, label = { Text(stringResource(R.string.quick_add_book)) }, leadingIcon = { Icon(Icons.Outlined.AutoStories, null) })
+                AssistChip(onClick = onTracker, label = { Text(stringResource(R.string.quick_add_tracker)) }, leadingIcon = { Icon(Icons.Outlined.Insights, null) })
+                AssistChip(onClick = onBook, label = { Text(stringResource(R.string.quick_add_book)) }, leadingIcon = { Icon(Icons.Outlined.AutoStories, null) })
                 AssistChip(onClick = {}, enabled = false, label = { Text(stringResource(R.string.quick_add_journal)) }, leadingIcon = { Icon(Icons.Outlined.EditNote, null) })
-                AssistChip(onClick = {}, enabled = false, label = { Text(stringResource(R.string.quick_add_study)) }, leadingIcon = { Icon(Icons.Outlined.School, null) })
+                AssistChip(onClick = onStudy, label = { Text(stringResource(R.string.quick_add_study)) }, leadingIcon = { Icon(Icons.Outlined.School, null) })
             }
         }
     }

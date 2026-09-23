@@ -32,8 +32,9 @@ Local storage (Room database, DataStore preferences, bundled assets)
 - `core/ui` – theme and shared components.
 - `data/repository` – Room implementations of the domain repositories plus mappers.
 - `data/quotes` – loads the 365 bundled quotes.
-- `data/sample` – default categories and optional example content.
-- `feature/*` – one package per screen group (home, planner, tasks, more, onboarding).
+- `data/sample` – default categories and optional example content (tasks, a fitness and a study tracker, a book).
+- `data/tracker` – tracker templates (study, fitness, reading, habit, project, money, learning, health, personal, custom).
+- `feature/*` – one package per screen group (home, planner, tasks, track, read, more, onboarding).
 - `AppContainer` – manual dependency wiring; small enough that a DI framework isn't worth the dependency.
 
 Features never read another feature's tables directly: they go through repositories and use cases.
@@ -44,6 +45,9 @@ Features never read another feature's tables directly: they go through repositor
 - **Dates are local calendar dates; reminder times are floating local times.** "08:00" means 08:00 wherever the phone is. Only trigger instants depend on the time zone, and they are recomputed on every rebuild.
 - **The reminder schedule is derived, not remembered.** `ReminderPlanner` is a pure function of the database and the clock. See `docs/NOTIFICATIONS.md`.
 - **Enums are stored by name, dates as epoch days, times as minutes of day.** Reordering an enum can't corrupt data and range queries use indexes.
+- **One tracker engine.** Study, fitness, habits and custom trackers are the same thing: a tracker with typed fields (yes/no, number, decimal, minutes, pages, percent, rating, text, checklist) and a frequency (daily, some days, N per week, N per month). Templates only pre-fill fields. Values are stored one row per field per day (`tracker_values`), so editing a tracker never rewrites history, and removing a field only switches it off. The first field is the main goal: completing it completes the day. Streaks count days, weeks or months depending on the frequency; today not done yet never breaks a streak.
+- **Study plans are separate from daily logs.** A study tracker has a topic tree (`study_topics`) and per-day targets (`study_targets`). Ticking a target records practice on its topic and moves it to "learning"; only the user marks a topic done.
+- **Books are more than pages.** `books` holds progress plus the READ → UNDERSTAND → REMEMBER → APPLY insight fields; `reading_sessions` and `book_notes` hang off it. A session moves the bookmark in the same transaction and never past the last page.
 - **Soft delete everywhere.** Deleting moves an item to Trash. Permanent deletion needs an explicit confirmation.
 - **Adaptive layout.** `NavigationSuiteScaffold` shows a bottom bar on phones and a navigation rail on tablets, foldables and landscape. Content is capped at a readable width and centred. The app draws edge to edge and respects system bar and cutout insets.
 - **Languages.** English and Kannada. The in-app switch uses AppCompat per-app locales, so it works on Android 8+ and appears in Android 13+'s per-app language settings. All UI text lives in `tools/strings_source.py`, which generates both `strings.xml` files and fails the build script if a key or placeholder is missing in either language.

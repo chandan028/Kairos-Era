@@ -1,6 +1,7 @@
 package com.kairosera
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.hasScrollToNodeAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.performScrollToNode
@@ -36,7 +37,18 @@ class AppSmokeTest {
 
     private fun waitForText(text: String, timeoutMs: Long = 10_000) {
         stage("wait '$text'")
-        rule.waitUntil(timeoutMs) { rule.onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty() }
+        try {
+            rule.waitUntil(timeoutMs) { rule.onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty() }
+        } catch (e: Throwable) {
+            val texts = mutableListOf<String>()
+            fun walk(n: androidx.compose.ui.semantics.SemanticsNode) {
+                n.config.getOrElseNullable(androidx.compose.ui.semantics.SemanticsProperties.Text) { null }?.let { texts += it.joinToString() }
+                n.children.forEach(::walk)
+            }
+            rule.onAllNodes(androidx.compose.ui.test.isRoot()).fetchSemanticsNodes().forEach(::walk)
+            println("SMOKE screen texts: $texts")
+            throw e
+        }
     }
 
     private fun waitForDesc(desc: String, timeoutMs: Long = 10_000) {
@@ -92,5 +104,45 @@ class AppSmokeTest {
         rule.onNodeWithContentDescription("Back").performClick()
         rule.onNodeWithText("Trash").performClick()
         waitForText("Trash is empty")
+        rule.onNodeWithContentDescription("Back").performClick()
+
+        // Track: example trackers, logging a day, and a new tracker from a template
+        rule.onNodeWithText("Track").performClick()
+        waitForText("Java backend")
+        rule.onNodeWithText("Fitness").performClick()
+        waitForText("Workout done")
+        rule.onAllNodes(isToggleable()).onFirst().performClick() // first switch is the main goal, "Workout done"
+        rule.waitUntil(10_000) { rule.onAllNodesWithText("Done").fetchSemanticsNodes().isNotEmpty() }
+        rule.onNodeWithContentDescription("Back").performClick()
+        waitForText("Java backend")
+        rule.onNodeWithText("Java backend").performClick()
+        waitForText("Study plan".uppercase())
+        rule.onNodeWithContentDescription("Back").performClick()
+        rule.onNodeWithText("New tracker", useUnmergedTree = true).performClick()
+        waitForText("Start a tracker")
+        rule.onNodeWithText("Habit").performClick()
+        waitForText("Save")
+        rule.onNodeWithText("Save").performClick()
+        waitForText("Last 5 weeks".uppercase(), timeoutMs = 15_000)
+        rule.onNodeWithContentDescription("Back").performClick()
+
+        // Read: example book and its reading status
+        rule.onNodeWithText("Read").performClick()
+        waitForText("Atomic Habits")
+        rule.onNodeWithText("Atomic Habits").performClick()
+        waitForText("Page 48 of 320")
+        rule.onNodeWithText("Paused", useUnmergedTree = true).performClick()
+        rule.onNodeWithText("Reading", useUnmergedTree = true).performClick()
+        // Dialogs that contain text fields never reach idle under Robolectric at phone densities
+        // (a minimal AlertDialog + OutlinedTextField reproduces it), so the "Log reading" dialog is
+        // checked by hand (docs/TESTING.md) and session logging is covered by MigrationTest.
+        rule.onNodeWithText("Finished", useUnmergedTree = true).performClick()
+        waitForText("Page 320 of 320")
+        rule.onNodeWithContentDescription("Back").performClick()
+
+        // Home's trackers card shows today's trackers and the new streak
+        rule.onNodeWithText("Home").performClick()
+        waitForText("Java backend")
+        waitForText("1 day")
     }
 }

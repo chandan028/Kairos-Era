@@ -64,6 +64,9 @@ fun HomeScreen(
     onOpenTask: (Long, LocalDate) -> Unit,
     onQuickAdd: () -> Unit,
     onCustomize: () -> Unit,
+    onOpenTracker: (Long) -> Unit,
+    onOpenTrack: () -> Unit,
+    onOpenBook: (Long) -> Unit,
 ) {
     val vm = kairosViewModel { HomeViewModel(it) }
     val state by vm.state.collectAsStateWithLifecycle()
@@ -76,7 +79,7 @@ fun HomeScreen(
             UiState.Loading -> LoadingState(Modifier.padding(padding))
             is UiState.Error -> ErrorState(onRetry = vm::retry, modifier = Modifier.padding(padding))
             is UiState.Ready -> Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.TopCenter) {
-                HomeContent(s.data, settings, vm, onOpenToday, onOpenTask, onCustomize)
+                HomeContent(s.data, settings, vm, onOpenToday, onOpenTask, onCustomize, onOpenTracker, onOpenTrack, onOpenBook)
             }
         }
     }
@@ -90,6 +93,9 @@ private fun HomeContent(
     onOpenToday: () -> Unit,
     onOpenTask: (Long, LocalDate) -> Unit,
     onCustomize: () -> Unit,
+    onOpenTracker: (Long) -> Unit,
+    onOpenTrack: () -> Unit,
+    onOpenBook: (Long) -> Unit,
 ) {
     val dateFmt = rememberDateFormatter("EEEE\nd MMMM yyyy")
     val cards = settings.homeCards.filterNot { it in settings.hiddenCards }
@@ -116,12 +122,12 @@ private fun HomeContent(
         }
         for (card in cards) {
             when (card) {
-                HomeCard.PROGRESS -> item(key = "progress") { ProgressCard(data, onOpenToday) }
+                HomeCard.PROGRESS -> item(key = "progress") { ProgressCard(data, onOpenToday, onOpenTrack, onOpenBook) }
                 HomeCard.NEXT_UP -> item(key = "next") { NextUpCard(data, vm, onOpenTask, onOpenToday) }
                 HomeCard.QUOTE -> item(key = "quote") {
                     QuoteCard(data, favorite = data.quote.dayOfYear in settings.favoriteQuotes, onFavorite = { vm.toggleFavorite(data.quote.dayOfYear) })
                 }
-                HomeCard.TRACKERS -> item(key = "trackers") { TrackersTeaserCard() }
+                HomeCard.TRACKERS -> item(key = "trackers") { TrackersCard(data, onOpenTracker, onOpenTrack) }
             }
         }
         item {
@@ -150,7 +156,7 @@ private fun greeting(part: DayPart, name: String): String {
 }
 
 @Composable
-private fun ProgressCard(data: HomeData, onOpenToday: () -> Unit) {
+private fun ProgressCard(data: HomeData, onOpenToday: () -> Unit, onOpenTrack: () -> Unit, onOpenBook: (Long) -> Unit) {
     val description = stringResource(R.string.home_progress_a11y, data.progress.done, data.progress.total)
     KCard(Modifier.clickable(onClick = onOpenToday).semantics(mergeDescendants = true) { contentDescription = description }) {
         SectionLabel(stringResource(R.string.home_today_progress))
@@ -184,6 +190,38 @@ private fun ProgressCard(data: HomeData, onOpenToday: () -> Unit) {
                 )
             }
         }
+        val due = data.trackersDue
+        if (due.isNotEmpty()) {
+            Spacer(Modifier.height(12.dp))
+            ProgressLine(
+                stringResource(R.string.home_trackers_line, due.count { it.today.done }, due.size),
+                due.sumOf { it.today.fraction } / due.size,
+                onClick = onOpenTrack,
+            )
+        }
+        data.currentBook?.let { book ->
+            Spacer(Modifier.height(8.dp))
+            ProgressLine(
+                stringResource(R.string.home_reading_line, data.pagesToday, book.title),
+                book.progress,
+                onClick = { onOpenBook(book.id) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProgressLine(text: String, fraction: Double, onClick: () -> Unit) {
+    Column(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 4.dp)) {
+        Text(text, style = MaterialTheme.typography.bodyMedium, maxLines = 1)
+        Spacer(Modifier.height(4.dp))
+        androidx.compose.material3.LinearProgressIndicator(
+            progress = { fraction.toFloat().coerceIn(0f, 1f) },
+            modifier = Modifier.fillMaxWidth().height(4.dp),
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            strokeCap = StrokeCap.Round,
+            drawStopIndicator = {},
+        )
     }
 }
 
@@ -246,11 +284,39 @@ private fun QuoteCard(data: HomeData, favorite: Boolean, onFavorite: () -> Unit)
 }
 
 @Composable
-private fun TrackersTeaserCard() {
+private fun TrackersCard(data: HomeData, onOpenTracker: (Long) -> Unit, onOpenTrack: () -> Unit) {
     KCard {
-        SectionLabel(stringResource(R.string.home_trackers))
-        Spacer(Modifier.height(8.dp))
-        Text(stringResource(R.string.home_trackers_soon), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            SectionLabel(stringResource(R.string.home_trackers), Modifier.weight(1f))
+            androidx.compose.material3.TextButton(onClick = onOpenTrack) { Text(stringResource(R.string.see_all)) }
+        }
+        val due = data.trackersDue
+        if (due.isEmpty()) {
+            Text(
+                stringResource(if (data.trackers.isEmpty()) R.string.home_trackers_empty else R.string.home_trackers_rest),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.clickable(onClick = onOpenTrack).padding(vertical = 8.dp),
+            )
+        }
+        due.take(5).forEach { t ->
+            Row(
+                Modifier.fillMaxWidth().clickable { onOpenTracker(t.tracker.id) }.padding(vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                com.kairosera.feature.track.TrackerBadge(t.tracker.icon, t.tracker.colorArgb, 32)
+                Spacer(Modifier.width(12.dp))
+                Text(t.tracker.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f), maxLines = 1)
+                Text(
+                    if (t.today.done) "✓" else "${(t.today.fraction * 100).toInt()}%",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (t.today.done) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                if (t.stats.currentStreak > 0) {
+                    Spacer(Modifier.width(10.dp))
+                    Text(com.kairosera.feature.track.streakText(t.stats.currentStreak, t.stats.unit), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.secondary)
+                }
+            }
+        }
     }
 }
-

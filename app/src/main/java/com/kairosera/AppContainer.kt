@@ -6,8 +6,11 @@ import com.kairosera.core.diagnostics.SafeLog
 import com.kairosera.core.notifications.NotificationScheduler
 import com.kairosera.core.settings.SettingsRepository
 import com.kairosera.data.quotes.QuoteRepository
+import com.kairosera.data.repository.RoomBookRepository
 import com.kairosera.data.repository.RoomNotificationRepository
+import com.kairosera.data.repository.RoomStudyRepository
 import com.kairosera.data.repository.RoomTaskRepository
+import com.kairosera.data.repository.RoomTrackerRepository
 import com.kairosera.data.sample.SampleData
 import com.kairosera.domain.usecase.MoveTaskToTrash
 import com.kairosera.domain.usecase.ObserveDayPlan
@@ -34,6 +37,9 @@ class AppContainer(context: Context) {
 
     val database: KairosDatabase by lazy { KairosDatabase.build(appContext) }
     val tasks: RoomTaskRepository by lazy { RoomTaskRepository(database) }
+    val trackers: RoomTrackerRepository by lazy { RoomTrackerRepository(database) }
+    val study: RoomStudyRepository by lazy { RoomStudyRepository(database) }
+    val books: RoomBookRepository by lazy { RoomBookRepository(database) }
     val settings = SettingsRepository(appContext)
     val quotes = QuoteRepository(appContext)
 
@@ -64,5 +70,16 @@ class AppContainer(context: Context) {
     suspend fun addSampleContent() {
         runCatching { SampleData.insertExamples(appContext, tasks, LocalDate.now(), clock) }
             .onFailure { SafeLog.error("samples_failed", it) }
+        runCatching { SampleData.insertTrackerExamples(appContext, trackers, study, books, LocalDate.now(), clock) }
+            .onFailure { SafeLog.error("tracker_samples_failed", it) }
+    }
+
+    /** Moves every example (tasks, trackers, books) to Trash, where it can still be restored. */
+    suspend fun trashSampleContent() {
+        val now = java.time.Instant.now(clock)
+        tasks.trashSampleData(now)
+        trackers.trashSamples(now)
+        books.trashSamples(now)
+        scheduler.rebuild("samples_removed")
     }
 }

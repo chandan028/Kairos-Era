@@ -20,11 +20,13 @@ If Maven Central rate-limits your network, set `robolectricRepoUrl=<mirror>` in 
 | Reminder planning: idempotent ids, no duplicates, missed-reminder grace, DST gap, clock and time-zone changes, deleted task/reminder cancels, snoozed/showing rows kept | `ReminderPlannerTest` |
 | Occurrence expansion and ordering, day progress | `OccurrenceExpanderTest` |
 | Quote rotation (Sep 23 = #266, leap days), validator | `QuoteSelectorTest` |
-| First run, onboarding, Home, Today (day/week/month), create task, inline validation, Settings, Trash | `AppSmokeTest` (Robolectric) |
+| Tracker scoring (checkbox, targets, checklists, text never counts, disabled fields), streaks for daily / selected days / weekly targets, "missed yesterday", study progress by leaf topics, targets never mark a topic done, topic cycles, reading bookmark bounds and pages-per-day | `TrackerLogicTest` |
+| Database v1 → v2 upgrade keeps tasks, reminders and occurrence state; Room validates the migrated schema; tracker entries replace a day atomically; removed fields keep history; Trash restore and delete-only-from-Trash; study target → topic practice; reading sessions move and restore the bookmark | `MigrationTest` (Robolectric) |
+| First run, onboarding, Home, Today (day/week/month), create task, inline validation, Settings, Trash, Track (example trackers, logging a day, new tracker from a template, study plan), Read (example book, status changes), Home trackers card and streak | `AppSmokeTest` (Robolectric) |
 
 ## Planned with later phases
 
-Database migration tests (from the first schema change), backup export/import/corruption, trash restore, trackers, study and book progress, widget updates, app lock, and on-device instrumentation tests for notification permission denial, exact alarm unavailable and reboot recovery.
+Backup export/import/corruption, widget updates, app lock, and on-device instrumentation tests for notification permission denial, exact alarm unavailable and reboot recovery.
 
 ## Release checklist
 
@@ -37,4 +39,6 @@ Database migration tests (from the first schema change), backup export/import/co
 - [ ] No secrets: `git grep -iE "api[_-]?key|secret|password|BEGIN (RSA|EC) PRIVATE"` is empty
 - [ ] Release build minified, installs and runs; signed with a key kept outside the repo
 - [ ] Airplane-mode pass over every screen
+- [ ] By hand: dialogs with text fields (Log reading, Add note, Add topic, Add target, Edit field). Robolectric can't drive text fields inside dialog windows at phone densities, so these are not in `AppSmokeTest`
+- [ ] Upgrade install over the previous release keeps every task, tracker and book
 - [ ] Reminders survive reboot, time change and time-zone change on a real device

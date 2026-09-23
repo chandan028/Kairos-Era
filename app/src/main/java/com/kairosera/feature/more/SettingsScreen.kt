@@ -195,7 +195,7 @@ fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit) {
             confirmButton = {
                 TextButton(onClick = {
                     confirmRemoveSamples = false
-                    scope.launch { runCatching { c.tasks.trashSampleData(java.time.Instant.now()); c.scheduler.rebuild("samples_removed") } }
+                    scope.launch { runCatching { c.trashSampleContent() } }
                 }) { Text(stringResource(R.string.remove_examples)) }
             },
             dismissButton = { TextButton(onClick = { confirmRemoveSamples = false }) { Text(stringResource(R.string.cancel)) } },
