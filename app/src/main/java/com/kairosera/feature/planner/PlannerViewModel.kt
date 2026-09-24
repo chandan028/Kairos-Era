@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kairosera.AppContainer
 import com.kairosera.core.ui.components.UiState
+import com.kairosera.domain.model.Category
 import com.kairosera.domain.model.TaskOccurrence
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,7 +16,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -31,6 +31,7 @@ data class PlannerData(
     val from: LocalDate,
     val to: LocalDate,
     val byDate: Map<LocalDate, List<TaskOccurrence>>,
+    val categories: Map<Long, Category> = emptyMap(),
 )
 
 sealed interface PlannerEvent {
@@ -51,8 +52,8 @@ class PlannerViewModel(private val c: AppContainer, initialDate: LocalDate?) : V
     val state: StateFlow<UiState<PlannerData>> = combine(selected, mode, retry) { d, m, _ -> d to m }
         .flatMapLatest { (date, m) ->
             val (from, to) = rangeFor(date, m)
-            c.observeDayPlan(from, to).map<Map<LocalDate, List<TaskOccurrence>>, UiState<PlannerData>> {
-                UiState.Ready(PlannerData(date, m, from, to, it))
+            combine(c.observeDayPlan(from, to), c.tasks.observeCategories()) { plan, cats ->
+                UiState.Ready(PlannerData(date, m, from, to, plan, cats.associateBy { it.id })) as UiState<PlannerData>
             }.catch { emit(UiState.Error()) }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState.Loading)
@@ -63,8 +64,7 @@ class PlannerViewModel(private val c: AppContainer, initialDate: LocalDate?) : V
 
     fun shift(steps: Long) {
         selected.value = when (mode.value) {
-            PlannerMode.DAY -> selected.value.plusDays(steps)
-            PlannerMode.WEEK -> selected.value.plusWeeks(steps)
+            PlannerMode.DAY, PlannerMode.WEEK -> selected.value.plusWeeks(steps)
             PlannerMode.MONTH -> selected.value.plusMonths(steps)
         }
     }
@@ -86,8 +86,8 @@ class PlannerViewModel(private val c: AppContainer, initialDate: LocalDate?) : V
 
     companion object {
         fun rangeFor(date: LocalDate, mode: PlannerMode): Pair<LocalDate, LocalDate> = when (mode) {
-            PlannerMode.DAY -> date to date
-            PlannerMode.WEEK -> date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).let { it to it.plusDays(6) }
+            // Day view loads its whole week so the day strip can show how full each day is.
+            PlannerMode.DAY, PlannerMode.WEEK -> date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).let { it to it.plusDays(6) }
             PlannerMode.MONTH -> YearMonth.from(date).let { it.atDay(1) to it.atEndOfMonth() }
         }
     }

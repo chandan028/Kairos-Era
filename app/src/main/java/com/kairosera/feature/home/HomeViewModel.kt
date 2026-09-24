@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kairosera.AppContainer
 import com.kairosera.core.ui.components.UiState
+import com.kairosera.domain.model.Category
 import com.kairosera.domain.model.TaskOccurrence
 import com.kairosera.domain.reading.Book
 import com.kairosera.domain.reading.BookStatus
@@ -40,11 +41,19 @@ data class HomeData(
     val trackers: List<TrackerSummary> = emptyList(),
     val pagesToday: Int = 0,
     val currentBook: Book? = null,
+    val categories: Map<Long, Category> = emptyMap(),
 ) {
     val trackersDue: List<TrackerSummary> get() = trackers.filter { it.dueToday }
+
+    /** One honest number for the day: planned tasks plus trackers due today, done over total. */
+    val overall: Float get() {
+        val due = trackersDue
+        val total = progress.total + due.size
+        return if (total == 0) 0f else (progress.done + due.sumOf { it.today.fraction }.toFloat()) / total
+    }
 }
 
-private data class Extras(val trackers: List<TrackerSummary>, val pagesToday: Int, val currentBook: Book?)
+private data class Extras(val trackers: List<TrackerSummary>, val pagesToday: Int, val currentBook: Book?, val categories: Map<Long, Category>)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel(private val c: AppContainer) : ViewModel() {
@@ -67,7 +76,9 @@ class HomeViewModel(private val c: AppContainer) : ViewModel() {
             val readingFlow = combine(c.books.observeBooks(), c.books.observeSessionsBetween(date, date)) { books, sessions ->
                 sessions.sumOf { it.pages } to books.firstOrNull { it.status == BookStatus.READING }
             }
-            val extras = combine(trackerFlow, readingFlow) { t, r -> Extras(t, r.first, r.second) }
+            val extras = combine(trackerFlow, readingFlow, c.tasks.observeCategories()) { t, r, cats ->
+                Extras(t, r.first, r.second, cats.associateBy { it.id })
+            }
             combine(c.observeDayPlan(date), now, quoteFlow, extras) { plan, time, quote, ex ->
                 val today = plan[date].orEmpty()
                 UiState.Ready(
@@ -81,6 +92,7 @@ class HomeViewModel(private val c: AppContainer) : ViewModel() {
                         trackers = ex.trackers,
                         pagesToday = ex.pagesToday,
                         currentBook = ex.currentBook,
+                        categories = ex.categories,
                     ),
                 ) as UiState<HomeData>
             }
@@ -90,7 +102,11 @@ class HomeViewModel(private val c: AppContainer) : ViewModel() {
     fun retry() { retry.value++ }
 
     fun setDone(occurrence: TaskOccurrence, done: Boolean) {
-        viewModelScope.launch { runCatching { c.setOccurrenceDone(occurrence.task.id, occurrence.date, done) } }
+        viewModelScope.launch {
+            // A short pause lets the completion tick play before the row leaves "next up".
+            if (done) delay(COMPLETE_DELAY_MS)
+            runCatching { c.setOccurrenceDone(occurrence.task.id, occurrence.date, done) }
+        }
     }
 
     fun toggleFavorite(day: Int) {
@@ -100,6 +116,7 @@ class HomeViewModel(private val c: AppContainer) : ViewModel() {
     private companion object {
         const val TICK_MS = 60_000L
         const val STOP_MS = 5_000L
+        const val COMPLETE_DELAY_MS = 550L
     }
 }
 

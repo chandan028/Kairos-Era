@@ -19,7 +19,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
 
-data class ReadingTotals(val pagesToday: Int, val pagesWeek: Int, val minutesWeek: Int, val finishedThisYear: Int, val readingDaysWeek: Int)
+data class ReadingTotals(val pagesToday: Int, val minutesToday: Int = 0, val pagesWeek: Int, val minutesWeek: Int, val finishedThisYear: Int, val readingDaysWeek: Int)
 
 data class ReadData(val today: LocalDate, val books: List<Book>, val totals: ReadingTotals) {
     fun byStatus(status: BookStatus) = books.filter { it.status == status }
@@ -31,6 +31,7 @@ object ReadingTotalsCalculator {
         val week = sessions.filter { it.date in weekStart..today }
         return ReadingTotals(
             pagesToday = sessions.filter { it.date == today }.sumOf { it.pages },
+            minutesToday = sessions.filter { it.date == today }.sumOf { it.minutes },
             pagesWeek = week.sumOf { it.pages },
             minutesWeek = week.sumOf { it.minutes },
             finishedThisYear = books.count { it.status == BookStatus.FINISHED && it.finishedDate?.year == today.year },

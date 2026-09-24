@@ -34,7 +34,7 @@ Local storage (Room database, DataStore preferences, bundled assets)
 - `data/quotes` – loads the 365 bundled quotes.
 - `data/sample` – default categories and optional example content (tasks, a fitness and a study tracker, a book).
 - `data/tracker` – tracker templates (study, fitness, reading, habit, project, money, learning, health, personal, custom).
-- `feature/*` – one package per screen group (home, planner, tasks, track, read, more, onboarding).
+- `feature/*` – one package per screen group (home, planner, tasks, track, read, more, onboarding, widgets).
 - `AppContainer` – manual dependency wiring; small enough that a DI framework isn't worth the dependency.
 
 Features never read another feature's tables directly: they go through repositories and use cases.
@@ -50,6 +50,9 @@ Features never read another feature's tables directly: they go through repositor
 - **Books are more than pages.** `books` holds progress plus the READ → UNDERSTAND → REMEMBER → APPLY insight fields; `reading_sessions` and `book_notes` hang off it. A session moves the bookmark in the same transaction and never past the last page.
 - **Soft delete everywhere.** Deleting moves an item to Trash. Permanent deletion needs an explicit confirmation.
 - **Adaptive layout.** `NavigationSuiteScaffold` shows a bottom bar on phones and a navigation rail on tablets, foldables and landscape. Content is capped at a readable width and centred. The app draws edge to edge and respects system bar and cutout insets.
+- **Design tokens in three layers.** `Palette` holds raw colors; the semantic layer (the Material 3 color scheme plus `KairosColors`: brand, sun, card, line, track, muted and five tones — success green, info blue, motivation amber, learning purple, activity coral — each with a strong and a soft shade) is what components read through `Kairos.colors`. Components never use raw hex, so light and dark themes change in one place. Type uses few sizes: a Lora serif for heroes and headings, the system sans for everything else. Spacing (`Space`) and corner radii are fixed scales.
+- **Feedback is a Kairos toast.** One `Toaster` (`LocalToaster`) above the navigation shows a navy capsule with a semantic icon (success, info, undo, error), an optional action such as Undo, and auto-dismiss. It is built on Material 3's `SnackbarHost`, so it is announced by screen readers and respects system timing.
+- **Widgets are plain RemoteViews.** Four `AppWidgetProvider`s share one `WidgetSnapshot` read from the repositories. While the app process is alive and a widget is placed, `Widgets.startSync` follows the database so widgets change as soon as data does; otherwise they refresh every 30 minutes and on date, time-zone and language changes. Ticking a task in the widget goes through a non-exported receiver and the same `SetOccurrenceDone` use case as the app. No new permissions, no widget library.
 - **Languages.** English and Kannada. The in-app switch uses AppCompat per-app locales, so it works on Android 8+ and appears in Android 13+'s per-app language settings. All UI text lives in `tools/strings_source.py`, which generates both `strings.xml` files and fails the build script if a key or placeholder is missing in either language.
 
 ## Dependencies

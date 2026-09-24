@@ -17,7 +17,7 @@ import java.io.IOException
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
 /** Cards on Home, in the user's order. */
-enum class HomeCard { PROGRESS, NEXT_UP, QUOTE, TRACKERS }
+enum class HomeCard { QUOTE, PROGRESS, NEXT_UP, TRACKERS }
 
 data class AppSettings(
     val onboardingDone: Boolean = false,

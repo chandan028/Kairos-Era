@@ -23,12 +23,12 @@ class LocaleAndLayoutTest {
     @Test(timeout = 120_000)
     @Config(sdk = [34], qualifiers = "kn-w411dp-h891dp-xxhdpi")
     fun onboardingIsInKannada() {
-        waitForAny("ನಿಮ್ಮ ಸಮಯ ನಿಮ್ಮದು.", "ಇಂದಿನ ಪ್ರಗತಿ")
+        waitForAny("ನಿಮ್ಮ ಸಮಯ ನಿಮ್ಮದು.", "ಮುಗಿದ ಕಾರ್ಯಗಳು")
     }
 
     @Test(timeout = 120_000)
     @Config(sdk = [34], qualifiers = "w1280dp-h800dp-land-mdpi")
     fun tabletLandscapeRenders() {
-        waitForAny("Your time is yours.", "Open today's plan")
+        waitForAny("Your time is yours.", "Tasks done")
     }
 }

@@ -125,6 +125,20 @@ class TaskEditorViewModel(private val c: AppContainer, private val taskId: Long?
 
     fun dismissFailure() { _status.value = EditorStatus.Editing }
 
+    /** Creates a category from the editor's "+" chip and selects it. */
+    fun addCategory(name: String) {
+        val clean = name.trim().take(40)
+        if (clean.isEmpty()) return
+        viewModelScope.launch {
+            val existing = categories.value
+            existing.firstOrNull { it.name.equals(clean, ignoreCase = true) }?.let { found -> edit { it.copy(categoryId = found.id) }; return@launch }
+            val id = runCatching {
+                c.tasks.saveCategory(Category(name = clean, colorArgb = 0xFF3A67AE, icon = "tag", position = (existing.maxOfOrNull { it.position } ?: -1) + 1))
+            }.getOrNull() ?: return@launch
+            edit { it.copy(categoryId = id) }
+        }
+    }
+
     private fun TaskForm.toTask(): Task {
         val rule = when (repeat) {
             RepeatChoice.NONE -> null

@@ -4,7 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kairosera.AppContainer
 import com.kairosera.core.ui.components.UiState
+import com.kairosera.domain.reading.Book
+import com.kairosera.domain.reading.BookStatus
 import com.kairosera.domain.tracker.FieldValue
+import com.kairosera.domain.tracker.StudyProgress
+import com.kairosera.domain.tracker.StudySummary
 import com.kairosera.domain.tracker.MeasurementType
 import com.kairosera.domain.tracker.TrackerEntry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,7 +23,15 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 
-data class TrackData(val today: LocalDate, val trackers: List<TrackerSummary>)
+data class TrackData(
+    val today: LocalDate,
+    val trackers: List<TrackerSummary>,
+    /** Topic progress per study tracker. */
+    val study: Map<Long, StudySummary> = emptyMap(),
+    /** Today's study targets per tracker: done to total. */
+    val targetsToday: Map<Long, Pair<Int, Int>> = emptyMap(),
+    val currentBook: Book? = null,
+)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TrackViewModel(private val c: AppContainer) : ViewModel() {
@@ -27,8 +39,22 @@ class TrackViewModel(private val c: AppContainer) : ViewModel() {
 
     val state: StateFlow<UiState<TrackData>> = retry.flatMapLatest {
         val today = LocalDate.now()
-        combine(c.trackers.observeActive(), c.trackers.observeEntries(today.minusDays(TrackerSummaries.HISTORY_DAYS), today)) { list, entries ->
-            UiState.Ready(TrackData(today, list.map { TrackerSummaries.summarize(it, entries, today) })) as UiState<TrackData>
+        combine(
+            c.trackers.observeActive(),
+            c.trackers.observeEntries(today.minusDays(TrackerSummaries.HISTORY_DAYS), today),
+            c.study.observeAllTopics(),
+            c.study.observeTargetsBetween(today, today),
+            c.books.observeBooks(),
+        ) { list, entries, topics, targets, books ->
+            UiState.Ready(
+                TrackData(
+                    today = today,
+                    trackers = list.map { TrackerSummaries.summarize(it, entries, today) },
+                    study = topics.groupBy { it.trackerId }.mapValues { StudyProgress.summarize(it.value) },
+                    targetsToday = targets.groupBy { it.trackerId }.mapValues { (_, t) -> t.count { it.done } to t.size },
+                    currentBook = books.firstOrNull { it.status == BookStatus.READING },
+                ),
+            ) as UiState<TrackData>
         }.catch { emit(UiState.Error()) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState.Loading)
 

@@ -22,11 +22,22 @@ If Maven Central rate-limits your network, set `robolectricRepoUrl=<mirror>` in 
 | Quote rotation (Sep 23 = #266, leap days), validator | `QuoteSelectorTest` |
 | Tracker scoring (checkbox, targets, checklists, text never counts, disabled fields), streaks for daily / selected days / weekly targets, "missed yesterday", study progress by leaf topics, targets never mark a topic done, topic cycles, reading bookmark bounds and pages-per-day | `TrackerLogicTest` |
 | Database v1 → v2 upgrade keeps tasks, reminders and occurrence state; Room validates the migrated schema; tracker entries replace a day atomically; removed fields keep history; Trash restore and delete-only-from-Trash; study target → topic practice; reading sessions move and restore the bookmark | `MigrationTest` (Robolectric) |
-| First run, onboarding, Home, Today (day/week/month), create task, inline validation, Settings, Trash, Track (example trackers, logging a day, new tracker from a template, study plan), Read (example book, status changes), Home trackers card and streak | `AppSmokeTest` (Robolectric) |
+| First run, onboarding, Home, Today (timeline and calendar), create task, inline validation, Settings, Trash, Track (example trackers, logging a day, new tracker from a template, study cockpit), Read (current book, status changes), Home trackers | `AppSmokeTest` (Robolectric) |
+| Kannada first screen, tablet landscape | `LocaleAndLayoutTest` (Robolectric) |
+
+## Design review screenshots
+
+`ScreenshotTour` walks every main screen with the example data and renders the four widgets, saving PNGs. It is skipped unless a folder is given:
+
+```
+./gradlew :app:testDebugUnitTest --tests '*ScreenshotTour*' -Pscreens=/some/dir
+```
+
+It captures the main window only, so bottom sheets (Quick add, template picker, Reschedule) are checked by hand.
 
 ## Planned with later phases
 
-Backup export/import/corruption, widget updates, app lock, and on-device instrumentation tests for notification permission denial, exact alarm unavailable and reboot recovery.
+Backup export/import/corruption, app lock, and on-device instrumentation tests for notification permission denial, exact alarm unavailable and reboot recovery.
 
 ## Release checklist
 
@@ -41,4 +52,5 @@ Backup export/import/corruption, widget updates, app lock, and on-device instrum
 - [ ] Airplane-mode pass over every screen
 - [ ] By hand: dialogs with text fields (Log reading, Add note, Add topic, Add target, Edit field). Robolectric can't drive text fields inside dialog windows at phone densities, so these are not in `AppSmokeTest`
 - [ ] Upgrade install over the previous release keeps every task, tracker and book
+- [ ] By hand, on a phone: swipe a Today card right to complete and left for Reschedule / Delete (Undo toast), long-press menu, the completion tick, the splash once per cold start, and each widget (add, tick a task, resize, dark mode, Kannada)
 - [ ] Reminders survive reboot, time change and time-zone change on a real device

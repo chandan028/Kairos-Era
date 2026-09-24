@@ -17,8 +17,8 @@ android {
         applicationId = "com.kairosera"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 3
+        versionName = "0.3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -56,6 +56,8 @@ android {
         unitTests.all { test ->
             // Optional mirror for Robolectric's Android jars, e.g. on networks where Maven Central rate-limits.
             providers.gradleProperty("robolectricRepoUrl").orNull?.let { test.systemProperty("robolectric.dependency.repo.url", it) }
+            // `-Pscreens=<dir>` renders design screenshots (ScreenshotTour) into that folder; skipped otherwise.
+            providers.gradleProperty("screens").orNull?.let { test.systemProperty("kairos.screens", it) }
         }
     }
 

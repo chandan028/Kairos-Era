@@ -60,6 +60,60 @@
             </intent-filter>
         </receiver>
 
+        <!-- Home-screen widgets. Not exported: the launcher binds them through the system, and no other app can call them. -->
+        <receiver
+            android:name=".feature.widgets.MotivationWidget"
+            android:exported="false"
+            android:label="@string/widget_motivation_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_motivation_info" />
+        </receiver>
+
+        <receiver
+            android:name=".feature.widgets.TasksWidget"
+            android:exported="false"
+            android:label="@string/widget_tasks_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_tasks_info" />
+        </receiver>
+
+        <receiver
+            android:name=".feature.widgets.ProgressWidget"
+            android:exported="false"
+            android:label="@string/widget_progress_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_progress_info" />
+        </receiver>
+
+        <receiver
+            android:name=".feature.widgets.QuickAddWidget"
+            android:exported="false"
+            android:label="@string/widget_quick_add_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_quick_add_info" />
+        </receiver>
+
+        <!-- Checkbox taps from the Today's Tasks widget; only our own PendingIntents reach it. -->
+        <receiver
+            android:name=".feature.widgets.WidgetActionReceiver"
+            android:exported="false" />
+
         <!-- Persists the per-app language choice on Android 12 and below (AppCompat). -->
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"

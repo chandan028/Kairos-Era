@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widget_card">#17223A</color>
+    <color name="widget_line">#2E3F66</color>
+    <color name="widget_ink">#EDE6D8</color>
+    <color name="widget_muted">#AEB3BF</color>
+    <color name="widget_button">#E8B04B</color>
+    <color name="widget_on_button">#0F1829</color>
+    <color name="widget_soft">#1B2843</color>
+    <color name="widget_green">#9FD0AE</color>
+    <color name="widget_purple">#C2B7EC</color>
+    <color name="widget_amber">#F0C572</color>
+    <color name="widget_coral">#F0AC9A</color>
+</resources>

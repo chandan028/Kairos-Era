@@ -1,9 +1,29 @@
 package com.kairosera.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationRailItemDefaults
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.alpha
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.outlined.Add
+import com.kairosera.core.ui.components.KCard
+import com.kairosera.core.ui.components.ToneIcon
+import com.kairosera.core.ui.theme.Tone
+import com.kairosera.core.ui.components.KairosToastHost
+import com.kairosera.core.ui.components.LocalToaster
+import com.kairosera.core.ui.components.rememberToaster
+import com.kairosera.core.ui.theme.Kairos
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -21,7 +41,6 @@ import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.School
 import androidx.compose.material.icons.outlined.Today
 import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -50,6 +69,7 @@ import androidx.navigation.navArgument
 import com.kairosera.R
 import com.kairosera.core.settings.AppSettings
 import com.kairosera.feature.home.HomeScreen
+import com.kairosera.feature.home.QuoteScreen
 import com.kairosera.feature.more.AboutScreen
 import com.kairosera.feature.more.HomeCardsScreen
 import com.kairosera.feature.more.MoreScreen
@@ -74,6 +94,9 @@ sealed interface LaunchRequest {
     data class OpenDay(val date: LocalDate) : LaunchRequest
     data class Reschedule(val taskId: Long, val date: LocalDate) : LaunchRequest
     data object QuickAdd : LaunchRequest
+    data object NewTask : LaunchRequest
+    data object OpenTrack : LaunchRequest
+    data object OpenQuote : LaunchRequest
 }
 
 private enum class TopLevel(val route: String, val label: Int, val icon: ImageVector, val selectedIcon: ImageVector) {
@@ -100,6 +123,7 @@ object Routes {
     const val TRACKER_EDIT = "tracker_edit"
     const val BOOK = "book"
     const val BOOK_EDIT = "book_edit"
+    const val QUOTE = "quote"
 
     fun today(date: LocalDate?) = if (date == null) TODAY else "$TODAY?date=${date.toEpochDay()}"
     fun task(id: Long? = null, date: LocalDate? = null) = "$TASK?id=${id ?: -1}&date=${date?.toEpochDay() ?: Long.MIN_VALUE}"
@@ -125,6 +149,9 @@ fun KairosRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchReq
             is LaunchRequest.OpenDay -> nav.navigateTopLevel(Routes.today(r.date))
             is LaunchRequest.Reschedule -> { nav.navigateTopLevel(Routes.today(r.date)); reschedule = r }
             LaunchRequest.QuickAdd -> quickAdd = true
+            LaunchRequest.NewTask -> nav.navigate(Routes.task(date = LocalDate.now()))
+            LaunchRequest.OpenTrack -> nav.navigateTopLevel(Routes.TRACK)
+            LaunchRequest.OpenQuote -> nav.navigate(Routes.QUOTE)
             null -> Unit
         }
         if (launchRequest != null) onLaunchRequestHandled()
@@ -140,34 +167,63 @@ fun KairosRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchReq
         else -> r
     }
 
-    NavigationSuiteScaffold(
-        navigationSuiteItems = {
-            TopLevel.entries.forEach { dest ->
-                val selected = currentRoute == dest.route
-                item(
-                    selected = selected,
-                    onClick = {
-                        when {
-                            rawRoute == dest.route -> Unit
-                            // Re-tapping the current tab from a detail screen goes back to the tab's root.
-                            selected -> if (!nav.popBackStack(dest.route, inclusive = false)) nav.navigateTopLevel(dest.route)
-                            else -> nav.navigateTopLevel(dest.route)
-                        }
-                    },
-                    icon = { Icon(if (selected) dest.selectedIcon else dest.icon, contentDescription = null) },
-                    label = { Text(stringResource(dest.label)) },
-                )
+    val toaster = rememberToaster()
+    val navColors = NavigationSuiteDefaults.itemColors(
+        navigationBarItemColors = NavigationBarItemDefaults.colors(
+            indicatorColor = Kairos.colors.brand,
+            selectedIconColor = Kairos.colors.onBrand,
+            selectedTextColor = MaterialTheme.colorScheme.onSurface,
+            unselectedIconColor = Kairos.colors.muted,
+            unselectedTextColor = Kairos.colors.muted,
+        ),
+        navigationRailItemColors = NavigationRailItemDefaults.colors(
+            indicatorColor = Kairos.colors.brand,
+            selectedIconColor = Kairos.colors.onBrand,
+            selectedTextColor = MaterialTheme.colorScheme.onSurface,
+            unselectedIconColor = Kairos.colors.muted,
+            unselectedTextColor = Kairos.colors.muted,
+        ),
+    )
+    // Full-screen moments (the daily thought) and focused editors hide the navigation.
+    val immersive = rawRoute?.substringBefore('/') in setOf(Routes.QUOTE, Routes.TASK, Routes.TRACKER_EDIT, Routes.BOOK_EDIT)
+    CompositionLocalProvider(LocalToaster provides toaster) {
+        NavigationSuiteScaffold(
+            layoutType = if (immersive) NavigationSuiteType.None else NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfo()),
+            navigationSuiteColors = NavigationSuiteDefaults.colors(
+                navigationBarContainerColor = Kairos.colors.card,
+                navigationRailContainerColor = MaterialTheme.colorScheme.background,
+            ),
+            navigationSuiteItems = {
+                TopLevel.entries.forEach { dest ->
+                    val selected = currentRoute == dest.route
+                    item(
+                        selected = selected,
+                        onClick = {
+                            when {
+                                rawRoute == dest.route -> Unit
+                                // Re-tapping the current tab from a detail screen goes back to the tab's root.
+                                selected -> if (!nav.popBackStack(dest.route, inclusive = false)) nav.navigateTopLevel(dest.route)
+                                else -> nav.navigateTopLevel(dest.route)
+                            }
+                        },
+                        icon = { Icon(if (selected) dest.selectedIcon else dest.icon, contentDescription = null) },
+                        label = { Text(stringResource(dest.label)) },
+                        colors = navColors,
+                    )
+                }
+            },
+        ) {
+            Box(Modifier.fillMaxSize()) {
+                KairosNavHost(nav, settings, onQuickAdd = { quickAdd = true })
+                KairosToastHost(toaster, Modifier.align(Alignment.BottomCenter))
             }
-        },
-    ) {
-        KairosNavHost(nav, settings, onQuickAdd = { quickAdd = true })
-    }
-
+        }
     reschedule?.let { r -> RescheduleDialog(taskId = r.taskId, date = r.date, onDismiss = { reschedule = null }) }
     if (quickAdd) {
         QuickAddSheet(
             onDismiss = { quickAdd = false },
             onTask = { quickAdd = false; nav.navigate(Routes.task(date = LocalDate.now())) },
+            onLog = { quickAdd = false; nav.navigateTopLevel(Routes.TRACK) },
             onTracker = { quickAdd = false; pickTemplate = true },
             onBook = { quickAdd = false; nav.navigate(Routes.bookEdit()) },
             onStudy = { quickAdd = false; nav.navigate(Routes.trackerEdit(template = TrackerTemplate.STUDY)) },
@@ -175,6 +231,7 @@ fun KairosRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchReq
     }
     if (pickTemplate) {
         TemplatePickerSheet(onDismiss = { pickTemplate = false }, onPick = { pickTemplate = false; nav.navigate(Routes.trackerEdit(template = it)) })
+    }
     }
 }
 
@@ -191,8 +248,10 @@ private fun KairosNavHost(nav: NavHostController, settings: AppSettings, onQuick
                 onOpenTracker = { nav.navigate(Routes.tracker(it)) },
                 onOpenTrack = { nav.navigateTopLevel(Routes.TRACK) },
                 onOpenBook = { nav.navigate(Routes.book(it)) },
+                onOpenQuote = { nav.navigate(Routes.QUOTE) },
             )
         }
+        composable(Routes.QUOTE) { QuoteScreen(settings = settings, onClose = { nav.popBackStack() }) }
         composable(
             "${Routes.TODAY}?date={date}",
             arguments = listOf(navArgument("date") { type = NavType.LongType; defaultValue = Long.MIN_VALUE }),
@@ -208,6 +267,7 @@ private fun KairosNavHost(nav: NavHostController, settings: AppSettings, onQuick
             TrackScreen(
                 onOpenTracker = { nav.navigate(Routes.tracker(it)) },
                 onNewTracker = { nav.navigate(Routes.trackerEdit(template = it)) },
+                onOpenBook = { nav.navigate(Routes.book(it)) },
             )
         }
         composable(Routes.READ) {
@@ -291,25 +351,36 @@ private fun NavHostController.navigateTopLevel(route: String) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun QuickAddSheet(onDismiss: () -> Unit, onTask: () -> Unit, onTracker: () -> Unit, onBook: () -> Unit, onStudy: () -> Unit) {
-    ModalBottomSheet(onDismissRequest = onDismiss) {
-        Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 24.dp).navigationBarsPadding()) {
-            Text(stringResource(R.string.quick_add_title), style = MaterialTheme.typography.titleLarge)
-            Text(
-                stringResource(R.string.quick_add_soon_note),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 4.dp, bottom = 16.dp),
+private fun QuickAddSheet(onDismiss: () -> Unit, onTask: () -> Unit, onLog: () -> Unit, onTracker: () -> Unit, onBook: () -> Unit, onStudy: () -> Unit) {
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.background) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 24.dp).navigationBarsPadding()) {
+            Text(stringResource(R.string.quick_add_title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(horizontal = 4.dp))
+            Spacer(Modifier.height(16.dp))
+            val c = Kairos.colors
+            val tiles = listOf(
+                QuickTile(R.string.quick_add_task, R.string.quick_add_task_hint, Icons.Outlined.CheckCircle, c.info, onTask),
+                QuickTile(R.string.quick_add_log, R.string.quick_add_log_hint, Icons.Outlined.Insights, c.success, onLog),
+                QuickTile(R.string.quick_add_study, R.string.quick_add_study_hint, Icons.Outlined.School, c.learning, onStudy),
+                QuickTile(R.string.quick_add_book, R.string.quick_add_book_hint, Icons.Outlined.AutoStories, c.motivation, onBook),
+                QuickTile(R.string.quick_add_tracker, R.string.quick_add_tracker_hint, Icons.Outlined.Add, c.activity, onTracker),
+                QuickTile(R.string.quick_add_journal, R.string.quick_add_soon_note, Icons.Outlined.EditNote, c.learning, null),
             )
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                AssistChip(onClick = onTask, label = { Text(stringResource(R.string.quick_add_task)) }, leadingIcon = { Icon(Icons.Outlined.CheckCircle, null) })
-                AssistChip(onClick = onTracker, label = { Text(stringResource(R.string.quick_add_tracker)) }, leadingIcon = { Icon(Icons.Outlined.Insights, null) })
-                AssistChip(onClick = onBook, label = { Text(stringResource(R.string.quick_add_book)) }, leadingIcon = { Icon(Icons.Outlined.AutoStories, null) })
-                AssistChip(onClick = {}, enabled = false, label = { Text(stringResource(R.string.quick_add_journal)) }, leadingIcon = { Icon(Icons.Outlined.EditNote, null) })
-                AssistChip(onClick = onStudy, label = { Text(stringResource(R.string.quick_add_study)) }, leadingIcon = { Icon(Icons.Outlined.School, null) })
+            tiles.chunked(2).forEach { row ->
+                Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    row.forEach { t ->
+                        KCard(Modifier.weight(1f).alpha(if (t.onClick == null) 0.55f else 1f), onClick = t.onClick, padding = 16.dp) {
+                            ToneIcon(t.icon, t.tone, size = 40.dp)
+                            Spacer(Modifier.height(12.dp))
+                            Text(stringResource(t.label), style = MaterialTheme.typography.titleSmall)
+                            Text(stringResource(t.hint), style = MaterialTheme.typography.bodySmall, color = c.muted, maxLines = 2)
+                        }
+                    }
+                }
             }
         }
     }
 }
+
+private data class QuickTile(val label: Int, val hint: Int, val icon: ImageVector, val tone: Tone, val onClick: (() -> Unit)?)

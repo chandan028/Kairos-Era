@@ -12,7 +12,8 @@ Built in phases (see the product spec).
 
 - **Phase 1:** project setup, architecture, theme, database, adaptive navigation, Home dashboard, Today planner (day / week / month), tasks with subtasks, tags, categories, priorities, repeat rules and multiple reminders, a notification engine that survives reboot, time and time-zone changes, Trash, Settings, onboarding, 365 original daily quotes, English and Kannada.
 - **Phase 2:** one tracker engine for anything (10 templates including study and fitness, 9 field types, flexible frequency, streaks and a 5-week history), study plans with a topic tree and daily targets, and a Read tab with books, reading sessions, notes and highlights, and "what I learned / applied" insights. Home shows today's trackers and reading. Trash covers tasks, trackers and books. Database v2 with a tested upgrade from v1.
-- **Next:** journal, statistics and calendar; widgets, backup/restore and app lock; diagnostics and hardening.
+- **Redesign (0.3):** a calm "personal operating system" look: deep navy and warm cream with soft semantic colors, a Lora serif for headings, a sunrise splash, and rebuilt Home, Today (week strip, timeline, swipe to complete / reschedule / delete), Add Task, Track, Study, fitness quick log and Read screens. A full-screen daily quote, a Kairos toast for feedback with Undo, and four home-screen widgets: Motivation, Today's Tasks (tick tasks off from the home screen), Progress and Quick Add.
+- **Next:** journal, statistics and calendar; backup/restore and app lock; diagnostics and hardening.
 
 ## Building
 

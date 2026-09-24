@@ -10,6 +10,8 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onLast
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -24,7 +26,7 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * End-to-end smoke test on the JVM: first run, onboarding with examples, Home, Today,
- * creating a task, and the More/Settings/Trash screens. Catches crashes on real screens.
+ * creating a task, More/Settings/Trash, Track and Read. Catches crashes on real screens.
  */
 @RunWith(AndroidJUnit4::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -56,6 +58,11 @@ class AppSmokeTest {
         rule.waitUntil(timeoutMs) { rule.onAllNodesWithContentDescription(desc).fetchSemanticsNodes().isNotEmpty() }
     }
 
+    private fun scrollTo(matcher: androidx.compose.ui.test.SemanticsMatcher) {
+        rule.waitUntil(10_000) { rule.onAllNodes(hasScrollToNodeAction()).fetchSemanticsNodes().isNotEmpty() }
+        rule.onAllNodes(hasScrollToNodeAction()).onFirst().performScrollToNode(matcher)
+    }
+
     @Test(timeout = 240_000)
     fun firstRunThroughCoreScreens() {
         waitForText("Your time is yours.")
@@ -66,33 +73,34 @@ class AppSmokeTest {
         rule.onNodeWithText("Not now").performClick()
 
         // Home
-        waitForText("Today's progress".uppercase())
         waitForText("Chan")
-        rule.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("Open today's plan"))
-        rule.onNodeWithText("Open today's plan").assertIsDisplayed()
+        scrollTo(hasText("Quick add"))
+        rule.onNodeWithText("Quick add").assertIsDisplayed()
 
         // Today, with the example content and the first task
         rule.onAllNodesWithText("Today").onFirst().performClick()
         waitForText("Plan the week")
         waitForText("Workout")
 
-        // Week and month views render
-        rule.onNodeWithText("Week").performClick()
+        // Calendar view renders, then back to the timeline
+        rule.onNodeWithContentDescription("Show calendar").performClick()
+        waitForDesc("Show timeline")
+        rule.onNodeWithContentDescription("Show timeline").performClick()
         waitForText("Workout")
-        rule.onNodeWithText("Month").performClick()
-        rule.onNodeWithText("Day").performClick()
 
         // Create a task
+        scrollTo(hasContentDescription("New task"))
         rule.onNodeWithContentDescription("New task").performClick()
-        waitForText("New task")
-        rule.onNode(hasSetTextAction() and hasText("Title")).performTextInput("Smoke test task")
-        rule.onNodeWithText("Save").performClick()
-        waitForDesc("New task")
+        waitForText("What needs to be done?")
+        rule.onAllNodes(hasSetTextAction()).onFirst().performTextInput("Smoke test task")
+        rule.onNodeWithText("Create").performScrollTo().performClick()
+        rule.waitUntil(10_000) { rule.onAllNodesWithText("What needs to be done?").fetchSemanticsNodes().isEmpty() }
         waitForText("Smoke test task")
 
         // Validation: empty title is rejected inline
+        scrollTo(hasContentDescription("New task"))
         rule.onNodeWithContentDescription("New task").performClick()
-        waitForText("Save")
+        waitForText("What needs to be done?")
         rule.onNodeWithText("Save").performClick()
         waitForText("Give the task a title.")
         rule.onNodeWithContentDescription("Close").performClick()
@@ -111,15 +119,18 @@ class AppSmokeTest {
         waitForText("Java backend")
         rule.onNodeWithText("Fitness").performClick()
         waitForText("Workout done")
-        rule.onAllNodes(isToggleable()).onFirst().performClick() // first switch is the main goal, "Workout done"
-        rule.waitUntil(10_000) { rule.onAllNodesWithText("Done").fetchSemanticsNodes().isNotEmpty() }
+        rule.onAllNodes(isToggleable()).onFirst().performClick() // the main goal, "Workout done"
+        scrollTo(hasText("Save"))
+        rule.onNodeWithText("Save").performClick()
+        waitForText("Logged. Nice work.")
         rule.onNodeWithContentDescription("Back").performClick()
         waitForText("Java backend")
         rule.onNodeWithText("Java backend").performClick()
-        waitForText("Study plan".uppercase())
+        waitForText("OVERALL")
         rule.onNodeWithContentDescription("Back").performClick()
-        rule.onNodeWithText("New tracker", useUnmergedTree = true).performClick()
-        waitForText("Start a tracker")
+        waitForDesc("New tracker")
+        rule.onNodeWithContentDescription("New tracker").performClick()
+        waitForText("Start from blank")
         rule.onNodeWithText("Habit").performClick()
         waitForText("Save")
         rule.onNodeWithText("Save").performClick()
@@ -128,21 +139,19 @@ class AppSmokeTest {
 
         // Read: example book and its reading status
         rule.onNodeWithText("Read").performClick()
-        waitForText("Atomic Habits")
-        rule.onNodeWithText("Atomic Habits").performClick()
+        waitForText("Continue reading")
+        rule.onNodeWithText("Continue reading").performClick()
         waitForText("Page 48 of 320")
-        rule.onNodeWithText("Paused", useUnmergedTree = true).performClick()
-        rule.onNodeWithText("Reading", useUnmergedTree = true).performClick()
-        // Dialogs that contain text fields never reach idle under Robolectric at phone densities
-        // (a minimal AlertDialog + OutlinedTextField reproduces it), so the "Log reading" dialog is
-        // checked by hand (docs/TESTING.md) and session logging is covered by MigrationTest.
-        rule.onNodeWithText("Finished", useUnmergedTree = true).performClick()
+        rule.onAllNodesWithText("Paused", useUnmergedTree = true).onLast().performClick()
+        rule.onAllNodesWithText("Reading", useUnmergedTree = true).onLast().performClick()
+        // Reading sessions are logged from a sheet of counters (no text fields, which never reach
+        // idle under Robolectric); session logging itself is covered by MigrationTest.
+        rule.onAllNodesWithText("Finished", useUnmergedTree = true).onLast().performClick()
         waitForText("Page 320 of 320")
         rule.onNodeWithContentDescription("Back").performClick()
 
-        // Home's trackers card shows today's trackers and the new streak
+        // Home follows today's trackers
         rule.onNodeWithText("Home").performClick()
         waitForText("Java backend")
-        waitForText("1 day")
     }
 }

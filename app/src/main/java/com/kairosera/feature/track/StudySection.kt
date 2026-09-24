@@ -1,5 +1,15 @@
 package com.kairosera.feature.track
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.draw.clip
+import com.kairosera.core.ui.components.GhostAddButton
+import com.kairosera.core.ui.components.KProgressBar
+import com.kairosera.core.ui.components.TaskCheck
+import com.kairosera.core.ui.theme.Kairos
+import com.kairosera.core.ui.theme.Space
+import com.kairosera.core.ui.theme.Tone
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -62,7 +72,7 @@ fun topicStatusLabel(s: TopicStatus): String = stringResource(
 )
 
 @Composable
-fun StudySection(vm: TrackerDetailViewModel, date: LocalDate) {
+fun StudySection(vm: TrackerDetailViewModel, date: LocalDate, tone: Tone, gain: String) {
     val topics by vm.topics.collectAsStateWithLifecycle()
     val targets by vm.targets.collectAsStateWithLifecycle()
     var editing by remember { mutableStateOf<StudyTopic?>(null) }
@@ -71,75 +81,87 @@ fun StudySection(vm: TrackerDetailViewModel, date: LocalDate) {
     val tree = StudyProgress.flatten(topics)
     val names = topics.associate { it.id to it.title }
 
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        KCard {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                SectionLabel(stringResource(R.string.study_plan_for_day), Modifier.weight(1f))
-                Text("${targets.count { it.done }}/${targets.size}", style = MaterialTheme.typography.labelLarge)
-            }
-            Text(stringResource(R.string.study_plan_note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            targets.forEach { target ->
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().clickable { vm.setTargetDone(target.id, !target.done) }) {
-                    Checkbox(checked = target.done, onCheckedChange = { vm.setTargetDone(target.id, it) })
-                    Column(Modifier.weight(1f)) {
-                        Text(target.title, style = MaterialTheme.typography.bodyLarge, textDecoration = if (target.done) TextDecoration.LineThrough else null)
-                        target.topicId?.let { names[it] }?.let {
-                            Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                    }
-                    IconButton(onClick = { vm.deleteTarget(target.id) }) { Icon(Icons.Outlined.Close, stringResource(R.string.remove_target)) }
+    Column(verticalArrangement = Arrangement.spacedBy(Space.l)) {
+        // OVERALL
+        Column(verticalArrangement = Arrangement.spacedBy(Space.s)) {
+            SectionLabel(stringResource(R.string.study_overall))
+            KCard {
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Text("${(summary.fraction * 100).toInt()}%", style = MaterialTheme.typography.displaySmall, color = tone.strong)
+                    Spacer(Modifier.width(12.dp))
+                    Text(
+                        stringResource(R.string.study_completed_of, summary.done, summary.leafTopics),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Kairos.colors.muted,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                    )
                 }
-            }
-            TextButton(onClick = { addingTarget = true }) {
-                Icon(Icons.Outlined.Add, null)
-                Text(stringResource(R.string.add_study_target))
+                Spacer(Modifier.height(12.dp))
+                KProgressBar(summary.fraction.toFloat(), color = tone.strong)
             }
         }
-        KCard {
+        // TODAY
+        Column(verticalArrangement = Arrangement.spacedBy(Space.s)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                SectionLabel(stringResource(R.string.study_topics), Modifier.weight(1f))
-                Text(stringResource(R.string.study_topics_done, summary.done, summary.leafTopics), style = MaterialTheme.typography.labelLarge)
+                SectionLabel(stringResource(R.string.study_plan_for_day), Modifier.weight(1f))
+                Text("${targets.count { it.done }}/${targets.size}", style = MaterialTheme.typography.labelLarge, color = tone.strong)
             }
-            Spacer(Modifier.height(8.dp))
-            LinearProgressIndicator(
-                progress = { summary.fraction.toFloat() },
-                modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)),
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                drawStopIndicator = {},
-            )
-            if (topics.isEmpty()) {
-                Text(stringResource(R.string.study_topics_empty), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 12.dp))
-            }
-            tree.forEach { (topic, depth) ->
-                Row(
-                    Modifier.fillMaxWidth().clickable { editing = topic }.padding(start = (depth * 20).dp, top = 10.dp, bottom = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        when (topic.status) {
-                            TopicStatus.DONE -> "✓"
-                            TopicStatus.REVIEWING -> "↻"
-                            TopicStatus.LEARNING -> "◐"
-                            TopicStatus.NOT_STARTED -> "○"
-                        },
-                        modifier = Modifier.padding(end = 10.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                    Column(Modifier.weight(1f)) {
-                        Text(topic.title, style = if (depth == 0) MaterialTheme.typography.titleSmall else MaterialTheme.typography.bodyLarge)
-                        val bits = buildList {
-                            add(topicStatusLabel(topic.status))
-                            if (topic.confidence > 0) add("★".repeat(topic.confidence))
-                            if (topic.practiceDone > 0) add(stringResource(R.string.topic_practice_count, topic.practiceDone))
+            KCard(padding = 4.dp) {
+                if (targets.isEmpty()) {
+                    Text(stringResource(R.string.study_plan_note), style = MaterialTheme.typography.bodyMedium, color = Kairos.colors.muted, modifier = Modifier.padding(16.dp))
+                }
+                targets.forEach { target ->
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().clip(MaterialTheme.shapes.medium).clickable { vm.setTargetDone(target.id, !target.done) }) {
+                        TaskCheck(checked = target.done, onCheckedChange = { vm.setTargetDone(target.id, it) }, label = target.title)
+                        Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
+                            Text(
+                                target.title,
+                                style = MaterialTheme.typography.bodyLarge,
+                                textDecoration = if (target.done) TextDecoration.LineThrough else null,
+                                color = if (target.done) Kairos.colors.muted else MaterialTheme.colorScheme.onSurface,
+                            )
+                            target.topicId?.let { names[it] }?.let {
+                                Text(it, style = MaterialTheme.typography.bodySmall, color = Kairos.colors.muted)
+                            }
                         }
-                        Text(bits.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        IconButton(onClick = { vm.deleteTarget(target.id) }) { Icon(Icons.Outlined.Close, stringResource(R.string.remove_target), tint = Kairos.colors.muted) }
+                    }
+                }
+                TextButton(onClick = { addingTarget = true }, modifier = Modifier.padding(start = 4.dp)) {
+                    Icon(Icons.Outlined.Add, null)
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.add_study_target))
+                }
+            }
+        }
+        if (gain.isNotBlank()) GainCard(gain, tone)
+        // TOPICS
+        Column(verticalArrangement = Arrangement.spacedBy(Space.s)) {
+            SectionLabel(stringResource(R.string.study_topics))
+            KCard(padding = 8.dp) {
+                if (topics.isEmpty()) {
+                    Text(stringResource(R.string.study_topics_empty), style = MaterialTheme.typography.bodyMedium, color = Kairos.colors.muted, modifier = Modifier.padding(12.dp))
+                }
+                tree.forEach { (topic, depth) ->
+                    Row(
+                        Modifier.fillMaxWidth().clip(MaterialTheme.shapes.medium).clickable { editing = topic }.padding(start = (8 + depth * 20).dp, end = 8.dp, top = 10.dp, bottom = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        TopicStatusDot(topic.status, tone)
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(topic.title, style = if (depth == 0) MaterialTheme.typography.titleSmall else MaterialTheme.typography.bodyLarge)
+                            val bits = buildList {
+                                add(topicStatusLabel(topic.status))
+                                if (topic.confidence > 0) add("★".repeat(topic.confidence))
+                                if (topic.practiceDone > 0) add(stringResource(R.string.topic_practice_count, topic.practiceDone))
+                            }
+                            Text(bits.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = Kairos.colors.muted)
+                        }
                     }
                 }
             }
-            TextButton(onClick = { editing = StudyTopic(trackerId = vm.trackerId, title = "") }) {
-                Icon(Icons.Outlined.Add, null)
-                Text(stringResource(R.string.add_topic))
-            }
+            GhostAddButton(stringResource(R.string.add_topic), onClick = { editing = StudyTopic(trackerId = vm.trackerId, title = "") }, icon = Icons.Outlined.Add)
         }
     }
 
@@ -264,4 +286,25 @@ private fun TargetDialog(topics: List<StudyTopic>, onDismiss: () -> Unit, onAdd:
         confirmButton = { TextButton(onClick = { onAdd(title, topicId) }, enabled = title.isNotBlank()) { Text(stringResource(R.string.add)) } },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
+}
+
+/** Filled = done, half = learning, ring with dot = reviewing, empty ring = not started. Label is always shown beside it. */
+@Composable
+private fun TopicStatusDot(status: TopicStatus, tone: Tone) {
+    val ring = Kairos.colors.line
+    androidx.compose.foundation.Canvas(Modifier.size(20.dp)) {
+        val r = size.minDimension / 2f
+        when (status) {
+            TopicStatus.DONE -> drawCircle(tone.strong, r)
+            TopicStatus.LEARNING -> {
+                drawCircle(ring, r - 1.dp.toPx(), style = androidx.compose.ui.graphics.drawscope.Stroke(2.dp.toPx()))
+                drawArc(tone.strong, -90f, 180f, useCenter = true)
+            }
+            TopicStatus.REVIEWING -> {
+                drawCircle(tone.strong, r - 1.dp.toPx(), style = androidx.compose.ui.graphics.drawscope.Stroke(2.dp.toPx()))
+                drawCircle(tone.strong, r * 0.35f)
+            }
+            TopicStatus.NOT_STARTED -> drawCircle(ring, r - 1.dp.toPx(), style = androidx.compose.ui.graphics.drawscope.Stroke(2.dp.toPx()))
+        }
+    }
 }

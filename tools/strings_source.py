@@ -406,3 +406,107 @@ PLURALS_KN = {
 "streak_weeks": {"one": "%1$d ವಾರ", "other": "%1$d ವಾರಗಳು"},
 "streak_months": {"one": "%1$d ತಿಂಗಳು", "other": "%1$d ತಿಂಗಳುಗಳು"},
 }
+
+# ---- Calm redesign (Home, Today, Add Task, Track, Study, Reading, Widgets) ----
+EN.update({
+"home_quick_add": "Quick add", "home_thought": "Today's thought", "home_stat_tasks": "Tasks done", "home_stat_progress": "Day progress",
+"home_see_day": "See day", "home_keep_going": "Keep going",
+"task_done_toast": "Done. One step closer.", "task_mark_done_a11y": "Mark \"%1$s\" as done", "done": "Done",
+"quote_todays_action": "Today's action", "quote_save": "Save", "quote_saved": "Saved", "quote_share": "Share",
+"quick_add_log": "Log progress",
+"quick_add_task_hint": "Something to do today or later", "quick_add_log_hint": "Update a tracker for today",
+"quick_add_study_hint": "A subject with topics to master", "quick_add_book_hint": "Start tracking a book",
+"quick_add_tracker_hint": "Habit, fitness or anything else",
+"quick_add_soon_note": "Coming soon",
+})
+KN.update({
+"home_quick_add": "ತ್ವರಿತ ಸೇರ್ಪಡೆ", "home_thought": "ಇಂದಿನ ಚಿಂತನೆ", "home_stat_tasks": "ಮುಗಿದ ಕಾರ್ಯಗಳು", "home_stat_progress": "ದಿನದ ಪ್ರಗತಿ",
+"home_see_day": "ದಿನ ನೋಡಿ", "home_keep_going": "ಮುಂದುವರಿಸಿ",
+"task_done_toast": "ಮುಗಿಯಿತು. ಇನ್ನೊಂದು ಹೆಜ್ಜೆ ಮುಂದೆ.", "task_mark_done_a11y": "\"%1$s\" ಮುಗಿದಿದೆ ಎಂದು ಗುರುತಿಸಿ", "done": "ಮುಗಿದಿದೆ",
+"quote_todays_action": "ಇಂದಿನ ಕ್ರಿಯೆ", "quote_save": "ಉಳಿಸಿ", "quote_saved": "ಉಳಿಸಲಾಗಿದೆ", "quote_share": "ಹಂಚಿಕೊಳ್ಳಿ",
+"quick_add_log": "ಪ್ರಗತಿ ದಾಖಲಿಸಿ",
+"quick_add_task_hint": "ಇಂದು ಅಥವಾ ನಂತರ ಮಾಡಬೇಕಾದದ್ದು", "quick_add_log_hint": "ಇಂದಿನ ಟ್ರ್ಯಾಕರ್ ನವೀಕರಿಸಿ",
+"quick_add_study_hint": "ಕಲಿಯಬೇಕಾದ ವಿಷಯಗಳ ಅಧ್ಯಯನ", "quick_add_book_hint": "ಪುಸ್ತಕವನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಲು ಪ್ರಾರಂಭಿಸಿ",
+"quick_add_tracker_hint": "ಅಭ್ಯಾಸ, ಫಿಟ್‌ನೆಸ್ ಅಥವಾ ಬೇರೆ ಯಾವುದಾದರೂ",
+"quick_add_soon_note": "ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ",
+})
+EN.update({
+"planner_calendar": "Calendar", "planner_show_timeline": "Show timeline", "planner_show_calendar": "Show calendar",
+"planner_summary": "%1$d tasks · %2$d completed", "planner_mark_open": "Mark as not done", "planner_delete": "Delete",
+"planner_until": "until %1$s", "planner_month_summary": "%1$d of %2$d tasks done this month",
+"reschedule_moved": "Moved to %1$s", "reschedule_later_today": "Later today", "reschedule_next_week": "Next week", "reschedule_pick": "Pick a date…",
+})
+KN.update({
+"planner_calendar": "ಕ್ಯಾಲೆಂಡರ್", "planner_show_timeline": "ಸಮಯರೇಖೆ ತೋರಿಸಿ", "planner_show_calendar": "ಕ್ಯಾಲೆಂಡರ್ ತೋರಿಸಿ",
+"planner_summary": "%1$d ಕಾರ್ಯಗಳು · %2$d ಮುಗಿದಿವೆ", "planner_mark_open": "ಮುಗಿದಿಲ್ಲ ಎಂದು ಗುರುತಿಸಿ", "planner_delete": "ಅಳಿಸಿ",
+"planner_until": "%1$s ವರೆಗೆ", "planner_month_summary": "ಈ ತಿಂಗಳು %2$d ರಲ್ಲಿ %1$d ಕಾರ್ಯಗಳು ಮುಗಿದಿವೆ",
+"reschedule_moved": "%1$s ಗೆ ಸರಿಸಲಾಗಿದೆ", "reschedule_later_today": "ಇಂದು ನಂತರ", "reschedule_next_week": "ಮುಂದಿನ ವಾರ", "reschedule_pick": "ದಿನಾಂಕ ಆರಿಸಿ…",
+})
+EN.update({
+"task_what": "What needs to be done?", "task_pick_day": "Pick a day", "task_time": "Time", "task_set_time": "Set a time",
+"section_reminder": "Reminder", "reminder_none": "None", "repeat_never": "Never",
+"task_new_category": "New", "task_new_category_title": "New category", "task_new_category_hint": "e.g. Family",
+"priority_normal": "Normal", "task_more_details": "More details", "task_create": "Create", "task_save_changes": "Save changes",
+})
+KN.update({
+"task_what": "ಏನು ಮಾಡಬೇಕಿದೆ?", "task_pick_day": "ದಿನ ಆರಿಸಿ", "task_time": "ಸಮಯ", "task_set_time": "ಸಮಯ ಹೊಂದಿಸಿ",
+"section_reminder": "ಜ್ಞಾಪನೆ", "reminder_none": "ಇಲ್ಲ", "repeat_never": "ಎಂದಿಗೂ ಇಲ್ಲ",
+"task_new_category": "ಹೊಸದು", "task_new_category_title": "ಹೊಸ ವರ್ಗ", "task_new_category_hint": "ಉದಾ. ಕುಟುಂಬ",
+"priority_normal": "ಸಾಮಾನ್ಯ", "task_more_details": "ಹೆಚ್ಚಿನ ವಿವರಗಳು", "task_create": "ರಚಿಸಿ", "task_save_changes": "ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಿ",
+})
+EN.update({
+"tracker_logged": "Logged. Nice work.", "tracker_todays_log": "Today's log", "tracker_daily_log": "Daily log",
+"tracker_your_why": "Your why", "tracker_gaining": "What you're gaining",
+"field_target_short": "Goal %1$s", "decrease_value": "Decrease %1$s", "increase_value": "Increase %1$s", "circle_value_a11y": "%1$s: %2$d",
+"study_overall": "Overall", "study_completed_of": "%1$d completed / %2$d",
+})
+KN.update({
+"tracker_logged": "ದಾಖಲಾಯಿತು. ಚೆನ್ನಾಗಿದೆ.", "tracker_todays_log": "ಇಂದಿನ ದಾಖಲೆ", "tracker_daily_log": "ದೈನಂದಿನ ದಾಖಲೆ",
+"tracker_your_why": "ನಿಮ್ಮ ಕಾರಣ", "tracker_gaining": "ನೀವು ಪಡೆಯುತ್ತಿರುವುದು",
+"field_target_short": "ಗುರಿ %1$s", "decrease_value": "%1$s ಕಡಿಮೆ ಮಾಡಿ", "increase_value": "%1$s ಹೆಚ್ಚಿಸಿ", "circle_value_a11y": "%1$s: %2$d",
+"study_overall": "ಒಟ್ಟಾರೆ", "study_completed_of": "%1$d ಮುಗಿದಿದೆ / %2$d",
+})
+EN.update({
+"track_subtitle": "Your progress", "track_active": "Active", "track_create_own": "Create your own tracker",
+"track_topics_line": "%1$d/%2$d topics", "track_today_line": "Today %1$d/%2$d", "template_start_blank": "Start from blank",
+})
+KN.update({
+"track_subtitle": "ನಿಮ್ಮ ಪ್ರಗತಿ", "track_active": "ಸಕ್ರಿಯ", "track_create_own": "ನಿಮ್ಮದೇ ಟ್ರ್ಯಾಕರ್ ರಚಿಸಿ",
+"track_topics_line": "%1$d/%2$d ವಿಷಯಗಳು", "track_today_line": "ಇಂದು %1$d/%2$d", "template_start_blank": "ಖಾಲಿಯಿಂದ ಪ್ರಾರಂಭಿಸಿ",
+})
+EN.update({
+"read_subtitle": "Your personal library", "read_currently": "Currently reading", "read_pages": "Pages today", "read_minutes": "Minutes today",
+"read_week_line": "%1$d pages this week · %2$d reading days · %3$d finished this year",
+"read_why_started": "Why I started", "read_gaining": "What I'm gaining", "read_my_library": "My library (%1$d)", "read_continue": "Continue reading",
+"reading_logged": "Reading logged. Keep turning pages.", "book_reflection": "Reflection", "book_reflection_empty": "Not written yet.",
+"book_add_reflection": "Add reflection", "book_edit_reflection": "Edit reflection", "read_to_end": "To the end (%1$d)",
+})
+KN.update({
+"read_subtitle": "ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಗ್ರಂಥಾಲಯ", "read_currently": "ಈಗ ಓದುತ್ತಿರುವುದು", "read_pages": "ಇಂದಿನ ಪುಟಗಳು", "read_minutes": "ಇಂದಿನ ನಿಮಿಷಗಳು",
+"read_week_line": "ಈ ವಾರ %1$d ಪುಟಗಳು · %2$d ಓದಿನ ದಿನಗಳು · ಈ ವರ್ಷ %3$d ಮುಗಿದಿವೆ",
+"read_why_started": "ನಾನು ಏಕೆ ಪ್ರಾರಂಭಿಸಿದೆ", "read_gaining": "ನಾನು ಪಡೆಯುತ್ತಿರುವುದು", "read_my_library": "ನನ್ನ ಗ್ರಂಥಾಲಯ (%1$d)", "read_continue": "ಓದು ಮುಂದುವರಿಸಿ",
+"reading_logged": "ಓದು ದಾಖಲಾಯಿತು. ಪುಟಗಳನ್ನು ತಿರುಗಿಸುತ್ತಿರಿ.", "book_reflection": "ಚಿಂತನೆ", "book_reflection_empty": "ಇನ್ನೂ ಬರೆದಿಲ್ಲ.",
+"book_add_reflection": "ಚಿಂತನೆ ಸೇರಿಸಿ", "book_edit_reflection": "ಚಿಂತನೆ ಸಂಪಾದಿಸಿ", "read_to_end": "ಕೊನೆಯವರೆಗೆ (%1$d)",
+})
+EN.update({
+"widget_motivation_label": "Motivation", "widget_motivation_desc": "Today's thought and one small action.",
+"widget_tasks_label": "Today's tasks", "widget_tasks_desc": "Check off today's tasks from your home screen.",
+"widget_progress_label": "Progress", "widget_progress_desc": "Tasks, study, reading and fitness at a glance.",
+"widget_quick_add_label": "Quick add", "widget_quick_add_desc": "Add a task or log progress in one tap.",
+"widget_add": "Add", "widget_done_count": "%1$d/%2$d done", "widget_empty": "Nothing planned. Enjoy the space.",
+"widget_more_tasks": "+%1$d more", "widget_progress_title": "Today's progress", "widget_tasks": "Tasks",
+"widget_study": "Study", "widget_reading": "Reading", "widget_fitness": "Fitness", "widget_keep_going": "Keep going.",
+"widget_task": "Task", "widget_log": "Log", "widget_more": "More", "widget_brand": "KAIROS ERA",
+"widget_mark_done": "Mark %1$s done", "widget_mark_open": "Mark %1$s not done", "widget_all_day": "Any time",
+})
+KN.update({
+"widget_motivation_label": "ಪ್ರೇರಣೆ", "widget_motivation_desc": "ಇಂದಿನ ಚಿಂತನೆ ಮತ್ತು ಒಂದು ಸಣ್ಣ ಕ್ರಿಯೆ.",
+"widget_tasks_label": "ಇಂದಿನ ಕಾರ್ಯಗಳು", "widget_tasks_desc": "ಹೋಮ್ ಸ್ಕ್ರೀನ್‌ನಿಂದಲೇ ಇಂದಿನ ಕಾರ್ಯಗಳನ್ನು ಗುರುತಿಸಿ.",
+"widget_progress_label": "ಪ್ರಗತಿ", "widget_progress_desc": "ಕಾರ್ಯಗಳು, ಅಧ್ಯಯನ, ಓದು ಮತ್ತು ಫಿಟ್‌ನೆಸ್ ಒಂದೇ ನೋಟದಲ್ಲಿ.",
+"widget_quick_add_label": "ತ್ವರಿತ ಸೇರ್ಪಡೆ", "widget_quick_add_desc": "ಒಂದೇ ಟ್ಯಾಪ್‌ನಲ್ಲಿ ಕಾರ್ಯ ಸೇರಿಸಿ ಅಥವಾ ಪ್ರಗತಿ ದಾಖಲಿಸಿ.",
+"widget_add": "ಸೇರಿಸಿ", "widget_done_count": "%1$d/%2$d ಮುಗಿದಿದೆ", "widget_empty": "ಏನೂ ಯೋಜಿಸಿಲ್ಲ. ಈ ಬಿಡುವನ್ನು ಆನಂದಿಸಿ.",
+"widget_more_tasks": "+%1$d ಇನ್ನಷ್ಟು", "widget_progress_title": "ಇಂದಿನ ಪ್ರಗತಿ", "widget_tasks": "ಕಾರ್ಯಗಳು",
+"widget_study": "ಅಧ್ಯಯನ", "widget_reading": "ಓದು", "widget_fitness": "ಫಿಟ್‌ನೆಸ್", "widget_keep_going": "ಮುಂದುವರಿಸಿ.",
+"widget_task": "ಕಾರ್ಯ", "widget_log": "ದಾಖಲಿಸಿ", "widget_more": "ಇನ್ನಷ್ಟು", "widget_brand": "ಕೈರೋಸ್ ಎರಾ",
+"widget_mark_done": "%1$s ಮುಗಿದಿದೆ ಎಂದು ಗುರುತಿಸಿ", "widget_mark_open": "%1$s ಮುಗಿದಿಲ್ಲ ಎಂದು ಗುರುತಿಸಿ", "widget_all_day": "ಯಾವಾಗಲಾದರೂ",
+})

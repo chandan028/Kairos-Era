@@ -5,7 +5,14 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
+import com.kairosera.ui.SplashOverlay
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -32,16 +39,22 @@ class MainActivity : AppCompatActivity() {
 
         val container = (application as KairosApp).container
         val settingsFlow = container.settings.settings.map<AppSettings, AppSettings?> { it }
+        // The brand moment plays once per cold start, never when opened from a reminder or widget action.
+        val playSplash = savedInstanceState == null && launchRequest == null
         setContent {
             val settings by settingsFlow.collectAsStateWithLifecycle(initialValue = null)
             val current = settings
+            var splash by rememberSaveable { mutableStateOf(playSplash) }
             KairosTheme(themeMode = current?.themeMode ?: com.kairosera.core.settings.ThemeMode.SYSTEM, dynamicColor = current?.dynamicColor ?: false) {
-                if (current != null) {
-                    KairosRoot(
-                        settings = current,
-                        launchRequest = launchRequest,
-                        onLaunchRequestHandled = { launchRequest = null },
-                    )
+                Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                    if (current != null) {
+                        KairosRoot(
+                            settings = current,
+                            launchRequest = launchRequest,
+                            onLaunchRequestHandled = { launchRequest = null },
+                        )
+                    }
+                    if (splash) SplashOverlay(onFinished = { splash = false })
                 }
             }
         }
@@ -62,6 +75,9 @@ class MainActivity : AppCompatActivity() {
             ACTION_OPEN_DAY -> LaunchRequest.OpenDay(date ?: LocalDate.now())
             ACTION_RESCHEDULE -> if (taskId != null && date != null) LaunchRequest.Reschedule(taskId, date) else null
             ACTION_QUICK_ADD -> LaunchRequest.QuickAdd
+            ACTION_NEW_TASK -> LaunchRequest.NewTask
+            ACTION_OPEN_TRACK -> LaunchRequest.OpenTrack
+            ACTION_OPEN_QUOTE -> LaunchRequest.OpenQuote
             else -> null
         }
     }
@@ -70,6 +86,9 @@ class MainActivity : AppCompatActivity() {
         const val ACTION_OPEN_DAY = "com.kairosera.action.OPEN_DAY"
         const val ACTION_RESCHEDULE = "com.kairosera.action.RESCHEDULE"
         const val ACTION_QUICK_ADD = "com.kairosera.action.QUICK_ADD"
+        const val ACTION_NEW_TASK = "com.kairosera.action.NEW_TASK"
+        const val ACTION_OPEN_TRACK = "com.kairosera.action.OPEN_TRACK"
+        const val ACTION_OPEN_QUOTE = "com.kairosera.action.OPEN_QUOTE"
         const val EXTRA_DATE = "date"
         const val EXTRA_TASK_ID = "taskId"
         const val EXTRA_NOTIFICATION_ID = "notificationId"

@@ -2,6 +2,7 @@ package com.kairosera
 
 import android.app.Application
 import com.kairosera.core.notifications.NotificationChannels
+import com.kairosera.feature.widgets.Widgets
 import kotlinx.coroutines.launch
 
 class KairosApp : Application() {
@@ -16,6 +17,8 @@ class KairosApp : Application() {
             container.seedDefaults()
             // Startup consistency check: recreate any missing alarm or notification from the database.
             container.scheduler.rebuild("startup")
+            // Keeps placed widgets in step with the app; does nothing when no widget is placed.
+            Widgets.startSync(this@KairosApp, container)
         }
     }
 }

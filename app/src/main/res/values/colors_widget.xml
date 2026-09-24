@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget colors. The launcher resolves these with its own day/night setting. Mirrors the Compose semantic tokens. -->
+<resources>
+    <color name="widget_card">#FDFAF4</color>
+    <color name="widget_line">#EDE5D5</color>
+    <color name="widget_ink">#1A2233</color>
+    <color name="widget_muted">#5B6170</color>
+    <color name="widget_button">#1E2D4F</color>
+    <color name="widget_on_button">#F5EFE3</color>
+    <color name="widget_soft">#F5EFE3</color>
+    <color name="widget_green">#36724E</color>
+    <color name="widget_purple">#62519F</color>
+    <color name="widget_amber">#8A5D0C</color>
+    <color name="widget_coral">#A94E39</color>
+    <color name="widget_quote_ink">#F5EFE3</color>
+    <color name="widget_quote_muted">#AEB8CF</color>
+</resources>

@@ -12,103 +12,258 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kairosera.R
 import com.kairosera.core.settings.ThemeMode
 
 /*
- * Kairos palette: dawn ink (primary), rising sun (secondary), mountain sage (tertiary),
- * on a warm paper background. Few colors, used with meaning.
+ * Kairos design tokens, in three layers:
+ *  1. Primitives (raw brand values below; never used directly by screens).
+ *  2. Semantic roles: the Material color scheme plus [KairosColors] for meaning
+ *     (done, info, motivation, learning, activity).
+ *  3. Components read only semantic roles, so light, dark and future themes stay consistent.
+ *
+ * Color is semantic, not decoration: green = done/progress, blue = information,
+ * amber = motivation, purple = learning, coral = activity. Navy + cream carry the brand.
  */
-private val Ink = Color(0xFF2E4A7D)
-private val InkLight = Color(0xFFAFC6F5)
-private val Sun = Color(0xFFD9772B)
-private val SunLight = Color(0xFFFFB77C)
-private val Sage = Color(0xFF4F7F62)
-private val SageLight = Color(0xFFA6D2B4)
+private object Palette {
+    val Navy950 = Color(0xFF0B1322)
+    val Navy900 = Color(0xFF0F1829)
+    val Navy850 = Color(0xFF17223A)
+    val Navy800 = Color(0xFF1B2843)
+    val Navy700 = Color(0xFF1E2D4F) // Deep Navy, the brand color
+    val Navy600 = Color(0xFF2E3F66)
+    val Navy300 = Color(0xFF8E9AB5)
+    val Navy100 = Color(0xFFDCE1EC)
+
+    val Cream50 = Color(0xFFFDFAF4)
+    val Cream100 = Color(0xFFF5EFE3) // Warm Cream, the page
+    val Cream200 = Color(0xFFEDE5D5)
+    val Cream300 = Color(0xFFDDD3C0)
+    val Cream400 = Color(0xFFB9AE99)
+
+    val Ink = Color(0xFF1A2233)
+    val InkMuted = Color(0xFF5B6170)
+    val Paper = Color(0xFFEDE6D8)
+    val PaperMuted = Color(0xFFAEB3BF)
+
+    val Blue = Color(0xFF3A67AE); val BlueSoft = Color(0xFFDDE7F7); val BlueNight = Color(0xFF9DBBEB); val BlueNightSoft = Color(0xFF22345A)
+    val Green = Color(0xFF36724E); val GreenSoft = Color(0xFFDCEDE1); val GreenNight = Color(0xFF9FD0AE); val GreenNightSoft = Color(0xFF1E3A30)
+    val Amber = Color(0xFF8A5D0C); val AmberSoft = Color(0xFFF8E7C2); val AmberBright = Color(0xFFE8B04B)
+    val AmberNight = Color(0xFFF0C572); val AmberNightSoft = Color(0xFF3D3220)
+    val Purple = Color(0xFF62519F); val PurpleSoft = Color(0xFFE6E1F5); val PurpleNight = Color(0xFFC2B7EC); val PurpleNightSoft = Color(0xFF2E2A4E)
+    val Coral = Color(0xFFA94E39); val CoralSoft = Color(0xFFF7DDD5); val CoralNight = Color(0xFFF0AC9A); val CoralNightSoft = Color(0xFF45282A)
+    val Error = Color(0xFFB3261E)
+}
+
+/** One semantic hue: [strong] for text, icons and bars (meets 4.5:1 on the page); [soft] for quiet fills. */
+@Immutable
+data class Tone(val strong: Color, val soft: Color)
+
+@Immutable
+data class KairosColors(
+    val success: Tone,
+    val info: Tone,
+    val motivation: Tone,
+    val learning: Tone,
+    val activity: Tone,
+    /** Brand block color (hero cards, primary buttons, the quote screen). */
+    val brand: Color,
+    val onBrand: Color,
+    /** Accent used on brand blocks (the rising sun). */
+    val sun: Color,
+    /** Raised card on the page. */
+    val card: Color,
+    /** Hairline between rows, and progress tracks. */
+    val line: Color,
+    val track: Color,
+    val muted: Color,
+)
+
+private val LightKairos = KairosColors(
+    success = Tone(Palette.Green, Palette.GreenSoft),
+    info = Tone(Palette.Blue, Palette.BlueSoft),
+    motivation = Tone(Palette.Amber, Palette.AmberSoft),
+    learning = Tone(Palette.Purple, Palette.PurpleSoft),
+    activity = Tone(Palette.Coral, Palette.CoralSoft),
+    brand = Palette.Navy700,
+    onBrand = Palette.Cream100,
+    sun = Palette.AmberBright,
+    card = Palette.Cream50,
+    line = Palette.Cream200,
+    track = Palette.Cream200,
+    muted = Palette.InkMuted,
+)
+
+private val DarkKairos = KairosColors(
+    success = Tone(Palette.GreenNight, Palette.GreenNightSoft),
+    info = Tone(Palette.BlueNight, Palette.BlueNightSoft),
+    motivation = Tone(Palette.AmberNight, Palette.AmberNightSoft),
+    learning = Tone(Palette.PurpleNight, Palette.PurpleNightSoft),
+    activity = Tone(Palette.CoralNight, Palette.CoralNightSoft),
+    brand = Palette.Navy800,
+    onBrand = Palette.Paper,
+    sun = Palette.AmberBright,
+    card = Palette.Navy850,
+    line = Color(0xFF26324D),
+    track = Color(0xFF26324D),
+    muted = Palette.PaperMuted,
+)
 
 private val LightColors = lightColorScheme(
-    primary = Ink,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFDCE6FB),
-    onPrimaryContainer = Color(0xFF0F2549),
-    secondary = Sun,
+    primary = Palette.Navy700,
+    onPrimary = Palette.Cream100,
+    primaryContainer = Palette.Navy100,
+    onPrimaryContainer = Palette.Navy700,
+    secondary = Palette.Amber,
     onSecondary = Color.White,
-    secondaryContainer = Color(0xFFFFE3CC),
-    onSecondaryContainer = Color(0xFF3A1D05),
-    tertiary = Sage,
+    secondaryContainer = Palette.AmberSoft,
+    onSecondaryContainer = Color(0xFF3A2804),
+    tertiary = Palette.Green,
     onTertiary = Color.White,
-    tertiaryContainer = Color(0xFFD3EBDB),
+    tertiaryContainer = Palette.GreenSoft,
     onTertiaryContainer = Color(0xFF0E2A1A),
-    background = Color(0xFFFBF8F3),
-    onBackground = Color(0xFF1C1B1A),
-    surface = Color(0xFFFBF8F3),
-    onSurface = Color(0xFF1C1B1A),
-    surfaceVariant = Color(0xFFEDE7DE),
-    onSurfaceVariant = Color(0xFF4D4740),
-    surfaceContainerLowest = Color(0xFFFFFFFF),
-    surfaceContainerLow = Color(0xFFF7F2EB),
-    surfaceContainer = Color(0xFFF2ECE4),
-    surfaceContainerHigh = Color(0xFFECE6DD),
-    surfaceContainerHighest = Color(0xFFE6E0D7),
-    outline = Color(0xFF7F776E),
-    outlineVariant = Color(0xFFD3CBC0),
-    error = Color(0xFFB3261E),
+    background = Palette.Cream100,
+    onBackground = Palette.Ink,
+    surface = Palette.Cream100,
+    onSurface = Palette.Ink,
+    surfaceVariant = Palette.Cream200,
+    onSurfaceVariant = Palette.InkMuted,
+    surfaceContainerLowest = Color.White,
+    surfaceContainerLow = Palette.Cream50,
+    surfaceContainer = Palette.Cream50,
+    surfaceContainerHigh = Palette.Cream50,
+    surfaceContainerHighest = Palette.Cream200,
+    inverseSurface = Palette.Navy700,
+    inverseOnSurface = Palette.Cream100,
+    inversePrimary = Palette.AmberBright,
+    outline = Palette.Cream400,
+    outlineVariant = Palette.Cream300,
+    error = Palette.Error,
+    scrim = Palette.Navy950,
 )
 
 private val DarkColors = darkColorScheme(
-    primary = InkLight,
-    onPrimary = Color(0xFF0F2549),
-    primaryContainer = Color(0xFF2A4270),
-    onPrimaryContainer = Color(0xFFDCE6FB),
-    secondary = SunLight,
-    onSecondary = Color(0xFF4A2605),
-    secondaryContainer = Color(0xFF6A3A12),
-    onSecondaryContainer = Color(0xFFFFE3CC),
-    tertiary = SageLight,
+    primary = Palette.Paper,
+    onPrimary = Palette.Navy900,
+    primaryContainer = Palette.Navy600,
+    onPrimaryContainer = Palette.Paper,
+    secondary = Palette.AmberNight,
+    onSecondary = Color(0xFF3A2804),
+    secondaryContainer = Palette.AmberNightSoft,
+    onSecondaryContainer = Palette.AmberNight,
+    tertiary = Palette.GreenNight,
     onTertiary = Color(0xFF0E2A1A),
-    tertiaryContainer = Color(0xFF2F5A40),
-    onTertiaryContainer = Color(0xFFD3EBDB),
-    background = Color(0xFF131519),
-    onBackground = Color(0xFFE6E2DC),
-    surface = Color(0xFF131519),
-    onSurface = Color(0xFFE6E2DC),
-    surfaceVariant = Color(0xFF3A3834),
-    onSurfaceVariant = Color(0xFFCBC5BC),
-    surfaceContainerLowest = Color(0xFF0E1013),
-    surfaceContainerLow = Color(0xFF1A1C20),
-    surfaceContainer = Color(0xFF1F2125),
-    surfaceContainerHigh = Color(0xFF292B30),
-    surfaceContainerHighest = Color(0xFF34363B),
-    outline = Color(0xFF959088),
-    outlineVariant = Color(0xFF45433F),
+    tertiaryContainer = Palette.GreenNightSoft,
+    onTertiaryContainer = Palette.GreenNight,
+    background = Palette.Navy900,
+    onBackground = Palette.Paper,
+    surface = Palette.Navy900,
+    onSurface = Palette.Paper,
+    surfaceVariant = Color(0xFF26324D),
+    onSurfaceVariant = Palette.PaperMuted,
+    surfaceContainerLowest = Palette.Navy950,
+    surfaceContainerLow = Palette.Navy850,
+    surfaceContainer = Palette.Navy850,
+    surfaceContainerHigh = Palette.Navy800,
+    surfaceContainerHighest = Palette.Navy600,
+    inverseSurface = Palette.Paper,
+    inverseOnSurface = Palette.Navy900,
+    inversePrimary = Palette.Navy700,
+    outline = Palette.Navy300,
+    outlineVariant = Color(0xFF2E3A56),
+    scrim = Color.Black,
 )
 
+/** Lora, a calm book serif, for the few moments that should feel personal: greeting, quotes, big numbers. */
+@OptIn(ExperimentalTextApi::class)
+val SerifFamily = FontFamily(
+    Font(R.font.lora, FontWeight.Normal, variationSettings = FontVariation.Settings(FontVariation.weight(400))),
+    Font(R.font.lora, FontWeight.Medium, variationSettings = FontVariation.Settings(FontVariation.weight(500))),
+    Font(R.font.lora, FontWeight.SemiBold, variationSettings = FontVariation.Settings(FontVariation.weight(600))),
+)
+
+private val Trim = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.None)
+
+/*
+ * Few sizes on purpose. Every Material slot maps onto one of five steps:
+ *  Hero 32 (serif)  · Large 24 (serif) · Title 18 · Body 16/14 · Small 13/12.
+ */
 private val KairosTypography = Typography().let { base ->
+    val hero = TextStyle(fontFamily = SerifFamily, fontWeight = FontWeight.Medium, fontSize = 32.sp, lineHeight = 40.sp, letterSpacing = (-0.3).sp, lineHeightStyle = Trim)
+    val large = TextStyle(fontFamily = SerifFamily, fontWeight = FontWeight.Medium, fontSize = 24.sp, lineHeight = 32.sp, lineHeightStyle = Trim)
+    val title = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 18.sp, lineHeight = 24.sp)
+    val sub = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 16.sp, lineHeight = 22.sp)
+    val body = TextStyle(fontWeight = FontWeight.Normal, fontSize = 16.sp, lineHeight = 24.sp)
+    val bodySmall = TextStyle(fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 20.sp)
+    val small = TextStyle(fontWeight = FontWeight.Normal, fontSize = 13.sp, lineHeight = 18.sp)
+    val label = TextStyle(fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.1.sp)
+    val labelSmall = TextStyle(fontWeight = FontWeight.Medium, fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.3.sp)
     base.copy(
-        displaySmall = base.displaySmall.copy(fontWeight = FontWeight.SemiBold, letterSpacing = (-0.5).sp),
-        headlineMedium = base.headlineMedium.copy(fontWeight = FontWeight.SemiBold, letterSpacing = (-0.25).sp),
-        headlineSmall = base.headlineSmall.copy(fontWeight = FontWeight.SemiBold),
-        titleLarge = base.titleLarge.copy(fontWeight = FontWeight.SemiBold),
-        titleMedium = base.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-        labelMedium = base.labelMedium.copy(letterSpacing = 1.sp),
+        displayLarge = hero.copy(fontSize = 44.sp, lineHeight = 52.sp),
+        displayMedium = hero.copy(fontSize = 40.sp, lineHeight = 48.sp),
+        displaySmall = hero,
+        headlineLarge = hero,
+        headlineMedium = hero.copy(fontSize = 28.sp, lineHeight = 36.sp),
+        headlineSmall = large,
+        titleLarge = title,
+        titleMedium = sub,
+        titleSmall = label.copy(fontWeight = FontWeight.SemiBold),
+        bodyLarge = body,
+        bodyMedium = bodySmall,
+        bodySmall = small,
+        labelLarge = label,
+        labelMedium = labelSmall,
+        labelSmall = labelSmall.copy(fontSize = 11.sp),
     )
 }
 
-/** Section label style: small caps-like overline used for "TODAY", "NEXT UP" etc. */
-val OverlineStyle = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.4.sp)
+/** Section label: small, spaced capitals for "TODAY", "NEXT UP" etc. */
+val OverlineStyle = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.6.sp, lineHeight = 16.sp)
+
+/** Serif quote style, for the daily thought and "why" statements. */
+val QuoteStyle = TextStyle(fontFamily = SerifFamily, fontWeight = FontWeight.Normal, fontSize = 20.sp, lineHeight = 30.sp)
 
 private val KairosShapes = Shapes(
-    extraSmall = RoundedCornerShape(6.dp),
-    small = RoundedCornerShape(10.dp),
-    medium = RoundedCornerShape(16.dp),
-    large = RoundedCornerShape(22.dp),
-    extraLarge = RoundedCornerShape(28.dp),
+    extraSmall = RoundedCornerShape(8.dp),
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(18.dp),
+    large = RoundedCornerShape(24.dp),
+    extraLarge = RoundedCornerShape(32.dp),
 )
+
+/** Spacing scale (4-pt grid). Screens use these instead of ad-hoc numbers. */
+object Space {
+    val xs = 4.dp
+    val s = 8.dp
+    val m = 12.dp
+    val l = 16.dp
+    val xl = 24.dp
+    val xxl = 32.dp
+    val gutter = 20.dp
+}
+
+private val LocalKairosColors = staticCompositionLocalOf { LightKairos }
+
+/** Accessor for Kairos-specific semantic colors: `Kairos.colors.success.strong`. */
+object Kairos {
+    val colors: KairosColors
+        @Composable @ReadOnlyComposable get() = LocalKairosColors.current
+}
 
 @Composable
 fun KairosTheme(
@@ -128,5 +283,7 @@ fun KairosTheme(
         dark -> DarkColors
         else -> LightColors
     }
-    MaterialTheme(colorScheme = colors, typography = KairosTypography, shapes = KairosShapes, content = content)
+    CompositionLocalProvider(LocalKairosColors provides if (dark) DarkKairos else LightKairos) {
+        MaterialTheme(colorScheme = colors, typography = KairosTypography, shapes = KairosShapes, content = content)
+    }
 }
