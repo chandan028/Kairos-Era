@@ -73,10 +73,13 @@ internal object StageType {
     val quote = TextStyle(fontFamily = SerifFamily, fontSize = 19.sp, lineHeight = 28.sp, color = Stage.cream)
 }
 
+/** Height of [KairosStepHeader]; the backdrop measures from below it. */
+internal val HEADER_HEIGHT = 56.dp
+
 /** Back arrow (from step 2 on) and the step progress, in one quiet row. */
 @Composable
 fun KairosStepHeader(step: Int, total: Int, onBack: (() -> Unit)?) {
-    Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().height(HEADER_HEIGHT).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
             if (onBack != null) {
                 IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = Stage.cream) }
@@ -257,9 +260,7 @@ fun KairosNotificationPreview(time: String, title: String, modifier: Modifier = 
         ) {
             Column(Modifier.padding(14.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.size(26.dp).clip(CircleShape).background(Stage.night0), contentAlignment = Alignment.Center) {
-                        KairosLogo(Modifier.size(22.dp))
-                    }
+                    KairosLogo(Modifier.size(26.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(stringResource(R.string.app_name), style = TextStyle(fontSize = 13.sp, color = Stage.sheetMuted), modifier = Modifier.weight(1f))
                     Text(stringResource(R.string.onb_rem_now), style = TextStyle(fontSize = 12.sp, color = Stage.sheetMuted))

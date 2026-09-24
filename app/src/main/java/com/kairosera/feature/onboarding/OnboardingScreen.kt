@@ -9,10 +9,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -108,7 +104,7 @@ import com.kairosera.core.settings.OnboardingStep
 import com.kairosera.core.settings.ReminderChoice
 import com.kairosera.core.ui.components.KTimePickerDialog
 import com.kairosera.core.ui.components.KairosLogo
-import com.kairosera.core.ui.components.SunriseScene
+import com.kairosera.core.ui.components.KairosWordmark
 import com.kairosera.core.ui.components.rememberTimeFormatter
 import com.kairosera.core.ui.theme.SerifFamily
 import com.kairosera.core.ui.theme.Stage
@@ -130,17 +126,19 @@ fun OnboardingScreen() {
     val vm = kairosViewModel { OnboardingViewModel(it) }
     val state by vm.state.collectAsStateWithLifecycle()
     val s = state
+    val reduceMotion = rememberReduceMotion()
     Box(Modifier.fillMaxSize().background(Stage.night0)) {
         if (s == null) return@Box
         BackHandler(enabled = s.step != OnboardingStep.WELCOME) { vm.back() }
-        val reduceMotion = rememberReduceMotion()
+        // One photo behind every step: it stays while the steps slide over it.
+        SunriseBackdrop(s.step, reduceMotion)
         AnimatedContent(
             targetState = s.step,
             transitionSpec = { stepTransition(initialState, targetState, reduceMotion) },
             label = "onboarding",
         ) { step ->
             when (step) {
-                OnboardingStep.WELCOME -> Welcome(reduceMotion, onBegin = vm::next)
+                OnboardingStep.WELCOME -> Welcome(onBegin = vm::next)
                 OnboardingStep.FOCUS -> Focus(s, vm)
                 OnboardingStep.FIRST_ACTION -> FirstAction(s, vm)
                 OnboardingStep.REMINDERS -> Reminders(s, vm)
@@ -174,12 +172,10 @@ private fun rememberReduceMotion(): Boolean {
 private fun StepFrame(
     step: Int,
     onBack: (() -> Unit)?,
-    background: (@Composable () -> Unit)? = null,
     actions: @Composable ColumnScope.() -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Box(Modifier.fillMaxSize()) {
-        background?.invoke()
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().imePadding(), horizontalAlignment = Alignment.CenterHorizontally) {
             KairosStepHeader(step, STEPS, onBack)
             Column(
@@ -204,11 +200,7 @@ private fun Heading(text: String, modifier: Modifier = Modifier, align: TextAlig
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun Welcome(reduceMotion: Boolean, onBegin: () -> Unit) {
-    val glow = if (reduceMotion) 1f else {
-        val t = rememberInfiniteTransition(label = "glow")
-        t.animateFloat(0.7f, 1f, infiniteRepeatable(tween(4200), RepeatMode.Reverse), label = "glow").value
-    }
+private fun Welcome(onBegin: () -> Unit) {
     StepFrame(
         step = 1,
         onBack = null,
@@ -217,17 +209,14 @@ private fun Welcome(reduceMotion: Boolean, onBegin: () -> Unit) {
             Text(stringResource(R.string.onb_change_later), style = StageType.small, modifier = Modifier.padding(top = 12.dp))
         },
     ) {
-        Box(Modifier.fillMaxWidth().height(290.dp)) {
-            SunriseScene(Modifier.fillMaxSize(), horizon = 0.8f, glow = glow, fadeTop = false)
-            Column(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(Modifier.size(104.dp).clip(CircleShape).background(Stage.night0.copy(alpha = 0.55f)), contentAlignment = Alignment.Center) {
-                    KairosLogo(Modifier.size(100.dp), line = Stage.cream, sun = Stage.gold)
-                }
-                Spacer(Modifier.height(16.dp))
-                Text(stringResource(R.string.app_name_display), style = StageType.brand, modifier = Modifier.semantics { heading() })
-                Spacer(Modifier.height(4.dp))
-                Text(stringResource(R.string.tagline), style = StageType.overline.copy(color = Stage.cream.copy(alpha = 0.8f)))
-            }
+        // The logo sits in the photo's night sky; the sun rises in the clear band below it (see the backdrop).
+        val brand = stringResource(R.string.app_name_display)
+        Column(Modifier.fillMaxWidth().height(330.dp).padding(top = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            KairosLogo(Modifier.size(112.dp))
+            Spacer(Modifier.height(18.dp))
+            KairosWordmark(Modifier.width(212.dp).semantics { heading() }, description = brand)
+            Spacer(Modifier.height(10.dp))
+            Text(stringResource(R.string.tagline), style = StageType.overline.copy(color = Stage.cream.copy(alpha = 0.85f)))
         }
         Column(Modifier.padding(horizontal = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Heading(stringResource(R.string.onboarding_welcome), align = TextAlign.Center)
@@ -381,8 +370,7 @@ private fun FirstAction(s: OnboardingState, vm: OnboardingViewModel) {
                 }
             }
         }
-        Spacer(Modifier.height(8.dp))
-        SunriseScene(Modifier.fillMaxWidth().height(180.dp), horizon = 0.55f, sunX = 0.62f, path = true)
+        Spacer(Modifier.height(16.dp))
     }
     if (picker) {
         KTimePickerDialog(initial = s.draft.time ?: LocalTime.of(9, 0), onDismiss = { picker = false }, onPick = { vm.setTime(it); picker = false })
@@ -451,7 +439,6 @@ private fun Ready(s: OnboardingState, vm: OnboardingViewModel) {
     StepFrame(
         step = 5,
         onBack = { vm.back() },
-        background = { SunriseScene(Modifier.fillMaxWidth().height(320.dp), horizon = 0.62f, sunX = 0.66f) },
         actions = {
             KairosPrimaryButton(stringResource(R.string.onb_open), onClick = { vm.finish(context) }, enabled = !s.finishing)
             Text(stringResource(R.string.onb_customize), style = StageType.small, modifier = Modifier.padding(top = 12.dp))
