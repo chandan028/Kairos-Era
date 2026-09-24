@@ -59,11 +59,28 @@ class ScreenshotTour {
     fun tour() {
         assumeTrue(outDir != null)
         waitForText("Your time is yours.")
-        rule.onNodeWithText("Begin").performClick()
-        rule.onNode(hasSetTextAction() and hasText("Name or nickname")).performTextInput("Chandan")
-        rule.onNode(hasSetTextAction() and hasText("One thing to do today")).performTextInput("Plan the week")
-        rule.onNodeWithText("Next").performScrollTo().performClick()
+        rule.mainClock.advanceTimeBy(2500) // past the splash
+        shot("00a-welcome")
+        rule.onNodeWithText("Let's begin").performClick()
+        waitForText("What matters to you")
+        rule.onNodeWithText("Learn & study").performClick()
+        rule.onNodeWithText("Health & movement").performClick()
+        rule.mainClock.advanceTimeBy(600)
+        shot("00b-focus")
+        rule.onNodeWithText("Continue").performClick()
+        waitForText("Start with one thing.")
+        rule.onAllNodes(hasSetTextAction()).onFirst().performTextInput("Plan the week")
+        shot("00c-first")
+        rule.onNodeWithText("Add to my day").performClick()
+        waitForText("Want Kairos Era")
+        shot("00d-reminders")
         rule.onNodeWithText("Not now").performClick()
+        waitForText("Your day is ready.")
+        rule.mainClock.advanceTimeBy(600)
+        shot("00e-ready")
+        val c = (rule.activity.application as KairosApp).container
+        kotlinx.coroutines.runBlocking { c.settings.setName("Chandan"); c.addSampleContent() }
+        rule.onNodeWithText("Open Kairos Era").performClick()
         waitForText("Chandan")
         shot("01-home")
         step("quick add") {

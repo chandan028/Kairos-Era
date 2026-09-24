@@ -66,11 +66,24 @@ class AppSmokeTest {
     @Test(timeout = 240_000)
     fun firstRunThroughCoreScreens() {
         waitForText("Your time is yours.")
-        rule.onNodeWithText("Begin").performClick()
-        rule.onNode(hasSetTextAction() and hasText("Name or nickname")).performTextInput("Chan")
-        rule.onNode(hasSetTextAction() and hasText("One thing to do today")).performTextInput("Plan the week")
-        rule.onNodeWithText("Next").performScrollTo().performClick()
+        rule.onNodeWithText("Let's begin").performClick()
+        waitForText("What matters to you")
+        rule.onNodeWithText("Skip for now").performClick()
+        waitForText("Start with one thing.")
+        rule.onAllNodes(hasSetTextAction()).onFirst().performTextInput("Plan the week")
+        rule.onNodeWithText("Add to my day").performClick()
+        waitForText("Want Kairos Era")
         rule.onNodeWithText("Not now").performClick()
+        waitForText("Your day is ready.")
+        waitForText("Plan the week")
+        // Back returns to the previous step with answers kept, then forward again.
+        rule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+        waitForText("Want Kairos Era")
+        rule.onNodeWithText("Not now").performClick()
+        waitForText("Your day is ready.")
+        val c = (rule.activity.application as KairosApp).container
+        kotlinx.coroutines.runBlocking { c.settings.setName("Chan"); c.addSampleContent() }
+        rule.onNodeWithText("Open Kairos Era").performClick()
 
         // Home
         waitForText("Chan")

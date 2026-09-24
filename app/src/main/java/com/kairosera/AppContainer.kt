@@ -4,6 +4,7 @@ import android.content.Context
 import com.kairosera.core.database.KairosDatabase
 import com.kairosera.core.diagnostics.SafeLog
 import com.kairosera.core.notifications.NotificationScheduler
+import com.kairosera.core.settings.OnboardingRepository
 import com.kairosera.core.settings.SettingsRepository
 import com.kairosera.data.quotes.QuoteRepository
 import com.kairosera.data.repository.RoomBookRepository
@@ -41,6 +42,7 @@ class AppContainer(context: Context) {
     val study: RoomStudyRepository by lazy { RoomStudyRepository(database) }
     val books: RoomBookRepository by lazy { RoomBookRepository(database) }
     val settings = SettingsRepository(appContext)
+    val onboarding = OnboardingRepository(appContext)
     val quotes = QuoteRepository(appContext)
 
     val scheduler: NotificationScheduler by lazy {
