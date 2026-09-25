@@ -56,7 +56,20 @@ class ScreenshotTour {
         var bmp: Bitmap? = null
         rule.activityRule.scenario.onActivity { a ->
             val v = a.window.decorView
-            bmp = Bitmap.createBitmap(v.width, v.height, Bitmap.Config.ARGB_8888).also { v.draw(android.graphics.Canvas(it)) }
+            bmp = Bitmap.createBitmap(v.width, v.height, Bitmap.Config.ARGB_8888).also { b ->
+                val canvas = android.graphics.Canvas(b)
+                v.draw(canvas)
+                // Dialogs (and the lock screen) are windows of their own: draw a showing one on top, centred.
+                val d = org.robolectric.shadows.ShadowDialog.getLatestDialog()
+                val dv = d?.window?.decorView
+                if (d != null && d.isShowing && dv != null && dv.width > 0) {
+                    canvas.save()
+                    if (dv.width < v.width) canvas.drawColor(android.graphics.Color.argb(150, 0, 0, 0))
+                    canvas.translate((v.width - dv.width) / 2f, (v.height - dv.height) / 2f)
+                    dv.draw(canvas)
+                    canvas.restore()
+                }
+            }
         }
         File(dir, "$name.png").outputStream().use { bmp!!.compress(Bitmap.CompressFormat.PNG, 100, it) }
         println("SCREEN saved $name")
@@ -206,6 +219,21 @@ class ScreenshotTour {
             c.lock.unlock()
             kotlinx.coroutines.runBlocking { c.settings.setLock(false) }
             rule.mainClock.advanceTimeBy(500)
+        }
+        step("diagnostics") {
+            val dir = java.io.File(c.appContext.filesDir, "diagnostics").apply { mkdirs() }
+            java.io.File(dir, "last-crash.txt").writeText(com.kairosera.core.diagnostics.CrashReports.format(IllegalStateException(), java.time.Instant.now(), onMainThread = true))
+            java.io.File(dir, "last-crash.prompted").createNewFile()
+            scrollTo(hasText("Diagnostics")); rule.onNodeWithText("Diagnostics").performClick()
+            waitForText("View report"); rule.mainClock.advanceTimeBy(800); shot("27-diagnostics")
+            rule.onNodeWithText("Check").performScrollTo().performClick(); waitForText("Everything checks out"); rule.mainClock.advanceTimeBy(300); shot("27b-diagnostics-checked")
+            rule.onNode(hasContentDescription("Back")).performClick()
+        }
+        step("delete all") {
+            scrollTo(hasText("Settings")); rule.onNodeWithText("Settings").performClick(); waitForText("Language")
+            rule.onNodeWithText("Delete all data").performScrollTo().performClick(); waitForText("Delete everything?"); rule.mainClock.advanceTimeBy(500); shot("28-delete-all")
+            rule.onNodeWithText("Cancel").performClick(); rule.mainClock.advanceTimeBy(300)
+            rule.onNode(hasContentDescription("Back")).performClick()
         }
         step("widgets") { widgets() }
     }

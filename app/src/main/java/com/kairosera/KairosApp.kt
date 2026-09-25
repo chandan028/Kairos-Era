@@ -11,6 +11,7 @@ class KairosApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        com.kairosera.core.diagnostics.CrashReports.install(this)
         container = AppContainer(this)
         NotificationChannels.ensure(this)
         container.appScope.launch {

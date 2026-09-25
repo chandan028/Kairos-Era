@@ -105,6 +105,9 @@ class SettingsRepository(private val context: Context) {
         it[Keys.favoriteQuotes] = (if (day in current) current - day else current + day).joinToString(",")
     }
 
+    /** Back to first-run defaults. Used only by "Delete all data". */
+    suspend fun clearAll() = context.dataStore.edit { it.clear() }
+
     suspend fun setLock(enabled: Boolean) = context.dataStore.edit { it[Keys.lockEnabled] = enabled }
     suspend fun setLockAfterSeconds(seconds: Int) = context.dataStore.edit { it[Keys.lockAfter] = seconds.coerceIn(0, 3600) }
     suspend fun setLastBackupAt(epochMillis: Long) = context.dataStore.edit { it[Keys.lastBackup] = epochMillis }

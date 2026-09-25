@@ -56,6 +56,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit, onPrivacy: () -> Unit = {}, onBackup: () -> Unit = {}) {
+    var deleteStep by remember { mutableIntStateOf(0) }
     val c = appContainer()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -231,9 +232,64 @@ fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit, onPrivacy: () ->
                 supportingContent = { Text(stringResource(R.string.remove_examples_summary)) },
                 modifier = Modifier.clickable { confirmRemoveSamples = true },
             )
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.delete_all), color = MaterialTheme.colorScheme.error) },
+                supportingContent = { Text(stringResource(R.string.delete_all_summary)) },
+                modifier = Modifier.clickable { deleteStep = 1 },
+            )
             HorizontalDivider(Modifier.padding(vertical = 16.dp))
             Text(stringResource(R.string.settings_footer), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
+    }
+    // Deleting everything takes two separate decisions: first the consequences (with a way to back up), then typing a word.
+    if (deleteStep == 1) {
+        AlertDialog(
+            onDismissRequest = { deleteStep = 0 },
+            title = { Text(stringResource(R.string.delete_all_title)) },
+            text = { Text(stringResource(R.string.delete_all_body)) },
+            confirmButton = { TextButton(onClick = { deleteStep = 2 }) { Text(stringResource(R.string.delete_all_continue), color = MaterialTheme.colorScheme.error) } },
+            dismissButton = {
+                Row {
+                    TextButton(onClick = { deleteStep = 0; onBackup() }) { Text(stringResource(R.string.delete_all_backup_first)) }
+                    TextButton(onClick = { deleteStep = 0 }) { Text(stringResource(R.string.cancel)) }
+                }
+            },
+        )
+    }
+    if (deleteStep == 2) {
+        val word = stringResource(R.string.delete_all_word)
+        var typed by remember { mutableStateOf("") }
+        var working by remember { mutableStateOf(false) }
+        AlertDialog(
+            onDismissRequest = { if (!working) deleteStep = 0 },
+            title = { Text(stringResource(R.string.delete_all_confirm_title)) },
+            text = {
+                Column {
+                    Text(stringResource(R.string.delete_all_confirm_body, word))
+                    OutlinedTextField(
+                        value = typed,
+                        onValueChange = { typed = it.take(20) },
+                        singleLine = true,
+                        enabled = !working,
+                        modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = !working && (typed.trim().equals(word, ignoreCase = true) || typed.trim().equals("DELETE", ignoreCase = true)),
+                    onClick = {
+                        working = true
+                        // App scope, not this screen's: the app returns to onboarding part-way, and the work must finish.
+                        c.appScope.launch {
+                            runCatching { c.deleteEverything() }.onFailure { com.kairosera.core.diagnostics.SafeLog.error("delete_everything_failed", it) }
+                            deleteStep = 0
+                        }
+                    },
+                ) { Text(stringResource(R.string.delete_all_final), color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = { TextButton(enabled = !working, onClick = { deleteStep = 0 }) { Text(stringResource(R.string.cancel)) } },
+        )
     }
     if (confirmRemoveSamples) {
         AlertDialog(

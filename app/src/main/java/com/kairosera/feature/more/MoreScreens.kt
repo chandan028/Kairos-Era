@@ -56,6 +56,7 @@ fun MoreScreen(
     onJournal: () -> Unit,
     onReading: () -> Unit,
     onBackup: () -> Unit = {},
+    onDiagnostics: () -> Unit = {},
 ) {
     Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.nav_more)) }) }) { padding ->
         Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.TopCenter) {
@@ -70,9 +71,8 @@ fun MoreScreen(
                 item { MoreRow(Icons.Outlined.Backup, R.string.backup_title, R.string.backup_summary, onBackup) }
                 item { MoreRow(Icons.Outlined.DeleteOutline, R.string.trash, R.string.trash_summary, onTrash) }
                 item { MoreRow(Icons.Outlined.Lock, R.string.privacy_policy, R.string.privacy_summary, onPrivacy) }
+                item { MoreRow(Icons.Outlined.BugReport, R.string.diagnostics, R.string.diagnostics_summary, onDiagnostics) }
                 item { MoreRow(Icons.Outlined.Info, R.string.about, R.string.about_summary, onAbout) }
-                item { SectionLabel(stringResource(R.string.coming_next), Modifier.padding(start = 16.dp, top = 24.dp, bottom = 8.dp)) }
-                item { MoreRow(Icons.Outlined.BugReport, R.string.diagnostics, R.string.soon, null) }
             }
         }
     }

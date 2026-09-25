@@ -17,7 +17,8 @@ Built in phases (see the product spec).
 - **Reflect (0.5):** a Journal tab (optional mood, "What happened today?", "What did I learn?", "What do I want to do tomorrow?", history by month), Statistics (7D / 30D / 90D / 1Y consistency with a clear definition of an active day, an activity map, your areas, momentum and personal milestones) and a Life Calendar (month grid with activity dots and journal markers, each day's story, a full-day timeline and a year view). Everything is derived from the data already stored; nothing is duplicated. Database v3 adds the journal with a tested upgrade from v2. Reading moved into More, where it sits beside Statistics and the calendar.
 - **Privacy policy (0.5.1):** a full policy in English and Kannada under More › Privacy policy and Settings, bundled so it reads offline. `docs/privacy-policy.html` is generated from the same strings by `tools/gen_privacy_html.py`, so the published copy and the in-app copy always match.
 - **Backup and app lock (0.6):** encrypted `.kairos` backup files (AES-256-GCM, passphrase you choose, saved wherever you pick), restore with a preview, a safety snapshot and Undo, and an optional app lock using the phone's fingerprint, face or screen lock after a delay you choose.
-- **Next:** diagnostics you can choose to email, hardening, then a polish pass.
+- **Diagnostics and hardening (0.7):** a crash report kept on the phone (versions and stack frames only, never messages or entries) that you can read and choose to email; a Diagnostics screen with permission checks and a database check; Delete all data behind two confirmations; the lock screen is its own window so it also covers open dialogs.
+- **Next:** a polish pass.
 
 ## Building
 

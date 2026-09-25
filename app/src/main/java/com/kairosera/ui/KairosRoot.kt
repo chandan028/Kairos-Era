@@ -58,6 +58,7 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -127,6 +128,7 @@ object Routes {
     const val TRASH = "trash"
     const val PRIVACY = "privacy"
     const val BACKUP = "backup"
+    const val DIAGNOSTICS = "diagnostics"
     const val ABOUT = "about"
     const val HOME_CARDS = "home_cards"
     const val TRACKER = "tracker"
@@ -162,6 +164,7 @@ fun KairosRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchReq
     var reschedule by remember { mutableStateOf<LaunchRequest.Reschedule?>(null) }
     var quickAdd by rememberSaveable { mutableStateOf(false) }
     var pickTemplate by rememberSaveable { mutableStateOf(false) }
+    CrashPrompt(onReview = { nav.navigate(Routes.DIAGNOSTICS) })
 
     LaunchedEffect(launchRequest) {
         when (val r = launchRequest) {
@@ -184,7 +187,7 @@ fun KairosRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchReq
         Routes.TRACKER, Routes.TRACKER_EDIT -> Routes.TRACK
         Routes.BOOK, Routes.BOOK_EDIT -> Routes.TRACK
         Routes.JOURNAL_EDIT -> Routes.JOURNAL
-        Routes.READ, Routes.SETTINGS, Routes.TRASH, Routes.PRIVACY, Routes.BACKUP, Routes.ABOUT, Routes.STATS, Routes.CALENDAR, Routes.DAY -> Routes.MORE
+        Routes.READ, Routes.SETTINGS, Routes.TRASH, Routes.PRIVACY, Routes.BACKUP, Routes.DIAGNOSTICS, Routes.ABOUT, Routes.STATS, Routes.CALENDAR, Routes.DAY -> Routes.MORE
         else -> r
     }
 
@@ -340,6 +343,7 @@ private fun KairosNavHost(nav: NavHostController, settings: AppSettings, onQuick
                 onPrivacy = { nav.navigate(Routes.PRIVACY) },
                 onAbout = { nav.navigate(Routes.ABOUT) },
                 onBackup = { nav.navigate(Routes.BACKUP) },
+                onDiagnostics = { nav.navigate(Routes.DIAGNOSTICS) },
                 onCalendar = { nav.navigate(Routes.calendar()) },
                 onStatistics = { nav.navigate(Routes.STATS) },
                 onJournal = { nav.navigateTopLevel(Routes.JOURNAL) },
@@ -431,6 +435,7 @@ private fun KairosNavHost(nav: NavHostController, settings: AppSettings, onQuick
         composable(Routes.TRASH) { TrashScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.PRIVACY) { PrivacyPolicyScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.BACKUP) { com.kairosera.feature.backup.BackupScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.DIAGNOSTICS) { com.kairosera.feature.diagnostics.DiagnosticsScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.ABOUT) { AboutScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.HOME_CARDS) { HomeCardsScreen(settings = settings, onBack = { nav.popBackStack() }) }
     }
@@ -477,3 +482,26 @@ private fun QuickAddSheet(onDismiss: () -> Unit, onTask: () -> Unit, onLog: () -
 }
 
 private data class QuickTile(val label: Int, val hint: Int, val icon: ImageVector, val tone: Tone, val onClick: (() -> Unit)?)
+
+/** Asks once, after a crash, whether to look at the report. Never over the app lock. */
+@Composable
+private fun CrashPrompt(onReview: () -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val locked by appContainer().lock.locked.collectAsStateWithLifecycle()
+    var report by remember { mutableStateOf(com.kairosera.core.diagnostics.CrashReports.pending(context)?.takeIf { !it.prompted }) }
+    if (report == null || locked) return
+    val close = { com.kairosera.core.diagnostics.CrashReports.markPrompted(context); report = null }
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = close,
+        title = { androidx.compose.material3.Text(androidx.compose.ui.res.stringResource(R.string.crash_prompt_title)) },
+        text = { androidx.compose.material3.Text(androidx.compose.ui.res.stringResource(R.string.crash_prompt_body)) },
+        confirmButton = {
+            androidx.compose.material3.TextButton(onClick = { close(); onReview() }) {
+                androidx.compose.material3.Text(androidx.compose.ui.res.stringResource(R.string.crash_prompt_review))
+            }
+        },
+        dismissButton = {
+            androidx.compose.material3.TextButton(onClick = close) { androidx.compose.material3.Text(androidx.compose.ui.res.stringResource(R.string.crash_prompt_later)) }
+        },
+    )
+}

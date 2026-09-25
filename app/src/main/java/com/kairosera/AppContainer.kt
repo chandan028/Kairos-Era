@@ -91,6 +91,32 @@ class AppContainer(context: Context) {
             .onFailure { SafeLog.error("journal_samples_failed", it) }
     }
 
+    /**
+     * Permanently deletes everything: all data, settings, the restore snapshot and any crash report.
+     * Only reachable after two confirmations in Settings. Alarms are cancelled first by rebuilding
+     * the reminder schedule against the now-empty database.
+     */
+    suspend fun deleteEverything() = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        val db = database.openHelper.writableDatabase
+        val tables = db.query("SELECT name FROM sqlite_master WHERE type = 'table'").use { c ->
+            buildList { while (c.moveToNext()) add(c.getString(0)) }
+        }.filter { it !in setOf("android_metadata", "room_master_table", "scheduled_notifications") && !it.startsWith("sqlite_") }
+        database.runInTransaction {
+            db.execSQL("PRAGMA defer_foreign_keys = ON")
+            tables.forEach { db.execSQL("DELETE FROM `$it`") }
+        }
+        scheduler.rebuild("delete_everything")
+        db.execSQL("DELETE FROM scheduled_notifications")
+        java.io.File(appContext.filesDir, "safety").deleteRecursively()
+        appContext.cacheDir.listFiles()?.forEach { it.deleteRecursively() }
+        com.kairosera.core.diagnostics.CrashReports.clear(appContext)
+        onboarding.clear()
+        settings.clearAll()
+        lock.unlock()
+        seedDefaults()
+        SafeLog.event("delete_everything")
+    }
+
     /** Moves every example (tasks, trackers, books, journal entries) to Trash, where it can still be restored. */
     suspend fun trashSampleContent() {
         val now = java.time.Instant.now(clock)

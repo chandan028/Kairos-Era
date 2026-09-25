@@ -30,3 +30,10 @@
 ## Checks to run before each release
 
 See the release checklist in `docs/TESTING.md`.
+
+## Diagnostics (0.7.0)
+
+- `CrashReports` records only the last uncaught crash, in private storage: app and Android versions, the time, main or background thread, exception class names and up to 40 stack frames per cause. Exception messages are never written, because they can echo user text. `CrashReportsTest` checks this.
+- Nothing is sent automatically. After a crash the app asks once whether to look at the report (never over the app lock). More › Diagnostics shows the full text; **Email report** opens the person's own email app addressed to the developer, so they see exactly what would go before sending. There are no SMTP credentials or network code in the app.
+- **Check my data** runs `PRAGMA integrity_check` and `foreign_key_check` read-only.
+- **Delete all data** (Settings › Data) needs two decisions: a dialog that explains the consequence and offers to back up first, then typing a confirmation word. It clears every table, cancels alarms, and removes preferences, the restore snapshot, caches and any crash report. `DeleteEverythingTest` covers it.

@@ -26,6 +26,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import android.os.Build
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.runtime.remember
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import com.kairosera.core.security.DeviceAuth
@@ -75,7 +77,18 @@ class MainActivity : AppCompatActivity() {
                     }
                     if (locked && current != null) {
                         val available = remember(locked) { DeviceAuth.isAvailable(this@MainActivity) }
-                        LockScreen(available = available, onUnlock = ::unlock, onLeave = { moveTaskToBack(true) })
+                        // A window of its own, so it also covers any dialog that was open when the app locked.
+                        Dialog(
+                            onDismissRequest = {},
+                            properties = DialogProperties(
+                                usePlatformDefaultWidth = false,
+                                dismissOnBackPress = false,
+                                dismissOnClickOutside = false,
+                                decorFitsSystemWindows = false,
+                            ),
+                        ) {
+                            LockScreen(available = available, onUnlock = ::unlock, onLeave = { moveTaskToBack(true) })
+                        }
                         LaunchedEffect(splash, available) { if (!splash && available) unlock() }
                     }
                     if (splash) SplashOverlay(onFinished = { splash = false })
