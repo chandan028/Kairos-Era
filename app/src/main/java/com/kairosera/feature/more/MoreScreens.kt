@@ -67,7 +67,7 @@ fun MoreScreen(
                 item { SectionLabel(stringResource(R.string.more_app), Modifier.padding(start = 16.dp, top = 16.dp, bottom = 4.dp)) }
                 item { MoreRow(Icons.Outlined.Settings, R.string.settings, R.string.settings_summary, onSettings) }
                 item { MoreRow(Icons.Outlined.DeleteOutline, R.string.trash, R.string.trash_summary, onTrash) }
-                item { MoreRow(Icons.Outlined.Lock, R.string.privacy, R.string.privacy_summary, onPrivacy) }
+                item { MoreRow(Icons.Outlined.Lock, R.string.privacy_policy, R.string.privacy_summary, onPrivacy) }
                 item { MoreRow(Icons.Outlined.Info, R.string.about, R.string.about_summary, onAbout) }
                 item { SectionLabel(stringResource(R.string.coming_next), Modifier.padding(start = 16.dp, top = 24.dp, bottom = 8.dp)) }
                 item { MoreRow(Icons.Outlined.Backup, R.string.backup, R.string.soon, null) }
@@ -104,20 +104,6 @@ fun SubScreen(title: String, onBack: () -> Unit, content: @Composable () -> Unit
         Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.TopCenter) {
             Box(Modifier.widthIn(max = ContentMaxWidth)) { content() }
         }
-    }
-}
-
-@Composable
-fun PrivacyScreen(onBack: () -> Unit) {
-    SubScreen(stringResource(R.string.privacy), onBack) {
-        TextPage(
-            stringResource(R.string.privacy_headline),
-            listOf(
-                R.string.privacy_point_device, R.string.privacy_point_account, R.string.privacy_point_cloud,
-                R.string.privacy_point_network, R.string.privacy_point_storage, R.string.privacy_point_logs,
-                R.string.privacy_point_lock, R.string.privacy_point_backup, R.string.privacy_point_diagnostics,
-            ).map { stringResource(it) },
-        )
     }
 }
 

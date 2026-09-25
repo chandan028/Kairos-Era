@@ -176,6 +176,14 @@ class ScreenshotTour {
             rule.onNodeWithText("Statistics").performClick(); waitForText("YOUR CONSISTENCY"); rule.mainClock.advanceTimeBy(1200); shot("22-stats-light")
             rule.onNode(hasContentDescription("Back")).performClick()
         }
+        step("privacy policy") {
+            scrollTo(hasText("Privacy policy")); rule.onNodeWithText("Privacy policy").performClick()
+            waitForText("At a glance"); rule.mainClock.advanceTimeBy(800); shot("23-privacy-light")
+            kotlinx.coroutines.runBlocking { c.settings.setThemeMode(com.kairosera.core.settings.ThemeMode.DARK) }
+            rule.mainClock.advanceTimeBy(1200); shot("23b-privacy-dark")
+            rule.onNodeWithText("Permissions and why").performScrollTo(); rule.mainClock.advanceTimeBy(500); shot("23c-privacy-permissions")
+            rule.onNode(hasContentDescription("Back")).performClick()
+        }
         step("widgets") { widgets() }
     }
 

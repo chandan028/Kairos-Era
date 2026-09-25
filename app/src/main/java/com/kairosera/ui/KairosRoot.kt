@@ -81,7 +81,7 @@ import com.kairosera.feature.home.QuoteScreen
 import com.kairosera.feature.more.AboutScreen
 import com.kairosera.feature.more.HomeCardsScreen
 import com.kairosera.feature.more.MoreScreen
-import com.kairosera.feature.more.PrivacyScreen
+import com.kairosera.feature.more.PrivacyPolicyScreen
 import com.kairosera.feature.more.SettingsScreen
 import com.kairosera.feature.more.TrashScreen
 import com.kairosera.feature.onboarding.OnboardingScreen
@@ -425,9 +425,9 @@ private fun KairosNavHost(nav: NavHostController, settings: AppSettings, onQuick
                 onClose = { nav.popBackStack() },
             )
         }
-        composable(Routes.SETTINGS) { SettingsScreen(onBack = { nav.popBackStack() }, onHomeCards = { nav.navigate(Routes.HOME_CARDS) }) }
+        composable(Routes.SETTINGS) { SettingsScreen(onBack = { nav.popBackStack() }, onHomeCards = { nav.navigate(Routes.HOME_CARDS) }, onPrivacy = { nav.navigate(Routes.PRIVACY) }) }
         composable(Routes.TRASH) { TrashScreen(onBack = { nav.popBackStack() }) }
-        composable(Routes.PRIVACY) { PrivacyScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.PRIVACY) { PrivacyPolicyScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.ABOUT) { AboutScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.HOME_CARDS) { HomeCardsScreen(settings = settings, onBack = { nav.popBackStack() }) }
     }

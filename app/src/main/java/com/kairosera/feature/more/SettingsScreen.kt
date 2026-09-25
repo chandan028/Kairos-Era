@@ -54,7 +54,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit) {
+fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit, onPrivacy: () -> Unit = {}) {
     val c = appContainer()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -184,6 +184,11 @@ fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit) {
                 headlineContent = { Text(stringResource(R.string.remove_examples)) },
                 supportingContent = { Text(stringResource(R.string.remove_examples_summary)) },
                 modifier = Modifier.clickable { confirmRemoveSamples = true },
+            )
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.privacy_policy)) },
+                supportingContent = { Text(stringResource(R.string.privacy_policy_summary)) },
+                modifier = Modifier.clickable(onClick = onPrivacy),
             )
             HorizontalDivider(Modifier.padding(vertical = 16.dp))
             Text(stringResource(R.string.settings_footer), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
