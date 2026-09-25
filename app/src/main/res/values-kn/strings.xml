@@ -943,6 +943,7 @@
     <string name="delete_all_confirm_body">ಎಲ್ಲವನ್ನೂ ಅಳಿಸಲು, ಕೆಳಗೆ %1$s ಎಂದು ಟೈಪ್ ಮಾಡಿ.</string>
     <string name="delete_all_word">ಅಳಿಸು</string>
     <string name="delete_all_final">ಎಲ್ಲವನ್ನೂ ಅಳಿಸಿ</string>
+    <string name="more_your_data">ನಿಮ್ಮ ಮಾಹಿತಿ</string>
     <plurals name="streak_days">
         <item quantity="one">%1$d ದಿನ</item>
         <item quantity="other">%1$d ದಿನಗಳು</item>

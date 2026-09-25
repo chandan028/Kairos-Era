@@ -83,6 +83,8 @@ class AppContainer(context: Context) {
     }
 
     suspend fun addSampleContent() {
+        // Examples use the default categories, which startup seeds in the background; make sure they exist first.
+        seedDefaults()
         runCatching { SampleData.insertExamples(appContext, tasks, LocalDate.now(), clock) }
             .onFailure { SafeLog.error("samples_failed", it) }
         runCatching { SampleData.insertTrackerExamples(appContext, trackers, study, books, LocalDate.now(), clock) }

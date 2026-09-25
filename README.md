@@ -18,7 +18,8 @@ Built in phases (see the product spec).
 - **Privacy policy (0.5.1):** a full policy in English and Kannada under More › Privacy policy and Settings, bundled so it reads offline. `docs/privacy-policy.html` is generated from the same strings by `tools/gen_privacy_html.py`, so the published copy and the in-app copy always match.
 - **Backup and app lock (0.6):** encrypted `.kairos` backup files (AES-256-GCM, passphrase you choose, saved wherever you pick), restore with a preview, a safety snapshot and Undo, and an optional app lock using the phone's fingerprint, face or screen lock after a delay you choose.
 - **Diagnostics and hardening (0.7):** a crash report kept on the phone (versions and stack frames only, never messages or entries) that you can read and choose to email; a Diagnostics screen with permission checks and a database check; Delete all data behind two confirmations; the lock screen is its own window so it also covers open dialogs.
-- **Next:** a polish pass.
+- **Polish (0.8):** More is grouped into calm cards (Reflect, Your data, App) with icons and one-line summaries; secondary screens share the serif header; About shows the emblem, tagline and meaning.
+- **Roadmap complete.** Open items: merging a backup into existing data (restore replaces everything today).
 
 ## Building
 

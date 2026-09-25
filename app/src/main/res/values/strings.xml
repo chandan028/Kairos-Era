@@ -944,6 +944,7 @@
     <string name="delete_all_confirm_body">To delete everything, type %1$s below.</string>
     <string name="delete_all_word">DELETE</string>
     <string name="delete_all_final">Delete everything</string>
+    <string name="more_your_data">Your data</string>
     <plurals name="streak_days">
         <item quantity="one">%1$d day</item>
         <item quantity="other">%1$d days</item>

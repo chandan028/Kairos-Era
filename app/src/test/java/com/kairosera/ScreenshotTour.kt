@@ -190,7 +190,7 @@ class ScreenshotTour {
             rule.onNode(hasContentDescription("Back")).performClick()
         }
         step("privacy policy") {
-            scrollTo(hasText("Privacy policy")); rule.onNodeWithText("Privacy policy").performClick()
+            rule.onNodeWithText("Privacy policy").performScrollTo().performClick()
             waitForText("At a glance"); rule.mainClock.advanceTimeBy(800); shot("23-privacy-light")
             kotlinx.coroutines.runBlocking { c.settings.setThemeMode(com.kairosera.core.settings.ThemeMode.DARK) }
             rule.mainClock.advanceTimeBy(1200); shot("23b-privacy-dark")
@@ -198,12 +198,12 @@ class ScreenshotTour {
             rule.onNode(hasContentDescription("Back")).performClick()
         }
         step("backup") {
-            scrollTo(hasText("Backup and restore")); rule.onNodeWithText("Backup and restore").performClick()
+            rule.onNodeWithText("Backup and restore").performScrollTo().performClick()
             waitForText("Create backup"); rule.mainClock.advanceTimeBy(800); shot("24-backup")
             rule.onNode(hasContentDescription("Back")).performClick()
         }
         step("settings security") {
-            scrollTo(hasText("Settings")); rule.onNodeWithText("Settings").performClick(); waitForText("Language")
+            rule.onNodeWithText("Settings").performScrollTo().performClick(); waitForText("Language")
             rule.onNodeWithText("Add example content").performScrollTo(); rule.mainClock.advanceTimeBy(500); shot("26-settings-security")
             rule.onNode(hasContentDescription("Back")).performClick()
         }
@@ -224,15 +224,20 @@ class ScreenshotTour {
             val dir = java.io.File(c.appContext.filesDir, "diagnostics").apply { mkdirs() }
             java.io.File(dir, "last-crash.txt").writeText(com.kairosera.core.diagnostics.CrashReports.format(IllegalStateException(), java.time.Instant.now(), onMainThread = true))
             java.io.File(dir, "last-crash.prompted").createNewFile()
-            scrollTo(hasText("Diagnostics")); rule.onNodeWithText("Diagnostics").performClick()
+            rule.onNodeWithText("Diagnostics").performScrollTo().performClick()
             waitForText("View report"); rule.mainClock.advanceTimeBy(800); shot("27-diagnostics")
             rule.onNodeWithText("Check").performScrollTo().performClick(); waitForText("Everything checks out"); rule.mainClock.advanceTimeBy(300); shot("27b-diagnostics-checked")
             rule.onNode(hasContentDescription("Back")).performClick()
         }
         step("delete all") {
-            scrollTo(hasText("Settings")); rule.onNodeWithText("Settings").performClick(); waitForText("Language")
+            rule.onNodeWithText("Settings").performScrollTo().performClick(); waitForText("Language")
             rule.onNodeWithText("Delete all data").performScrollTo().performClick(); waitForText("Delete everything?"); rule.mainClock.advanceTimeBy(500); shot("28-delete-all")
             rule.onNodeWithText("Cancel").performClick(); rule.mainClock.advanceTimeBy(300)
+            rule.onNode(hasContentDescription("Back")).performClick()
+        }
+        step("about") {
+            rule.onNodeWithText("About").performScrollTo().performClick()
+            waitForText("Version "); rule.mainClock.advanceTimeBy(800); shot("29-about")
             rule.onNode(hasContentDescription("Back")).performClick()
         }
         step("widgets") { widgets() }
