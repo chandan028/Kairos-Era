@@ -22,6 +22,15 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import java.io.File
+import com.kairosera.domain.journal.JournalEntry
+import com.kairosera.domain.journal.Mood
+import com.kairosera.domain.model.Task
+import com.kairosera.domain.tracker.FieldValue
+import com.kairosera.domain.tracker.MeasurementType
+import com.kairosera.domain.tracker.TrackerEntry
+import com.kairosera.domain.usecase.SaveTask
+import androidx.compose.ui.test.onLast
+import kotlinx.coroutines.flow.first
 
 /**
  * Design review aid, not a regression test: walks the main screens with example data and saves
@@ -54,6 +63,14 @@ class ScreenshotTour {
     }
 
     private fun tab(label: String) = rule.onAllNodesWithText(label).onFirst().performClick()
+
+    /** The bottom bar item itself: a dismissed sheet can leave same-named nodes in the tree. */
+    private fun navTab(label: String) {
+        val nodes = rule.onAllNodesWithText(label).fetchSemanticsNodes()
+        val root = rule.onAllNodes(androidx.compose.ui.test.isRoot()).fetchSemanticsNodes().first().boundsInRoot
+        val i = nodes.indexOfFirst { it.boundsInRoot.bottom <= root.bottom && it.boundsInRoot.top > root.bottom * 0.85f && it.config.getOrElseNullable(androidx.compose.ui.semantics.SemanticsProperties.Text) { null }?.size == 1 }
+        rule.onAllNodesWithText(label)[i].performClick()
+    }
 
     @Test(timeout = 300_000)
     fun tour() {
@@ -112,13 +129,53 @@ class ScreenshotTour {
             rule.onNode(hasContentDescription("New tracker")).performClick(); waitForText("Start from blank"); shot("07-create")
             rule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
         }
-        step("read") { tab("Read"); waitForText("CURRENTLY"); shot("09-read"); scrollTo(hasText("MY LIBRARY", substring = true)); shot("09b-read") }
+        step("more") { tab("More"); rule.mainClock.advanceTimeBy(1000); shot("14-more") }
+        step("read") { rule.onNodeWithText("Read").performClick(); waitForText("CURRENTLY"); shot("09-read"); scrollTo(hasText("MY LIBRARY", substring = true)); shot("09b-read") }
         step("book") {
             rule.onNodeWithText("Continue reading").performClick(); waitForText("Log reading"); shot("10-book")
             scrollTo(hasText("NOTES", substring = true)); shot("10b-book")
             rule.onNode(hasContentDescription("Back")).performClick()
+            rule.onNode(hasContentDescription("Back")).performClick()
         }
-        step("more") { tab("More"); rule.mainClock.advanceTimeBy(1000); shot("14-more") }
+        // Six weeks of history, then the reflection screens in the night theme of Chan's mockups.
+        kotlinx.coroutines.runBlocking { seedHistory(c); c.settings.setThemeMode(com.kairosera.core.settings.ThemeMode.DARK) }
+        rule.mainClock.advanceTimeBy(1000)
+        step("journal") {
+            navTab("Journal"); waitForText("Continue writing"); rule.mainClock.advanceTimeBy(800); shot("16-journal")
+            scrollTo(hasText("AUGUST 2026")); rule.mainClock.advanceTimeBy(500); shot("16b-journal")
+            scrollTo(hasText("Continue writing"))
+        }
+        step("journal editor") {
+            rule.onNodeWithText("Continue writing").performClick()
+            waitForText("Save reflection"); rule.mainClock.advanceTimeBy(800); shot("17-journal-editor")
+            rule.onNode(hasContentDescription("Close")).performClick()
+        }
+        step("statistics") {
+            navTab("More"); waitForText("Statistics"); rule.onNodeWithText("Statistics").performClick()
+            waitForText("YOUR CONSISTENCY"); rule.mainClock.advanceTimeBy(1200); shot("18-stats")
+            rule.onNodeWithText("YOUR AREAS").performScrollTo(); rule.mainClock.advanceTimeBy(800); shot("18b-stats-areas")
+            rule.onNodeWithText("YOUR MOMENTUM").performScrollTo(); shot("18c-stats-momentum")
+            rule.onNodeWithText("Your data stays", substring = true).performScrollTo(); shot("18d-stats-milestones")
+            rule.onNodeWithText("1Y").performScrollTo().performClick(); rule.mainClock.advanceTimeBy(1200)
+            rule.onNodeWithText("ACTIVITY").performScrollTo(); shot("18e-stats-year")
+            rule.onNode(hasContentDescription("Back")).performClick()
+        }
+        step("life calendar") {
+            waitForText("Life Calendar"); rule.onNodeWithText("Life Calendar").performClick()
+            waitForText("Today's story"); rule.mainClock.advanceTimeBy(800); shot("19-calendar")
+            rule.onNodeWithText("View full day").performScrollTo(); shot("19b-calendar-story")
+            rule.onNodeWithText("View full day").performClick(); waitForText("TIMELINE"); rule.mainClock.advanceTimeBy(800); shot("20-day")
+            rule.onNode(hasContentDescription("Back")).performClick()
+            waitForText("Today's story")
+            rule.onNode(hasContentDescription("More options")).performClick(); rule.onNodeWithText("View year").performClick()
+            waitForText("active days in"); rule.mainClock.advanceTimeBy(800); shot("21-year")
+            rule.onNode(hasContentDescription("Back")).performClick()
+        }
+        step("stats light") {
+            kotlinx.coroutines.runBlocking { c.settings.setThemeMode(com.kairosera.core.settings.ThemeMode.LIGHT) }
+            rule.onNodeWithText("Statistics").performClick(); waitForText("YOUR CONSISTENCY"); rule.mainClock.advanceTimeBy(1200); shot("22-stats-light")
+            rule.onNode(hasContentDescription("Back")).performClick()
+        }
         step("widgets") { widgets() }
     }
 
@@ -158,11 +215,68 @@ class ScreenshotTour {
         }
     }
 
+    /** Past days with tasks done, study and fitness logs, reading and reflections, with a few quiet days between. */
+    private suspend fun seedHistory(c: AppContainer) {
+        val today = java.time.LocalDate.now()
+        val trackers = c.trackers.observeActive().first()
+        val study = trackers.first { it.name == "Java backend" }
+        val fit = trackers.first { it.name == "Fitness" }
+        val book = c.books.observeBooks().first().first { it.status == com.kairosera.domain.reading.BookStatus.READING }
+        val notes = listOf(
+            "Finally understood HashMap internals. Felt good to see it click.",
+            "Slow start, but the evening walk reset my head.",
+            "Read before bed instead of scrolling. Small win.",
+            "Too many meetings. Still finished the one thing that mattered.",
+            "Revised generics and wrote two small examples.",
+        )
+        val moods = listOf(Mood.GOOD, Mood.OKAY, Mood.GREAT, Mood.LOW, Mood.GOOD)
+        for (ago in 0L..44L) {
+            val d = today.minusDays(ago)
+            val quiet = ago % 9 == 4L || ago % 13 == 6L || ago > 30 && ago % 3 == 0L
+            if (quiet) continue
+            val at = d.atTime(19, 30).atZone(java.time.ZoneId.systemDefault()).toInstant()
+            repeat((ago % 4 + 1).toInt()) { i ->
+                val r = c.saveTask(Task(title = "Focus block ${i + 1}", date = d))
+                if (r is SaveTask.Result.Saved && (i < 3 || ago % 2 == 0L)) c.setOccurrenceDone(r.id, d, true)
+            }
+            if (ago % 2 == 1L || ago % 5 == 0L) {
+                val f = study.enabledFields.first { it.type == MeasurementType.DURATION }
+                c.trackers.saveEntry(TrackerEntry(study.id, d, mapOf(f.id to FieldValue(f.id, number = 30.0 + (ago % 4) * 15)), at))
+            }
+            if (ago % 3 != 2L) {
+                val values = fit.enabledFields.mapNotNull { f ->
+                    when (f.type) {
+                        MeasurementType.NUMBER -> f.id to FieldValue(f.id, number = 4200.0 + ago * 173 % 5200)
+                        MeasurementType.DURATION -> f.id to FieldValue(f.id, number = 20.0 + ago % 3 * 10)
+                        MeasurementType.CHECKBOX -> f.id to FieldValue(f.id, number = 1.0)
+                        else -> null
+                    }
+                }.toMap()
+                c.trackers.saveEntry(TrackerEntry(fit.id, d, values, at))
+            }
+            if (ago == 0L) {
+                c.journal.save(
+                    JournalEntry(
+                        date = d, mood = Mood.GOOD, createdAt = at, updatedAt = at,
+                        text = "Finally understood how HashMap handles collisions. The evening walk cleared my head, and I read before bed.",
+                        lesson = "Short, focused sessions work better than one long one.",
+                        tomorrow = "Revise TreeMap before lunch",
+                    ),
+                )
+            }
+            if (ago % 2 == 0L) c.books.logSession(book.id, pages = 10 + (ago % 5).toInt() * 6, minutes = 20 + (ago % 4).toInt() * 10, date = d, at = at)
+            if (ago % 3 == 0L && ago > 0) {
+                val k = (ago / 3 % notes.size).toInt()
+                c.journal.save(JournalEntry(date = d, mood = moods[k], text = notes[k], lesson = "Short sessions beat long ones.", createdAt = at, updatedAt = at))
+            }
+        }
+    }
+
     private fun scrollTo(matcher: androidx.compose.ui.test.SemanticsMatcher) {
         rule.onAllNodes(hasScrollToNodeAction()).onFirst().performScrollToNode(matcher)
     }
 
     private fun step(name: String, block: () -> Unit) {
-        runCatching(block).onFailure { println("SCREEN fail $name: $it") }
+        runCatching(block).onFailure { println("SCREEN fail $name: $it"); runCatching { shot("fail-${name.replace(' ', '-')}") } }
     }
 }

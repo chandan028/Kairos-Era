@@ -35,4 +35,13 @@ object Migrations {
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_book_notes_bookId` ON `book_notes` (`bookId`)")
         }
     }
+
+    /** v3 adds the journal. A new table only, so no existing row is touched. */
+    val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `journal_entries` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `mood` TEXT, `text` TEXT NOT NULL, `win` TEXT NOT NULL, `lesson` TEXT NOT NULL, `gratitude` TEXT NOT NULL, `tomorrow` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, `deletedAt` INTEGER, `isSample` INTEGER NOT NULL DEFAULT 0)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_journal_entries_date` ON `journal_entries` (`date`)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_journal_entries_deletedAt` ON `journal_entries` (`deletedAt`)")
+        }
+    }
 }

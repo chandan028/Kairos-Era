@@ -10,6 +10,9 @@ import com.kairosera.domain.model.RepeatRule
 import com.kairosera.domain.model.Subtask
 import com.kairosera.domain.model.Task
 import com.kairosera.data.repository.RoomBookRepository
+import com.kairosera.data.repository.RoomJournalRepository
+import com.kairosera.domain.journal.JournalEntry
+import com.kairosera.domain.journal.Mood
 import com.kairosera.data.repository.RoomStudyRepository
 import com.kairosera.data.repository.RoomTrackerRepository
 import com.kairosera.data.tracker.TrackerTemplates
@@ -108,5 +111,20 @@ object SampleData {
                 createdAt = now, updatedAt = now, isSample = true,
             ))
         }
+    }
+
+    suspend fun insertJournalExamples(context: Context, journal: RoomJournalRepository, today: LocalDate, clock: Clock) {
+        if (journal.hasSamples()) return
+        val now = Instant.now(clock)
+        journal.save(JournalEntry(
+            date = today.minusDays(1), mood = Mood.GOOD,
+            text = context.getString(R.string.sample_journal_text), win = context.getString(R.string.sample_journal_win),
+            lesson = context.getString(R.string.sample_journal_lesson), gratitude = context.getString(R.string.sample_journal_gratitude),
+            tomorrow = context.getString(R.string.sample_journal_tomorrow), createdAt = now, updatedAt = now, isSample = true,
+        ))
+        journal.save(JournalEntry(
+            date = today.minusDays(2), mood = Mood.OKAY, text = context.getString(R.string.sample_journal_text_2),
+            createdAt = now, updatedAt = now, isSample = true,
+        ))
     }
 }

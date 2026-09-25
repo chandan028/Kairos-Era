@@ -1,5 +1,6 @@
 package com.kairosera.domain.repository
 
+import com.kairosera.domain.journal.JournalEntry
 import com.kairosera.domain.reading.Book
 import com.kairosera.domain.reading.BookNote
 import com.kairosera.domain.reading.ReadingSession
@@ -59,4 +60,19 @@ interface BookRepository {
     suspend fun moveToTrash(id: Long, at: Instant)
     suspend fun restore(id: Long, at: Instant)
     suspend fun deletePermanently(id: Long)
+}
+
+interface JournalRepository {
+    fun observeEntries(): Flow<List<JournalEntry>>
+    fun observeBetween(from: LocalDate, to: LocalDate): Flow<List<JournalEntry>>
+    fun observeTrash(): Flow<List<JournalEntry>>
+    suspend fun get(id: Long): JournalEntry?
+    /** The day's entry, if one exists; the journal keeps one reflection per day. */
+    suspend fun forDate(date: LocalDate): JournalEntry?
+    suspend fun save(entry: JournalEntry): Long
+    suspend fun moveToTrash(id: Long, at: Instant)
+    suspend fun restore(id: Long, at: Instant)
+    /** Permanent deletion, only from Trash. Callers must have explicit user confirmation. */
+    suspend fun deletePermanently(id: Long)
+    suspend fun trashSamples(at: Instant)
 }

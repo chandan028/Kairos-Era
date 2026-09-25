@@ -8,6 +8,7 @@ import com.kairosera.core.settings.OnboardingRepository
 import com.kairosera.core.settings.SettingsRepository
 import com.kairosera.data.quotes.QuoteRepository
 import com.kairosera.data.repository.RoomBookRepository
+import com.kairosera.data.repository.RoomJournalRepository
 import com.kairosera.data.repository.RoomNotificationRepository
 import com.kairosera.data.repository.RoomStudyRepository
 import com.kairosera.data.repository.RoomTaskRepository
@@ -41,9 +42,18 @@ class AppContainer(context: Context) {
     val trackers: RoomTrackerRepository by lazy { RoomTrackerRepository(database) }
     val study: RoomStudyRepository by lazy { RoomStudyRepository(database) }
     val books: RoomBookRepository by lazy { RoomBookRepository(database) }
+    val journal: RoomJournalRepository by lazy { RoomJournalRepository(database) }
     val settings = SettingsRepository(appContext)
     val onboarding = OnboardingRepository(appContext)
     val quotes = QuoteRepository(appContext)
+
+    /** The day Kairos Era arrived on this phone. Statistics never count days before it against the person. */
+    val installedOn: LocalDate by lazy {
+        runCatching {
+            val t = appContext.packageManager.getPackageInfo(appContext.packageName, 0).firstInstallTime
+            java.time.Instant.ofEpochMilli(t).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+        }.getOrElse { LocalDate.now() }
+    }
 
     val scheduler: NotificationScheduler by lazy {
         NotificationScheduler(
@@ -74,14 +84,17 @@ class AppContainer(context: Context) {
             .onFailure { SafeLog.error("samples_failed", it) }
         runCatching { SampleData.insertTrackerExamples(appContext, trackers, study, books, LocalDate.now(), clock) }
             .onFailure { SafeLog.error("tracker_samples_failed", it) }
+        runCatching { SampleData.insertJournalExamples(appContext, journal, LocalDate.now(), clock) }
+            .onFailure { SafeLog.error("journal_samples_failed", it) }
     }
 
-    /** Moves every example (tasks, trackers, books) to Trash, where it can still be restored. */
+    /** Moves every example (tasks, trackers, books, journal entries) to Trash, where it can still be restored. */
     suspend fun trashSampleContent() {
         val now = java.time.Instant.now(clock)
         tasks.trashSampleData(now)
         trackers.trashSamples(now)
         books.trashSamples(now)
+        journal.trashSamples(now)
         scheduler.rebuild("samples_removed")
     }
 }

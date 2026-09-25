@@ -150,7 +150,9 @@ class AppSmokeTest {
         waitForText("Last 5 weeks".uppercase(), timeoutMs = 15_000)
         rule.onNodeWithContentDescription("Back").performClick()
 
-        // Read: example book and its reading status
+        // Read: example book and its reading status (reached from More now that Journal has the tab)
+        rule.onNodeWithText("More").performClick()
+        waitForText("Read")
         rule.onNodeWithText("Read").performClick()
         waitForText("Continue reading")
         rule.onNodeWithText("Continue reading").performClick()
@@ -161,6 +163,33 @@ class AppSmokeTest {
         // idle under Robolectric); session logging itself is covered by MigrationTest.
         rule.onAllNodesWithText("Finished", useUnmergedTree = true).onLast().performClick()
         waitForText("Page 320 of 320")
+        rule.onNodeWithContentDescription("Back").performClick()
+        waitForText("Your personal library")
+        rule.onNodeWithContentDescription("Back").performClick()
+
+        // Journal: one tap on a mood starts today's reflection; saving brings it into the list
+        rule.onAllNodesWithText("Journal").onLast().performClick() // the tab, not the More row
+        waitForText("Write today's reflection")
+        rule.onNodeWithContentDescription("Good").performClick()
+        waitForText("Save reflection")
+        rule.onNodeWithText("Save").performClick() // the top bar's Save; the form has text fields, which never idle under Robolectric
+        waitForText("Continue writing")
+
+        // Statistics and the Life Calendar are built from the same records
+        rule.onNodeWithText("More").performClick()
+        waitForText("Statistics")
+        rule.onNodeWithText("Statistics").performClick()
+        waitForText("Your consistency".uppercase())
+        rule.onNodeWithText("90D").performClick()
+        waitForText("Last 90 days".uppercase())
+        rule.onNodeWithContentDescription("Back").performClick()
+        waitForText("Life Calendar")
+        rule.onNodeWithText("Life Calendar").performClick()
+        waitForText("Today's story")
+        rule.onNodeWithText("View full day").performScrollTo().performClick()
+        waitForText("Timeline".uppercase())
+        rule.onNodeWithContentDescription("Back").performClick()
+        waitForText("Today's story")
         rule.onNodeWithContentDescription("Back").performClick()
 
         // Home follows today's trackers

@@ -78,6 +78,7 @@ class MainActivity : AppCompatActivity() {
             ACTION_NEW_TASK -> LaunchRequest.NewTask
             ACTION_OPEN_TRACK -> LaunchRequest.OpenTrack
             ACTION_OPEN_QUOTE -> LaunchRequest.OpenQuote
+            ACTION_NEW_JOURNAL -> LaunchRequest.NewJournal
             else -> null
         }
     }
@@ -89,6 +90,7 @@ class MainActivity : AppCompatActivity() {
         const val ACTION_NEW_TASK = "com.kairosera.action.NEW_TASK"
         const val ACTION_OPEN_TRACK = "com.kairosera.action.OPEN_TRACK"
         const val ACTION_OPEN_QUOTE = "com.kairosera.action.OPEN_QUOTE"
+        const val ACTION_NEW_JOURNAL = "com.kairosera.action.NEW_JOURNAL"
         const val EXTRA_DATE = "date"
         const val EXTRA_TASK_ID = "taskId"
         const val EXTRA_NOTIFICATION_ID = "notificationId"

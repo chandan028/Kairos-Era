@@ -20,7 +20,7 @@ Local storage (Room database, DataStore preferences, bundled assets)
 
 | Module | What it holds | Why separate |
 |---|---|---|
-| `:domain` | Models, recurrence engine, reminder planner, quote selection, validation, use cases, repository interfaces | Pure Kotlin with no Android dependency, so the time-critical logic is unit-tested on the JVM in seconds |
+| `:domain` | Models, recurrence engine, reminder planner, quote selection, validation, activity history and statistics, use cases, repository interfaces | Pure Kotlin with no Android dependency, so the time-critical logic is unit-tested on the JVM in seconds |
 | `:app` | Room database, repositories, notification scheduler, Compose UI, resources | Everything that touches Android |
 
 ## Packages in `:app` (`com.kairosera`)
@@ -34,7 +34,7 @@ Local storage (Room database, DataStore preferences, bundled assets)
 - `data/quotes` – loads the 365 bundled quotes.
 - `data/sample` – default categories and optional example content (tasks, a fitness and a study tracker, a book).
 - `data/tracker` – tracker templates (study, fitness, reading, habit, project, money, learning, health, personal, custom).
-- `feature/*` – one package per screen group (home, planner, tasks, track, read, more, onboarding, widgets).
+- `feature/*` – one package per screen group (home, planner, tasks, track, read, journal, insights, more, onboarding, widgets). `insights` holds Statistics, the Life Calendar and the day detail; `HistorySource` is the one place that reads the repositories for them.
 - `AppContainer` – manual dependency wiring; small enough that a DI framework isn't worth the dependency.
 
 Features never read another feature's tables directly: they go through repositories and use cases.
@@ -48,6 +48,8 @@ Features never read another feature's tables directly: they go through repositor
 - **One tracker engine.** Study, fitness, habits and custom trackers are the same thing: a tracker with typed fields (yes/no, number, decimal, minutes, pages, percent, rating, text, checklist) and a frequency (daily, some days, N per week, N per month). Templates only pre-fill fields. Values are stored one row per field per day (`tracker_values`), so editing a tracker never rewrites history, and removing a field only switches it off. The first field is the main goal: completing it completes the day. Streaks count days, weeks or months depending on the frequency; today not done yet never breaks a streak.
 - **Study plans are separate from daily logs.** A study tracker has a topic tree (`study_topics`) and per-day targets (`study_targets`). Ticking a target records practice on its topic and moves it to "learning"; only the user marks a topic done.
 - **Books are more than pages.** `books` holds progress plus the READ → UNDERSTAND → REMEMBER → APPLY insight fields; `reading_sessions` and `book_notes` hang off it. A session moves the bookmark in the same transaction and never past the last page.
+- **One activity history, derived, never stored.** `ActivityHistory.build` (in `:domain`) turns tasks, tracker entries, study targets, reading sessions and journal entries for a date range into `ActivityItem`s and a per-day `DayActivity`. Statistics, the Life Calendar and the day timeline all read this one structure, so they always agree and there is no second copy to drift. Only the requested range is queried. A tracker or book that was deleted shows as "Previous activity" instead of failing.
+- **Statistics are transparent and never judge.** An active day is a day with at least one completed task, tracker log, study topic, reading session or reflection; planning alone does not count. Consistency is active days over days counted, and days before the app was installed (or before the first data) are never counted. Heat levels are 1–2, 3–5 and 6+ actions. Momentum is chosen from fixed templates by comparing the last 7 days with the 7 before; there is no AI and nothing leaves the phone. Dates use `java.time` in the phone's time zone, and the "today" flow re-checks every minute so midnight, DST and time-zone changes move the screens on their own.
 - **Soft delete everywhere.** Deleting moves an item to Trash. Permanent deletion needs an explicit confirmation.
 - **Adaptive layout.** `NavigationSuiteScaffold` shows a bottom bar on phones and a navigation rail on tablets, foldables and landscape. Content is capped at a readable width and centred. The app draws edge to edge and respects system bar and cutout insets.
 - **Design tokens in three layers.** `Palette` holds raw colors; the semantic layer (the Material 3 color scheme plus `KairosColors`: brand, sun, card, line, track, muted and five tones — success green, info blue, motivation amber, learning purple, activity coral — each with a strong and a soft shade) is what components read through `Kairos.colors`. Components never use raw hex, so light and dark themes change in one place. Type uses few sizes: a Lora serif for heroes and headings, the system sans for everything else. Spacing (`Space`) and corner radii are fixed scales.

@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Backup
@@ -45,18 +46,30 @@ import com.kairosera.core.ui.components.SectionLabel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MoreScreen(onSettings: () -> Unit, onTrash: () -> Unit, onPrivacy: () -> Unit, onAbout: () -> Unit, onCalendar: () -> Unit) {
+fun MoreScreen(
+    onSettings: () -> Unit,
+    onTrash: () -> Unit,
+    onPrivacy: () -> Unit,
+    onAbout: () -> Unit,
+    onCalendar: () -> Unit,
+    onStatistics: () -> Unit,
+    onJournal: () -> Unit,
+    onReading: () -> Unit,
+) {
     Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.nav_more)) }) }) { padding ->
         Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.TopCenter) {
             LazyColumn(Modifier.widthIn(max = ContentMaxWidth), contentPadding = PaddingValues(bottom = 24.dp)) {
+                item { SectionLabel(stringResource(R.string.more_reflect), Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)) }
+                item { MoreRow(Icons.Outlined.BarChart, R.string.statistics, R.string.statistics_summary, onStatistics) }
+                item { MoreRow(Icons.Outlined.CalendarMonth, R.string.life_calendar, R.string.life_calendar_summary, onCalendar) }
+                item { MoreRow(Icons.Outlined.EditNote, R.string.journal, R.string.journal_summary, onJournal) }
+                item { MoreRow(Icons.AutoMirrored.Outlined.MenuBook, R.string.nav_read, R.string.reading_summary, onReading) }
+                item { SectionLabel(stringResource(R.string.more_app), Modifier.padding(start = 16.dp, top = 16.dp, bottom = 4.dp)) }
                 item { MoreRow(Icons.Outlined.Settings, R.string.settings, R.string.settings_summary, onSettings) }
-                item { MoreRow(Icons.Outlined.CalendarMonth, R.string.calendar, R.string.calendar_summary, onCalendar) }
                 item { MoreRow(Icons.Outlined.DeleteOutline, R.string.trash, R.string.trash_summary, onTrash) }
                 item { MoreRow(Icons.Outlined.Lock, R.string.privacy, R.string.privacy_summary, onPrivacy) }
                 item { MoreRow(Icons.Outlined.Info, R.string.about, R.string.about_summary, onAbout) }
                 item { SectionLabel(stringResource(R.string.coming_next), Modifier.padding(start = 16.dp, top = 24.dp, bottom = 8.dp)) }
-                item { MoreRow(Icons.Outlined.EditNote, R.string.journal, R.string.soon, null) }
-                item { MoreRow(Icons.Outlined.BarChart, R.string.statistics, R.string.soon, null) }
                 item { MoreRow(Icons.Outlined.Backup, R.string.backup, R.string.soon, null) }
                 item { MoreRow(Icons.Outlined.BugReport, R.string.diagnostics, R.string.soon, null) }
             }

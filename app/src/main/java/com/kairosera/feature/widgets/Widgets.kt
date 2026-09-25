@@ -186,10 +186,10 @@ class QuickAddWidget : KairosWidget() {
         val ctx = Widgets.localized(context)
         setTextViewText(R.id.label_task, ctx.getString(R.string.widget_task))
         setTextViewText(R.id.label_log, ctx.getString(R.string.widget_log))
-        setTextViewText(R.id.label_more, ctx.getString(R.string.widget_more))
+        setTextViewText(R.id.label_more, ctx.getString(R.string.widget_note))
         setOnClickPendingIntent(R.id.btn_task, Widgets.openApp(context, MainActivity.ACTION_NEW_TASK))
         setOnClickPendingIntent(R.id.btn_log, Widgets.openApp(context, MainActivity.ACTION_OPEN_TRACK))
-        setOnClickPendingIntent(R.id.btn_more, Widgets.openApp(context, MainActivity.ACTION_QUICK_ADD))
+        setOnClickPendingIntent(R.id.btn_more, Widgets.openApp(context, MainActivity.ACTION_NEW_JOURNAL))
     }
 }
 

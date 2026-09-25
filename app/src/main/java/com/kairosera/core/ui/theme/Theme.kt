@@ -42,9 +42,9 @@ import com.kairosera.core.settings.ThemeMode
  */
 private object Palette {
     val Navy950 = Color(0xFF0B1322)
-    val Navy900 = Color(0xFF0F1829)
-    val Navy850 = Color(0xFF17223A)
-    val Navy800 = Color(0xFF1B2843)
+    val Navy900 = Color(0xFF0D1729) // night page
+    val Navy850 = Color(0xFF15233D) // night card
+    val Navy800 = Color(0xFF1B2B48) // night raised surface
     val Navy700 = Color(0xFF1E2D4F) // Deep Navy, the brand color
     val Navy600 = Color(0xFF2E3F66)
     val Navy300 = Color(0xFF8E9AB5)
@@ -58,8 +58,8 @@ private object Palette {
 
     val Ink = Color(0xFF1A2233)
     val InkMuted = Color(0xFF5B6170)
-    val Paper = Color(0xFFEDE6D8)
-    val PaperMuted = Color(0xFFAEB3BF)
+    val Paper = Color(0xFFF4EFE5)
+    val PaperMuted = Color(0xFFAAB4C7)
 
     val Blue = Color(0xFF3A67AE); val BlueSoft = Color(0xFFDDE7F7); val BlueNight = Color(0xFF9DBBEB); val BlueNightSoft = Color(0xFF22345A)
     val Green = Color(0xFF36724E); val GreenSoft = Color(0xFFDCEDE1); val GreenNight = Color(0xFF9FD0AE); val GreenNightSoft = Color(0xFF1E3A30)
@@ -92,6 +92,14 @@ data class KairosColors(
     val line: Color,
     val track: Color,
     val muted: Color,
+    /** Warm gold: the one accent for progress, today and the selected day. [accentText] is its readable form for text. */
+    val accent: Color,
+    val accentText: Color,
+    val accentSoft: Color,
+    /** Soft blue, the calm second accent. */
+    val calm: Color,
+    /** Activity intensity, none to a full day: navy, soft blue, blue, gold. */
+    val heat: List<Color>,
 )
 
 private val LightKairos = KairosColors(
@@ -107,6 +115,11 @@ private val LightKairos = KairosColors(
     line = Palette.Cream200,
     track = Palette.Cream200,
     muted = Palette.InkMuted,
+    accent = Color(0xFFD9A441),
+    accentText = Palette.Amber,
+    accentSoft = Color(0xFFF6E7C4),
+    calm = Color(0xFF4F72C4),
+    heat = listOf(Palette.Cream200, Color(0xFFC9D5EE), Color(0xFF7E9BD8), Color(0xFFD9A441)),
 )
 
 private val DarkKairos = KairosColors(
@@ -122,6 +135,11 @@ private val DarkKairos = KairosColors(
     line = Color(0xFF26324D),
     track = Color(0xFF26324D),
     muted = Palette.PaperMuted,
+    accent = Color(0xFFF3C96A),
+    accentText = Color(0xFFF3C96A),
+    accentSoft = Color(0xFF3A3322),
+    calm = Color(0xFF6D8EDB),
+    heat = listOf(Color(0xFF1E2C47), Color(0xFF2E4270), Color(0xFF5876BF), Color(0xFFF3C96A)),
 )
 
 private val LightColors = lightColorScheme(

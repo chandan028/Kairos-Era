@@ -6,6 +6,9 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.kairosera.data.repository.RoomBookRepository
+import com.kairosera.data.repository.RoomJournalRepository
+import com.kairosera.domain.journal.JournalEntry
+import com.kairosera.domain.journal.Mood
 import com.kairosera.data.repository.RoomStudyRepository
 import com.kairosera.data.repository.RoomTrackerRepository
 import com.kairosera.domain.reading.Book
@@ -49,8 +52,10 @@ class MigrationTest {
         context.deleteDatabase(dbName)
     }
 
-    private fun createV1(fill: SQLiteDatabase.() -> Unit = {}) {
-        val schema = listOf("schemas", "app/schemas").map { File(it, "com.kairosera.core.database.KairosDatabase/1.json") }.first { it.exists() }
+    private fun createV1(fill: SQLiteDatabase.() -> Unit = {}) = createAt(1, fill)
+
+    private fun createAt(version: Int, fill: SQLiteDatabase.() -> Unit = {}) {
+        val schema = listOf("schemas", "app/schemas").map { File(it, "com.kairosera.core.database.KairosDatabase/$version.json") }.first { it.exists() }
         val db = JSONObject(schema.readText()).getJSONObject("database")
         context.deleteDatabase(dbName)
         val file = context.getDatabasePath(dbName).also { it.parentFile?.mkdirs() }
@@ -65,7 +70,7 @@ class MigrationTest {
             }
             val setup = db.getJSONArray("setupQueries")
             for (i in 0 until setup.length()) sql.execSQL(setup.getString(i))
-            sql.version = 1
+            sql.version = version
             sql.fill()
         }
     }
@@ -164,5 +169,34 @@ class MigrationTest {
         books.moveToTrash(bookId, now)
         assertTrue(books.observeBooks().first().isEmpty())
         assertNull(books.observeBooks().first().firstOrNull())
+    }
+
+    @Test
+    fun v2ToV3AddsTheJournalAndKeepsTrackers() = runBlocking {
+        createAt(2) {
+            execSQL("INSERT INTO trackers (id, name, icon, colorArgb, description, why, gain, template, frequency, frequencyDays, frequencyTimes, position, createdAt, updatedAt, archivedAt, deletedAt, isSample) VALUES (4, 'Reading', 'b', 1, '', '', '', 'READING', 'DAILY', 0, 0, 0, 1, 1, NULL, NULL, 0)")
+        }
+        val room = openCurrent()
+        val db = room.openHelper.writableDatabase
+        assertEquals(KairosDatabase.VERSION, db.version)
+        db.query("SELECT name FROM trackers WHERE id = 4").use { c -> assertTrue(c.moveToFirst()); assertEquals("Reading", c.getString(0)) }
+
+        val journal = RoomJournalRepository(room)
+        val day = LocalDate.of(2026, 9, 24)
+        val now = Instant.parse("2026-09-24T20:00:00Z")
+        val id = journal.save(JournalEntry(date = day, mood = Mood.GOOD, text = "First", createdAt = now, updatedAt = now))
+        // A second save for the same day continues that day's entry rather than adding another.
+        journal.save(JournalEntry(date = day, text = "Second", createdAt = now, updatedAt = now))
+        val all = journal.observeEntries().first()
+        assertEquals(1, all.size)
+        assertEquals(id, all.single().id)
+        assertEquals("Second", all.single().text)
+        assertEquals(now, all.single().createdAt)
+
+        journal.moveToTrash(id, now)
+        assertTrue(journal.observeEntries().first().isEmpty())
+        assertEquals(1, journal.observeTrash().first().size)
+        journal.restore(id, now)
+        assertEquals(1, journal.observeBetween(day, day).first().size)
     }
 }

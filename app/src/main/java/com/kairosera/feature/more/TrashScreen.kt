@@ -36,7 +36,7 @@ import java.time.ZoneId
 
 /** One row in Trash, whatever it was before it was deleted. */
 private data class TrashItem(val kind: Kind, val id: Long, val title: String, val deletedAt: Instant?) {
-    enum class Kind { TASK, TRACKER, BOOK }
+    enum class Kind { TASK, TRACKER, BOOK, JOURNAL }
     val key get() = "$kind-$id"
 }
 
@@ -46,6 +46,7 @@ private suspend fun AppContainer.restore(item: TrashItem) {
         TrashItem.Kind.TASK -> restoreTask(item.id)
         TrashItem.Kind.TRACKER -> trackers.restore(item.id, now)
         TrashItem.Kind.BOOK -> books.restore(item.id, now)
+        TrashItem.Kind.JOURNAL -> journal.restore(item.id, now)
     }
 }
 
@@ -54,20 +55,22 @@ private suspend fun AppContainer.deleteForever(item: TrashItem) {
         TrashItem.Kind.TASK -> { tasks.deletePermanently(item.id); scheduler.rebuild("deleted") }
         TrashItem.Kind.TRACKER -> trackers.deletePermanently(item.id)
         TrashItem.Kind.BOOK -> books.deletePermanently(item.id)
+        TrashItem.Kind.JOURNAL -> journal.deletePermanently(item.id)
     }
 }
 
-/** Recently deleted tasks, trackers and books. Nothing leaves Trash without an explicit, confirmed permanent delete. */
+/** Recently deleted tasks, trackers, books and reflections. Nothing leaves Trash without an explicit, confirmed permanent delete. */
 @Composable
 fun TrashScreen(onBack: () -> Unit) {
     val c = appContainer()
     val scope = rememberCoroutineScope()
     val flow = remember {
-        combine(c.tasks.observeTrash(), c.trackers.observeTrash(), c.books.observeTrash()) { tasks, trackers, books ->
+        combine(c.tasks.observeTrash(), c.trackers.observeTrash(), c.books.observeTrash(), c.journal.observeTrash()) { tasks, trackers, books, entries ->
             (
                 tasks.map { TrashItem(TrashItem.Kind.TASK, it.id, it.title, it.deletedAt) } +
                     trackers.map { TrashItem(TrashItem.Kind.TRACKER, it.id, "${it.icon} ${it.name}", it.deletedAt) } +
-                    books.map { TrashItem(TrashItem.Kind.BOOK, it.id, it.title, it.deletedAt) }
+                    books.map { TrashItem(TrashItem.Kind.BOOK, it.id, it.title, it.deletedAt) } +
+                    entries.map { TrashItem(TrashItem.Kind.JOURNAL, it.id, listOf(it.date.toString(), it.excerpt(60)).filter { s -> s.isNotBlank() }.joinToString(" · "), it.deletedAt) }
                 ).sortedByDescending { it.deletedAt }
         }.catch { emit(emptyList()) }
     }
@@ -93,6 +96,7 @@ fun TrashScreen(onBack: () -> Unit) {
                                         TrashItem.Kind.TASK -> R.string.trash_kind_task
                                         TrashItem.Kind.TRACKER -> R.string.trash_kind_tracker
                                         TrashItem.Kind.BOOK -> R.string.trash_kind_book
+                                        TrashItem.Kind.JOURNAL -> R.string.trash_kind_journal
                                     },
                                 ),
                             )

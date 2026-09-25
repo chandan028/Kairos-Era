@@ -68,11 +68,11 @@ import java.time.LocalDate
 
 /** Read: a personal library. The book in your hands first, then today, then the shelf. */
 @Composable
-fun ReadScreen(onOpenBook: (Long) -> Unit, onNewBook: () -> Unit) {
+fun ReadScreen(onOpenBook: (Long) -> Unit, onNewBook: () -> Unit, onBack: (() -> Unit)? = null) {
     val vm = kairosViewModel { ReadViewModel(it) }
     val state by vm.state.collectAsStateWithLifecycle()
     Column(Modifier.fillMaxSize()) {
-        ScreenHeader(stringResource(R.string.nav_read), subtitle = stringResource(R.string.read_subtitle)) {
+        ScreenHeader(stringResource(R.string.nav_read), subtitle = stringResource(R.string.read_subtitle), onBack = onBack) {
             IconButton(onClick = onNewBook) { Icon(Icons.Filled.Add, stringResource(R.string.add_book)) }
         }
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {

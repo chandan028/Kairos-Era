@@ -17,7 +17,7 @@
     </LinearLayout>
     <LinearLayout android:id="@+id/btn_more" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginStart="8dp"
         android:background="@drawable/widget_btn_soft" android:gravity="center" android:orientation="vertical" android:minHeight="56dp" android:padding="6dp">
-        <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_widget_grid" android:importantForAccessibility="no" />
+        <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_widget_note" android:importantForAccessibility="no" />
         <TextView android:id="@+id/label_more" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp"
             android:maxLines="1" android:ellipsize="end" android:textColor="@color/widget_ink" android:textSize="13sp" />
     </LinearLayout>
