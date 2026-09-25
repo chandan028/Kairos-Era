@@ -1,0 +1,2192 @@
+[
+  {
+    "dayOfYear": 1,
+    "quote": "A new year does not need a new you. It needs one honest first step.",
+    "category": "beginnings",
+    "actionPrompt": "Write down one thing you want to begin this week."
+  },
+  {
+    "dayOfYear": 2,
+    "quote": "Motivation starts the work. Repetition finishes it.",
+    "category": "consistency",
+    "actionPrompt": "Repeat yesterday's good habit once more today."
+  },
+  {
+    "dayOfYear": 3,
+    "quote": "Beginnings are rarely dramatic. Most of them look like opening a notebook and writing one line.",
+    "category": "beginnings",
+    "actionPrompt": "Open a blank page and write the first sentence."
+  },
+  {
+    "dayOfYear": 4,
+    "quote": "Keeping promises to yourself is how self-respect is built.",
+    "category": "self-respect",
+    "actionPrompt": "Write down a promise to yourself for tomorrow, small enough to keep."
+  },
+  {
+    "dayOfYear": 5,
+    "quote": "Start before you feel ready. Readiness usually arrives halfway through.",
+    "category": "beginnings",
+    "actionPrompt": "Begin a task you have been waiting to feel ready for."
+  },
+  {
+    "dayOfYear": 6,
+    "quote": "A failed attempt tells you where to aim next.",
+    "category": "failure",
+    "actionPrompt": "Write down what one recent failure taught you."
+  },
+  {
+    "dayOfYear": 7,
+    "quote": "The first version is allowed to be rough. Its only job is to exist.",
+    "category": "beginnings",
+    "actionPrompt": "Make a rough first draft of something in ten minutes."
+  },
+  {
+    "dayOfYear": 8,
+    "quote": "Do the small thing today that makes tomorrow easier.",
+    "category": "discipline",
+    "actionPrompt": "Prepare one thing tonight that saves time tomorrow."
+  },
+  {
+    "dayOfYear": 9,
+    "quote": "Starting small is not thinking small. It is thinking in a way you can actually follow.",
+    "category": "beginnings",
+    "actionPrompt": "Shrink one goal until the first step takes five minutes."
+  },
+  {
+    "dayOfYear": 10,
+    "quote": "Before setting new goals, understand what happened to the old ones.",
+    "category": "reflection",
+    "actionPrompt": "Review last year's goals and note what helped or blocked them."
+  },
+  {
+    "dayOfYear": 11,
+    "quote": "Every habit you respect today began as something slightly awkward.",
+    "category": "beginnings",
+    "actionPrompt": "Try a new habit once today, even if it feels clumsy."
+  },
+  {
+    "dayOfYear": 12,
+    "quote": "Failing at something means you tried it. It does not define who you are.",
+    "category": "failure",
+    "actionPrompt": "Separate one failed outcome from your sense of worth."
+  },
+  {
+    "dayOfYear": 13,
+    "quote": "You do not need the whole map. You need the next turn.",
+    "category": "beginnings",
+    "actionPrompt": "Name the very next action for your biggest goal."
+  },
+  {
+    "dayOfYear": 14,
+    "quote": "Your future is shaped by what you repeatedly choose when nobody is watching.",
+    "category": "discipline",
+    "actionPrompt": "Keep one private promise to yourself today."
+  },
+  {
+    "dayOfYear": 15,
+    "quote": "Planning feels like progress. Starting is progress.",
+    "category": "beginnings",
+    "actionPrompt": "Close the planning document and do the first real step."
+  },
+  {
+    "dayOfYear": 16,
+    "quote": "Your body carries every plan you make. Treat it like a partner.",
+    "category": "health",
+    "actionPrompt": "Take a ten-minute walk today."
+  },
+  {
+    "dayOfYear": 17,
+    "quote": "A clean start is less about the calendar and more about the decision.",
+    "category": "beginnings",
+    "actionPrompt": "Pick one thing to restart today, whatever the date."
+  },
+  {
+    "dayOfYear": 18,
+    "quote": "Fear may keep talking. You can keep walking anyway.",
+    "category": "courage",
+    "actionPrompt": "Say yes to one thing today that makes you a little nervous."
+  },
+  {
+    "dayOfYear": 19,
+    "quote": "The hardest part of most work is the distance between thinking about it and touching it.",
+    "category": "beginnings",
+    "actionPrompt": "Put the tools for tomorrow's task where you will see them first."
+  },
+  {
+    "dayOfYear": 20,
+    "quote": "Learning is slow at first because you are building the shelves for everything that comes next.",
+    "category": "learning",
+    "actionPrompt": "Study the fundamentals of a topic for twenty minutes."
+  },
+  {
+    "dayOfYear": 21,
+    "quote": "Begin with what you have. Waiting for perfect conditions is its own kind of delay.",
+    "category": "beginnings",
+    "actionPrompt": "Start one project using only what is already within reach."
+  },
+  {
+    "dayOfYear": 22,
+    "quote": "One task, fully present, often beats three tasks half attended.",
+    "category": "focus",
+    "actionPrompt": "Work on a single task for twenty-five minutes."
+  },
+  {
+    "dayOfYear": 23,
+    "quote": "Some days are for speed. Some days are for simply not stopping.",
+    "category": "resilience",
+    "actionPrompt": "Decide what 'not stopping' looks like for you today."
+  },
+  {
+    "dayOfYear": 24,
+    "quote": "Some things cannot be rushed, only tended.",
+    "category": "patience",
+    "actionPrompt": "Tend to one slow-growing project for fifteen minutes."
+  },
+  {
+    "dayOfYear": 25,
+    "quote": "Moving in the cold is easier once you have started. So is most of life.",
+    "category": "health",
+    "actionPrompt": "Get outside for a brisk walk, even a short one."
+  },
+  {
+    "dayOfYear": 26,
+    "quote": "Good work is often ordinary effort, done carefully and repeated.",
+    "category": "work",
+    "actionPrompt": "Do one routine task with more care than usual."
+  },
+  {
+    "dayOfYear": 27,
+    "quote": "Two minutes of starting beats two hours of preparing to start.",
+    "category": "beginnings",
+    "actionPrompt": "Set a two-minute timer and begin."
+  },
+  {
+    "dayOfYear": 28,
+    "quote": "Patience is not waiting passively. It is continuing while results take their time.",
+    "category": "patience",
+    "actionPrompt": "Keep working on a goal that has not shown results yet."
+  },
+  {
+    "dayOfYear": 29,
+    "quote": "Discipline is remembering what you want most when something else is louder.",
+    "category": "discipline",
+    "actionPrompt": "Write your main goal where you will see it today."
+  },
+  {
+    "dayOfYear": 30,
+    "quote": "Growth is often uncomfortable in the moment and obvious only in hindsight.",
+    "category": "growth",
+    "actionPrompt": "Do one thing today that stretches you slightly."
+  },
+  {
+    "dayOfYear": 31,
+    "quote": "The conversation you avoid usually grows heavier the longer you wait.",
+    "category": "courage",
+    "actionPrompt": "Start one conversation you have been postponing."
+  },
+  {
+    "dayOfYear": 32,
+    "quote": "Attention is your most valuable resource. Spend it like it matters.",
+    "category": "focus",
+    "actionPrompt": "Turn off one nonessential notification permanently."
+  },
+  {
+    "dayOfYear": 33,
+    "quote": "Progress becomes visible only after enough invisible effort.",
+    "category": "consistency",
+    "actionPrompt": "Do today's small effort, even if nobody will see it."
+  },
+  {
+    "dayOfYear": 34,
+    "quote": "Quality lives in the details nobody asked you to check.",
+    "category": "work",
+    "actionPrompt": "Check one detail in your work that others might overlook."
+  },
+  {
+    "dayOfYear": 35,
+    "quote": "Busy is not the same as useful. Ask what actually moves things forward.",
+    "category": "focus",
+    "actionPrompt": "Circle the one task today that matters most."
+  },
+  {
+    "dayOfYear": 36,
+    "quote": "Structure is not a cage. It is the frame that lets you move freely.",
+    "category": "discipline",
+    "actionPrompt": "Block one hour in your calendar for focused work."
+  },
+  {
+    "dayOfYear": 37,
+    "quote": "You are allowed to outgrow old versions of yourself without disowning them.",
+    "category": "growth",
+    "actionPrompt": "Let go of one outdated belief about what you cannot do."
+  },
+  {
+    "dayOfYear": 38,
+    "quote": "Time is spent either way. The only question is on what.",
+    "category": "time",
+    "actionPrompt": "Track how you spend the next three hours."
+  },
+  {
+    "dayOfYear": 39,
+    "quote": "Seeds do not sprout faster when you check on them every hour.",
+    "category": "patience",
+    "actionPrompt": "Stop checking one metric for a day."
+  },
+  {
+    "dayOfYear": 40,
+    "quote": "A few pages a day add up to many books a year.",
+    "category": "reading",
+    "actionPrompt": "Read ten pages of a book today."
+  },
+  {
+    "dayOfYear": 41,
+    "quote": "Confusion is often the feeling of your understanding getting bigger.",
+    "category": "learning",
+    "actionPrompt": "Stay with a confusing idea for five more minutes."
+  },
+  {
+    "dayOfYear": 42,
+    "quote": "It is fine to start again. Restarting is still a form of continuing.",
+    "category": "beginnings",
+    "actionPrompt": "Return to one habit you dropped, without judging the gap."
+  },
+  {
+    "dayOfYear": 43,
+    "quote": "A calm morning often begins the night before.",
+    "category": "time",
+    "actionPrompt": "Set out what you need for tomorrow morning tonight."
+  },
+  {
+    "dayOfYear": 44,
+    "quote": "You can hold high standards and still speak to yourself kindly.",
+    "category": "self-respect",
+    "actionPrompt": "Replace one harsh self-judgment with a fair one."
+  },
+  {
+    "dayOfYear": 45,
+    "quote": "Small improvements feel invisible until they quietly change everything.",
+    "category": "growth",
+    "actionPrompt": "Adjust one small detail of your routine to make it smoother."
+  },
+  {
+    "dayOfYear": 46,
+    "quote": "A small habit kept daily outruns a big plan kept occasionally.",
+    "category": "consistency",
+    "actionPrompt": "Pick one habit and do the smallest version of it today."
+  },
+  {
+    "dayOfYear": 47,
+    "quote": "Look at mistakes like a scientist, not a judge.",
+    "category": "failure",
+    "actionPrompt": "Analyze one mistake by asking what caused it, not who."
+  },
+  {
+    "dayOfYear": 48,
+    "quote": "A bad day is a bad day, not a bad life.",
+    "category": "resilience",
+    "actionPrompt": "Name what made today hard, then do one small good thing."
+  },
+  {
+    "dayOfYear": 49,
+    "quote": "Feedback is useful even when it arrives in uncomfortable wrapping.",
+    "category": "growth",
+    "actionPrompt": "Ask someone for one piece of honest feedback."
+  },
+  {
+    "dayOfYear": 50,
+    "quote": "Explain it simply, and you will find out whether you really understand it.",
+    "category": "learning",
+    "actionPrompt": "Explain something you learned today in three sentences."
+  },
+  {
+    "dayOfYear": 51,
+    "quote": "Consistency is not about intensity. It is about showing up at a size you can repeat.",
+    "category": "consistency",
+    "actionPrompt": "Reduce one habit to a size you could manage on your worst day."
+  },
+  {
+    "dayOfYear": 52,
+    "quote": "Sleep is not lost time. It is where tomorrow's clarity is made.",
+    "category": "health",
+    "actionPrompt": "Go to bed thirty minutes earlier tonight."
+  },
+  {
+    "dayOfYear": 53,
+    "quote": "Practice what you are learning soon, before it fades into theory.",
+    "category": "learning",
+    "actionPrompt": "Apply one thing you learned this week to a real task."
+  },
+  {
+    "dayOfYear": 54,
+    "quote": "Being brave often looks quiet from the outside: a message sent, a hand raised.",
+    "category": "courage",
+    "actionPrompt": "Speak up once in a meeting or group today."
+  },
+  {
+    "dayOfYear": 55,
+    "quote": "Bend when you need to. Breaking is optional more often than it seems.",
+    "category": "resilience",
+    "actionPrompt": "Adjust your plan instead of abandoning it."
+  },
+  {
+    "dayOfYear": 56,
+    "quote": "A clear desk will not do your work, but it removes one reason to drift.",
+    "category": "focus",
+    "actionPrompt": "Clear everything off your desk except today's task."
+  },
+  {
+    "dayOfYear": 57,
+    "quote": "Reading lets you borrow years of someone else's thinking in a few hours.",
+    "category": "reading",
+    "actionPrompt": "Pick a book written by an expert on something you care about."
+  },
+  {
+    "dayOfYear": 58,
+    "quote": "Boundaries take courage to set and self-respect to keep.",
+    "category": "self-respect",
+    "actionPrompt": "Set one clear boundary around your time today."
+  },
+  {
+    "dayOfYear": 59,
+    "quote": "You can be scared and still be ready.",
+    "category": "courage",
+    "actionPrompt": "Take the first step on something that scares you a little."
+  },
+  {
+    "dayOfYear": 60,
+    "quote": "Someday has no date on it. That is why it rarely comes.",
+    "category": "time",
+    "actionPrompt": "Give one 'someday' goal an actual date."
+  },
+  {
+    "dayOfYear": 61,
+    "quote": "Comfort is a fine place to rest and a poor place to stay.",
+    "category": "growth",
+    "actionPrompt": "Try one activity that is slightly outside your comfort zone."
+  },
+  {
+    "dayOfYear": 62,
+    "quote": "Hard work matters more when it is pointed in a clear direction.",
+    "category": "work",
+    "actionPrompt": "Write the purpose of your current project in one sentence."
+  },
+  {
+    "dayOfYear": 63,
+    "quote": "Small pockets of time become large when you use them on purpose.",
+    "category": "time",
+    "actionPrompt": "Use your next ten-minute gap for a small useful task."
+  },
+  {
+    "dayOfYear": 64,
+    "quote": "Read slowly when it matters. Understanding is not a race.",
+    "category": "reading",
+    "actionPrompt": "Reread one paragraph that made you think."
+  },
+  {
+    "dayOfYear": 65,
+    "quote": "Your worth is not measured by your productivity.",
+    "category": "self-respect",
+    "actionPrompt": "Do something enjoyable without trying to make it useful."
+  },
+  {
+    "dayOfYear": 66,
+    "quote": "The gap between who you are and who you want to be is where the work lives.",
+    "category": "growth",
+    "actionPrompt": "Name one trait you want to build and one step toward it."
+  },
+  {
+    "dayOfYear": 67,
+    "quote": "Do the work that is actually yours before helping with everyone else's.",
+    "category": "work",
+    "actionPrompt": "Finish your key task before answering other requests."
+  },
+  {
+    "dayOfYear": 68,
+    "quote": "Not every failure is a lesson in disguise. Some are just bad luck. Let those go.",
+    "category": "failure",
+    "actionPrompt": "Let go of one setback that was outside your control."
+  },
+  {
+    "dayOfYear": 69,
+    "quote": "Choose the harder right over the easier later.",
+    "category": "discipline",
+    "actionPrompt": "Do the unpleasant task first, before anything else."
+  },
+  {
+    "dayOfYear": 70,
+    "quote": "Asking a question costs a moment. Not asking can cost much longer.",
+    "category": "learning",
+    "actionPrompt": "Ask one clarifying question at work or school today."
+  },
+  {
+    "dayOfYear": 71,
+    "quote": "Impatience asks why this is taking so long. Patience asks whether the work is still being done.",
+    "category": "patience",
+    "actionPrompt": "Ask yourself whether you did the work today, not whether it paid off."
+  },
+  {
+    "dayOfYear": 72,
+    "quote": "Books you disagree with can sharpen your thinking more than those you agree with.",
+    "category": "reading",
+    "actionPrompt": "Read an article from a perspective you usually avoid."
+  },
+  {
+    "dayOfYear": 73,
+    "quote": "Drink the water, take the walk, eat the vegetable. Small things, repeated.",
+    "category": "health",
+    "actionPrompt": "Drink a full glass of water right now."
+  },
+  {
+    "dayOfYear": 74,
+    "quote": "Take pride in the parts of your work that only you will ever know about.",
+    "category": "work",
+    "actionPrompt": "Improve one hidden part of a task you are working on."
+  },
+  {
+    "dayOfYear": 75,
+    "quote": "Give new habits months, not days, before you judge them.",
+    "category": "patience",
+    "actionPrompt": "Commit to one habit for thirty days before evaluating it."
+  },
+  {
+    "dayOfYear": 76,
+    "quote": "Movement does not need to be intense to count. It needs to happen.",
+    "category": "health",
+    "actionPrompt": "Stand up and stretch for two minutes."
+  },
+  {
+    "dayOfYear": 77,
+    "quote": "Speak to yourself the way you would speak to someone you are proud of.",
+    "category": "self-respect",
+    "actionPrompt": "Notice your inner voice and soften one sentence."
+  },
+  {
+    "dayOfYear": 78,
+    "quote": "Missing once is an accident. Missing twice is the start of a new pattern.",
+    "category": "consistency",
+    "actionPrompt": "If you missed a habit yesterday, do it today."
+  },
+  {
+    "dayOfYear": 79,
+    "quote": "The cost of a small failure today is lower than the cost of never testing.",
+    "category": "failure",
+    "actionPrompt": "Test one idea quickly and cheaply."
+  },
+  {
+    "dayOfYear": 80,
+    "quote": "Keep a book within reach, and idle minutes become reading minutes.",
+    "category": "reading",
+    "actionPrompt": "Put a book where you usually reach for your phone."
+  },
+  {
+    "dayOfYear": 81,
+    "quote": "Depth needs time without interruption. Guard a block of it today.",
+    "category": "focus",
+    "actionPrompt": "Protect one ninety-minute block with no meetings or messages."
+  },
+  {
+    "dayOfYear": 82,
+    "quote": "Guard your mornings from the noise and the rest of the day tends to follow.",
+    "category": "time",
+    "actionPrompt": "Skip your phone for the first thirty minutes after waking."
+  },
+  {
+    "dayOfYear": 83,
+    "quote": "Owning a mistake quickly stops it from growing.",
+    "category": "failure",
+    "actionPrompt": "Correct or acknowledge one mistake today."
+  },
+  {
+    "dayOfYear": 84,
+    "quote": "Clear communication is half the work. Say what you mean, and say it early.",
+    "category": "work",
+    "actionPrompt": "Send one clear, short update on your current work."
+  },
+  {
+    "dayOfYear": 85,
+    "quote": "Slow progress is still progress. It just refuses to show off.",
+    "category": "patience",
+    "actionPrompt": "Write down one slow but real improvement you have made."
+  },
+  {
+    "dayOfYear": 86,
+    "quote": "Switching tasks has a hidden cost. Pay it less often.",
+    "category": "focus",
+    "actionPrompt": "Batch your messages into two set times today."
+  },
+  {
+    "dayOfYear": 87,
+    "quote": "Self-control is easier when your surroundings are designed for it.",
+    "category": "discipline",
+    "actionPrompt": "Move one distraction out of reach before you start."
+  },
+  {
+    "dayOfYear": 88,
+    "quote": "Asking for help takes more courage than pretending you do not need it.",
+    "category": "courage",
+    "actionPrompt": "Ask for help with one thing you are stuck on."
+  },
+  {
+    "dayOfYear": 89,
+    "quote": "Change rarely feels like change while it is happening. Trust the direction.",
+    "category": "growth",
+    "actionPrompt": "Note one sign that you are moving in the right direction."
+  },
+  {
+    "dayOfYear": 90,
+    "quote": "Resilience is not never falling. It is knowing how you get back up.",
+    "category": "resilience",
+    "actionPrompt": "Write down what helps you recover after a hard day."
+  },
+  {
+    "dayOfYear": 91,
+    "quote": "Saying yes to everything is quietly saying no to your own priorities.",
+    "category": "time",
+    "actionPrompt": "Before accepting a new commitment, wait one day."
+  },
+  {
+    "dayOfYear": 92,
+    "quote": "Respecting yourself sometimes means leaving the room, the conversation, or the habit.",
+    "category": "self-respect",
+    "actionPrompt": "Step away from one situation that drains you."
+  },
+  {
+    "dayOfYear": 93,
+    "quote": "Do it on the boring days too. That is where the results are made.",
+    "category": "consistency",
+    "actionPrompt": "Complete your routine today, even if it feels uneventful."
+  },
+  {
+    "dayOfYear": 94,
+    "quote": "A tired mind makes expensive decisions. Rest before the important ones.",
+    "category": "health",
+    "actionPrompt": "Take a short break before making your next decision."
+  },
+  {
+    "dayOfYear": 95,
+    "quote": "Saying 'I was wrong' is one of the bravest sentences you can learn.",
+    "category": "courage",
+    "actionPrompt": "Admit one small mistake openly today."
+  },
+  {
+    "dayOfYear": 96,
+    "quote": "Screens are built to be endless. Your attention is not. Set the edge yourself.",
+    "category": "focus",
+    "actionPrompt": "Set a time limit on one app you open too often."
+  },
+  {
+    "dayOfYear": 97,
+    "quote": "Review is not repetition for its own sake. It is how knowledge stays.",
+    "category": "learning",
+    "actionPrompt": "Review your notes from last week for ten minutes."
+  },
+  {
+    "dayOfYear": 98,
+    "quote": "The same walk, taken daily, eventually wears a path.",
+    "category": "consistency",
+    "actionPrompt": "Do the same small task at the same time today."
+  },
+  {
+    "dayOfYear": 99,
+    "quote": "Write in the margins. A book becomes yours when you argue with it.",
+    "category": "reading",
+    "actionPrompt": "Note one thought or question while reading today."
+  },
+  {
+    "dayOfYear": 100,
+    "quote": "Discipline feels like a limit today and like freedom next year.",
+    "category": "discipline",
+    "actionPrompt": "Say no to one small indulgence that works against your goal."
+  },
+  {
+    "dayOfYear": 101,
+    "quote": "Rest well and your work improves. Exhaustion is not a badge.",
+    "category": "work",
+    "actionPrompt": "Stop working at a reasonable time tonight."
+  },
+  {
+    "dayOfYear": 102,
+    "quote": "Protect time for what matters before others fill it for you.",
+    "category": "time",
+    "actionPrompt": "Put your top priority in the calendar before accepting meetings."
+  },
+  {
+    "dayOfYear": 103,
+    "quote": "When everything feels urgent, choose what will still matter in a month.",
+    "category": "focus",
+    "actionPrompt": "Pick the task that will still matter thirty days from now."
+  },
+  {
+    "dayOfYear": 104,
+    "quote": "Rest does not have to be earned by exhausting yourself first.",
+    "category": "self-respect",
+    "actionPrompt": "Rest for twenty minutes before you feel depleted."
+  },
+  {
+    "dayOfYear": 105,
+    "quote": "Skills are not fixed. They are simply at their current level.",
+    "category": "growth",
+    "actionPrompt": "Practice a skill you believe you are bad at for ten minutes."
+  },
+  {
+    "dayOfYear": 106,
+    "quote": "You learn more from finishing one small project than from starting ten tutorials.",
+    "category": "learning",
+    "actionPrompt": "Build or complete one small practice project."
+  },
+  {
+    "dayOfYear": 107,
+    "quote": "Some work is invisible but essential. Do it well anyway.",
+    "category": "work",
+    "actionPrompt": "Handle one maintenance task that keeps things running."
+  },
+  {
+    "dayOfYear": 108,
+    "quote": "Your hours do not need to be full. They need to be intentional.",
+    "category": "time",
+    "actionPrompt": "Leave one hour of today unscheduled on purpose."
+  },
+  {
+    "dayOfYear": 109,
+    "quote": "Discomfort is often the price of a door opening. Pay it once and see.",
+    "category": "courage",
+    "actionPrompt": "Make one request you are afraid might be refused."
+  },
+  {
+    "dayOfYear": 110,
+    "quote": "Hard seasons end. Keep your routines small and steady until this one does.",
+    "category": "resilience",
+    "actionPrompt": "Keep one small routine going during a difficult week."
+  },
+  {
+    "dayOfYear": 111,
+    "quote": "Health is built in unremarkable moments, like choosing the stairs.",
+    "category": "health",
+    "actionPrompt": "Take the stairs or walk a little farther today."
+  },
+  {
+    "dayOfYear": 112,
+    "quote": "Looking back is useful when it helps you step forward more wisely.",
+    "category": "reflection",
+    "actionPrompt": "Write down one lesson from the past week."
+  },
+  {
+    "dayOfYear": 113,
+    "quote": "Doing what you said you would do, even quietly, builds trust with yourself.",
+    "category": "discipline",
+    "actionPrompt": "Follow through on one thing you said you would do."
+  },
+  {
+    "dayOfYear": 114,
+    "quote": "Falling short of a goal still moves you further than never setting one.",
+    "category": "failure",
+    "actionPrompt": "Note how far you got, even if you missed the target."
+  },
+  {
+    "dayOfYear": 115,
+    "quote": "Remember the hard things you have already come through. They count as evidence.",
+    "category": "resilience",
+    "actionPrompt": "List two difficult things you have handled before."
+  },
+  {
+    "dayOfYear": 116,
+    "quote": "Being patient with others often starts with being patient with yourself.",
+    "category": "patience",
+    "actionPrompt": "Respond gently to your own mistake today."
+  },
+  {
+    "dayOfYear": 117,
+    "quote": "A few honest minutes of reflection can save weeks of repeating the same mistake.",
+    "category": "reflection",
+    "actionPrompt": "Spend five minutes reviewing what went well and what did not."
+  },
+  {
+    "dayOfYear": 118,
+    "quote": "Self-respect is quiet. It shows in how you treat your own time.",
+    "category": "self-respect",
+    "actionPrompt": "Show up on time for an activity you planned for yourself."
+  },
+  {
+    "dayOfYear": 119,
+    "quote": "It is okay to have a low-energy day. Just do not let it decide the whole week.",
+    "category": "resilience",
+    "actionPrompt": "Do one useful thing, then let yourself rest."
+  },
+  {
+    "dayOfYear": 120,
+    "quote": "Clarity comes from subtraction more often than addition.",
+    "category": "focus",
+    "actionPrompt": "Remove one item from today's list without replacing it."
+  },
+  {
+    "dayOfYear": 121,
+    "quote": "Reading before bed quiets the mind in a way scrolling cannot.",
+    "category": "reading",
+    "actionPrompt": "Replace ten minutes of scrolling with reading tonight."
+  },
+  {
+    "dayOfYear": 122,
+    "quote": "Decide once, in advance, so you do not have to decide again in the moment.",
+    "category": "discipline",
+    "actionPrompt": "Set a simple rule for one recurring temptation."
+  },
+  {
+    "dayOfYear": 123,
+    "quote": "Notice what gave you energy this week. It is telling you something.",
+    "category": "reflection",
+    "actionPrompt": "List two moments this week that felt energizing."
+  },
+  {
+    "dayOfYear": 124,
+    "quote": "Every skill has a clumsy phase. Walk through it instead of around it.",
+    "category": "learning",
+    "actionPrompt": "Practice a new skill imperfectly for fifteen minutes."
+  },
+  {
+    "dayOfYear": 125,
+    "quote": "A plan you follow at seventy percent is worth more than a perfect plan you abandon.",
+    "category": "discipline",
+    "actionPrompt": "Follow today's plan loosely rather than dropping it."
+  },
+  {
+    "dayOfYear": 126,
+    "quote": "Courage grows with use. Spend a little of it today.",
+    "category": "courage",
+    "actionPrompt": "Choose one small brave act and do it before noon."
+  },
+  {
+    "dayOfYear": 127,
+    "quote": "Results arrive on their own schedule. Effort runs on yours.",
+    "category": "patience",
+    "actionPrompt": "Focus on what you can do today, not on when results will come."
+  },
+  {
+    "dayOfYear": 128,
+    "quote": "Growing well means changing your mind when the evidence asks you to.",
+    "category": "growth",
+    "actionPrompt": "Reconsider one opinion in light of new information."
+  },
+  {
+    "dayOfYear": 129,
+    "quote": "Listen to your body's early signals before they become loud ones.",
+    "category": "health",
+    "actionPrompt": "Check in with how your body feels for one minute."
+  },
+  {
+    "dayOfYear": 130,
+    "quote": "Stress shrinks your view. Step back until the whole picture fits again.",
+    "category": "resilience",
+    "actionPrompt": "Step away from your desk for five minutes."
+  },
+  {
+    "dayOfYear": 131,
+    "quote": "The work in front of you deserves more than the leftover minutes of your attention.",
+    "category": "focus",
+    "actionPrompt": "Give your first hour to your most important task."
+  },
+  {
+    "dayOfYear": 132,
+    "quote": "Breathing slowly is the simplest way to tell your body it is safe.",
+    "category": "health",
+    "actionPrompt": "Take five slow, deep breaths."
+  },
+  {
+    "dayOfYear": 133,
+    "quote": "A bad result does not cancel the good work that came before it.",
+    "category": "failure",
+    "actionPrompt": "List what you did well on a project that did not go as planned."
+  },
+  {
+    "dayOfYear": 134,
+    "quote": "Finishing is a separate skill from starting. Practice it on purpose.",
+    "category": "finishing",
+    "actionPrompt": "Choose one half-done task and complete it today."
+  },
+  {
+    "dayOfYear": 135,
+    "quote": "Ask what the job actually needs, not only what it appears to need.",
+    "category": "work",
+    "actionPrompt": "Clarify one unclear requirement before continuing."
+  },
+  {
+    "dayOfYear": 136,
+    "quote": "Streaks are useful until they become fragile. Aim for a rhythm instead.",
+    "category": "consistency",
+    "actionPrompt": "Set a realistic weekly target instead of a daily streak."
+  },
+  {
+    "dayOfYear": 137,
+    "quote": "The long way is sometimes the only way that actually arrives.",
+    "category": "patience",
+    "actionPrompt": "Choose the thorough approach on one task today."
+  },
+  {
+    "dayOfYear": 138,
+    "quote": "Doing the right thing when it is unpopular is a quiet kind of strength.",
+    "category": "courage",
+    "actionPrompt": "Stand by one decision you know is right."
+  },
+  {
+    "dayOfYear": 139,
+    "quote": "Take notes in your own words. Copying is not the same as understanding.",
+    "category": "learning",
+    "actionPrompt": "Rewrite one idea you learned in your own words."
+  },
+  {
+    "dayOfYear": 140,
+    "quote": "Failure hurts. That is allowed. Just do not build a home in it.",
+    "category": "failure",
+    "actionPrompt": "Allow yourself a moment to feel it, then plan one next step."
+  },
+  {
+    "dayOfYear": 141,
+    "quote": "Reliable effort compounds. Occasional brilliance does not.",
+    "category": "consistency",
+    "actionPrompt": "Schedule your key habit for the same time tomorrow."
+  },
+  {
+    "dayOfYear": 142,
+    "quote": "Roots grow before branches do. Patient foundations hold later growth.",
+    "category": "growth",
+    "actionPrompt": "Strengthen one basic skill your goals depend on."
+  },
+  {
+    "dayOfYear": 143,
+    "quote": "Fail small and early, and you rarely have to fail big and late.",
+    "category": "failure",
+    "actionPrompt": "Share an early draft to catch problems sooner."
+  },
+  {
+    "dayOfYear": 144,
+    "quote": "Finishing a book is optional. Learning from it is the point.",
+    "category": "reading",
+    "actionPrompt": "Put down one book that is not serving you and pick another."
+  },
+  {
+    "dayOfYear": 145,
+    "quote": "An hour spent planning can save a day of confusion.",
+    "category": "time",
+    "actionPrompt": "Spend fifteen minutes planning tomorrow before you finish today."
+  },
+  {
+    "dayOfYear": 146,
+    "quote": "The best time to improve a habit is right after you notice it.",
+    "category": "growth",
+    "actionPrompt": "Adjust one habit the moment you notice it is not helping."
+  },
+  {
+    "dayOfYear": 147,
+    "quote": "It is not selfish to take care of what keeps you going.",
+    "category": "self-respect",
+    "actionPrompt": "Do one thing today purely to take care of yourself."
+  },
+  {
+    "dayOfYear": 148,
+    "quote": "Rushing wastes time too. It just hides the cost until later.",
+    "category": "time",
+    "actionPrompt": "Slow down on one task today and do it right the first time."
+  },
+  {
+    "dayOfYear": 149,
+    "quote": "Curiosity is a good enough reason to begin.",
+    "category": "beginnings",
+    "actionPrompt": "Spend fifteen minutes exploring something you are curious about."
+  },
+  {
+    "dayOfYear": 150,
+    "quote": "Asking for support is part of being resilient, not the opposite of it.",
+    "category": "resilience",
+    "actionPrompt": "Tell one person what you are dealing with."
+  },
+  {
+    "dayOfYear": 151,
+    "quote": "Distraction is not a character flaw. It is a design problem, and design can change.",
+    "category": "focus",
+    "actionPrompt": "Put your phone in another room while you work."
+  },
+  {
+    "dayOfYear": 152,
+    "quote": "Reflection is not dwelling. It is sorting.",
+    "category": "reflection",
+    "actionPrompt": "Sort today's events into keep, change, and let go."
+  },
+  {
+    "dayOfYear": 153,
+    "quote": "Done and modest beats perfect and imaginary.",
+    "category": "finishing",
+    "actionPrompt": "Ship something small that has been sitting at ninety percent."
+  },
+  {
+    "dayOfYear": 154,
+    "quote": "A simple solution that works beats a clever one that nobody understands.",
+    "category": "work",
+    "actionPrompt": "Simplify one part of your current work."
+  },
+  {
+    "dayOfYear": 155,
+    "quote": "Rest is part of discipline, not a break from it.",
+    "category": "discipline",
+    "actionPrompt": "Schedule a real break and take it without guilt."
+  },
+  {
+    "dayOfYear": 156,
+    "quote": "The right book at the right time can change the direction of a year.",
+    "category": "reading",
+    "actionPrompt": "Ask a friend which book changed their thinking."
+  },
+  {
+    "dayOfYear": 157,
+    "quote": "Write the stray thought down, then return. The note will keep it safe.",
+    "category": "focus",
+    "actionPrompt": "Keep a notepad nearby for distracting thoughts."
+  },
+  {
+    "dayOfYear": 158,
+    "quote": "Hurrying a decision rarely makes it better. Sleep on the important ones.",
+    "category": "patience",
+    "actionPrompt": "Delay one big decision until tomorrow."
+  },
+  {
+    "dayOfYear": 159,
+    "quote": "What you do every day matters more than what you do once in a while.",
+    "category": "consistency",
+    "actionPrompt": "Name one daily action that moves your main goal forward."
+  },
+  {
+    "dayOfYear": 160,
+    "quote": "Approval from others is pleasant. Approval from your own conscience lasts longer.",
+    "category": "self-respect",
+    "actionPrompt": "Make one choice today based on your values, not on approval."
+  },
+  {
+    "dayOfYear": 161,
+    "quote": "Share your work before it feels perfect. Hiding it will not make it better.",
+    "category": "courage",
+    "actionPrompt": "Show an unfinished piece of work to someone you trust."
+  },
+  {
+    "dayOfYear": 162,
+    "quote": "When plans fall apart, the next good decision is still available.",
+    "category": "resilience",
+    "actionPrompt": "Make one good decision right now, however small."
+  },
+  {
+    "dayOfYear": 163,
+    "quote": "Tie a new habit to something you already do, and let the old habit carry it.",
+    "category": "consistency",
+    "actionPrompt": "Attach one new habit to your morning coffee or commute."
+  },
+  {
+    "dayOfYear": 164,
+    "quote": "Learning something useful every day is a quiet form of wealth.",
+    "category": "learning",
+    "actionPrompt": "Learn one new fact related to your work or studies."
+  },
+  {
+    "dayOfYear": 165,
+    "quote": "Present yourself in ways that feel like your best self, not someone else's.",
+    "category": "self-respect",
+    "actionPrompt": "Choose one small way to present yourself that feels true."
+  },
+  {
+    "dayOfYear": 166,
+    "quote": "Rest counts when it restores you. Choose the kind that actually does.",
+    "category": "health",
+    "actionPrompt": "Pick one restful activity that leaves you refreshed."
+  },
+  {
+    "dayOfYear": 167,
+    "quote": "A beginner's questions are a sign of movement, not weakness.",
+    "category": "beginnings",
+    "actionPrompt": "Ask one question you have been too embarrassed to ask."
+  },
+  {
+    "dayOfYear": 168,
+    "quote": "The last ten percent of a task shows who you are once the novelty is gone.",
+    "category": "finishing",
+    "actionPrompt": "Spend twenty minutes on the final details of a project."
+  },
+  {
+    "dayOfYear": 169,
+    "quote": "Craft is patience applied to details.",
+    "category": "work",
+    "actionPrompt": "Revise one piece of work for quality, not speed."
+  },
+  {
+    "dayOfYear": 170,
+    "quote": "Patience is easier when you can see the process. Track it.",
+    "category": "patience",
+    "actionPrompt": "Log today's small progress somewhere visible."
+  },
+  {
+    "dayOfYear": 171,
+    "quote": "Ten focused minutes every day add up to more than an hour you keep postponing.",
+    "category": "consistency",
+    "actionPrompt": "Spend ten minutes on your most important goal right now."
+  },
+  {
+    "dayOfYear": 172,
+    "quote": "Waiting for free time is how free time disappears. Make some instead.",
+    "category": "time",
+    "actionPrompt": "Block an evening this week for something you enjoy."
+  },
+  {
+    "dayOfYear": 173,
+    "quote": "Rejection hurts briefly. Regret tends to stay much longer.",
+    "category": "courage",
+    "actionPrompt": "Apply, pitch, or ask for one thing you want."
+  },
+  {
+    "dayOfYear": 174,
+    "quote": "You grow by doing things that are slightly too hard, then slightly less so.",
+    "category": "growth",
+    "actionPrompt": "Raise the difficulty of one practice a little."
+  },
+  {
+    "dayOfYear": 175,
+    "quote": "When something breaks, ask what the system allowed, not just who slipped.",
+    "category": "failure",
+    "actionPrompt": "Change one process that made a mistake easy to make."
+  },
+  {
+    "dayOfYear": 176,
+    "quote": "Summer hours feel endless. Give a few of them a purpose.",
+    "category": "time",
+    "actionPrompt": "Choose one project to make progress on this summer."
+  },
+  {
+    "dayOfYear": 177,
+    "quote": "Summarize what you read, and it stays with you far longer.",
+    "category": "reading",
+    "actionPrompt": "Write a three-line summary of your latest reading."
+  },
+  {
+    "dayOfYear": 178,
+    "quote": "Ask not only what you did, but why you did it that way.",
+    "category": "reflection",
+    "actionPrompt": "Pick one decision from today and write down why you made it."
+  },
+  {
+    "dayOfYear": 179,
+    "quote": "Mood is information, not instruction.",
+    "category": "discipline",
+    "actionPrompt": "Notice your mood, then do the planned task anyway."
+  },
+  {
+    "dayOfYear": 180,
+    "quote": "People who grow are rarely the most talented. They are the most willing to adjust.",
+    "category": "growth",
+    "actionPrompt": "Make one small adjustment based on what did not work."
+  },
+  {
+    "dayOfYear": 181,
+    "quote": "Mental health deserves the same attention as physical health.",
+    "category": "health",
+    "actionPrompt": "Name your current mood honestly, without judging it."
+  },
+  {
+    "dayOfYear": 182,
+    "quote": "The middle of the year tests whether your January plans were habits or wishes.",
+    "category": "consistency",
+    "actionPrompt": "Check in on one goal you set at the start of the year."
+  },
+  {
+    "dayOfYear": 183,
+    "quote": "An unfinished task takes up space even when you are not working on it.",
+    "category": "finishing",
+    "actionPrompt": "Close one open loop: reply, file, or cancel."
+  },
+  {
+    "dayOfYear": 184,
+    "quote": "The present moment is the only place where any work actually happens.",
+    "category": "time",
+    "actionPrompt": "Do one task now instead of scheduling it."
+  },
+  {
+    "dayOfYear": 185,
+    "quote": "Mistakes in practice are cheap lessons. Welcome them there.",
+    "category": "learning",
+    "actionPrompt": "Try a practice exercise knowing you will get some wrong."
+  },
+  {
+    "dayOfYear": 186,
+    "quote": "The patterns in your days are easier to see on paper than in memory.",
+    "category": "reflection",
+    "actionPrompt": "Write a one-line journal entry tonight."
+  },
+  {
+    "dayOfYear": 187,
+    "quote": "Focus is less about forcing and more about removing what pulls you away.",
+    "category": "focus",
+    "actionPrompt": "Close every browser tab you do not need right now."
+  },
+  {
+    "dayOfYear": 188,
+    "quote": "Try the thing you are curious about before your doubts finish their argument.",
+    "category": "courage",
+    "actionPrompt": "Sign up for something new before you talk yourself out of it."
+  },
+  {
+    "dayOfYear": 189,
+    "quote": "Most doors open by being pushed, not by being studied.",
+    "category": "beginnings",
+    "actionPrompt": "Send the message or application you have been drafting in your head."
+  },
+  {
+    "dayOfYear": 190,
+    "quote": "What grows slowly often lasts longest.",
+    "category": "patience",
+    "actionPrompt": "Invest time in one relationship or skill for the long term."
+  },
+  {
+    "dayOfYear": 191,
+    "quote": "You are not behind. You are on a path with its own pace.",
+    "category": "resilience",
+    "actionPrompt": "Write down one step you took this week, however small."
+  },
+  {
+    "dayOfYear": 192,
+    "quote": "Reading widely makes your own ideas less predictable.",
+    "category": "reading",
+    "actionPrompt": "Read something outside your usual genre or field."
+  },
+  {
+    "dayOfYear": 193,
+    "quote": "Work you care about deserves a good start each morning.",
+    "category": "work",
+    "actionPrompt": "Begin your workday with a two-minute plan."
+  },
+  {
+    "dayOfYear": 194,
+    "quote": "Fewer things started, more things finished. That is how progress becomes real.",
+    "category": "finishing",
+    "actionPrompt": "Park one new idea until you finish a current one."
+  },
+  {
+    "dayOfYear": 195,
+    "quote": "Apologize when you are wrong. Stop apologizing for simply taking up space.",
+    "category": "self-respect",
+    "actionPrompt": "Notice one unnecessary 'sorry' and drop it."
+  },
+  {
+    "dayOfYear": 196,
+    "quote": "Every missed day is a chance to practice coming back.",
+    "category": "failure",
+    "actionPrompt": "Resume one habit you broke without restarting the count."
+  },
+  {
+    "dayOfYear": 197,
+    "quote": "Delay the easy reward a little, and the meaningful one comes closer.",
+    "category": "discipline",
+    "actionPrompt": "Wait ten minutes before acting on one impulse today."
+  },
+  {
+    "dayOfYear": 198,
+    "quote": "Momentum is not found. It is built from the first small push.",
+    "category": "beginnings",
+    "actionPrompt": "Do the easiest part of a hard task first to get moving."
+  },
+  {
+    "dayOfYear": 199,
+    "quote": "Curiosity keeps learning alive long after the requirements end.",
+    "category": "learning",
+    "actionPrompt": "Look up the answer to one question you have wondered about."
+  },
+  {
+    "dayOfYear": 200,
+    "quote": "Failure is information delivered at an uncomfortable volume.",
+    "category": "failure",
+    "actionPrompt": "Turn one recent failure into a single rule for next time."
+  },
+  {
+    "dayOfYear": 201,
+    "quote": "Eat like you want to feel good in two hours, not only in two minutes.",
+    "category": "health",
+    "actionPrompt": "Plan one nourishing meal for tomorrow."
+  },
+  {
+    "dayOfYear": 202,
+    "quote": "A short list you finish beats a long list that overwhelms you.",
+    "category": "focus",
+    "actionPrompt": "Write a list of just three tasks for today."
+  },
+  {
+    "dayOfYear": 203,
+    "quote": "Storms pass. The habits you kept during them remain.",
+    "category": "resilience",
+    "actionPrompt": "Protect one habit during a busy or stressful day."
+  },
+  {
+    "dayOfYear": 204,
+    "quote": "Good routines free your mind for the things that actually need thinking.",
+    "category": "consistency",
+    "actionPrompt": "Turn one repeated decision into a simple routine."
+  },
+  {
+    "dayOfYear": 205,
+    "quote": "Quiet time is not wasted time. It is where your thoughts catch up with your life.",
+    "category": "reflection",
+    "actionPrompt": "Sit for five minutes without your phone."
+  },
+  {
+    "dayOfYear": 206,
+    "quote": "Spread practice out. A little every day beats a lot the night before.",
+    "category": "learning",
+    "actionPrompt": "Schedule three short study sessions this week."
+  },
+  {
+    "dayOfYear": 207,
+    "quote": "Responsibility is simple to describe and hard to practice: own what is yours.",
+    "category": "work",
+    "actionPrompt": "Take full ownership of one task today."
+  },
+  {
+    "dayOfYear": 208,
+    "quote": "Deciding that something is done is part of the work.",
+    "category": "finishing",
+    "actionPrompt": "Define what done looks like for your current task."
+  },
+  {
+    "dayOfYear": 209,
+    "quote": "The quiet choices add up louder than the dramatic ones.",
+    "category": "discipline",
+    "actionPrompt": "Make one small healthy choice nobody will notice."
+  },
+  {
+    "dayOfYear": 210,
+    "quote": "Rereading a good book is meeting it again as a different person.",
+    "category": "reading",
+    "actionPrompt": "Revisit a favorite book and read one chapter."
+  },
+  {
+    "dayOfYear": 211,
+    "quote": "Time you lose to worry is rarely returned with answers.",
+    "category": "time",
+    "actionPrompt": "Write your worry down, then set a time to deal with it."
+  },
+  {
+    "dayOfYear": 212,
+    "quote": "Daylight and fresh air are small medicines. Take your daily dose.",
+    "category": "health",
+    "actionPrompt": "Spend ten minutes outside in daylight."
+  },
+  {
+    "dayOfYear": 213,
+    "quote": "Growth is not a straight line. Plateaus are part of the climb.",
+    "category": "growth",
+    "actionPrompt": "Keep going through a plateau today instead of changing plans."
+  },
+  {
+    "dayOfYear": 214,
+    "quote": "Your path does not need to look like anyone else's to be the right one.",
+    "category": "self-respect",
+    "actionPrompt": "Mute one account that makes you feel smaller."
+  },
+  {
+    "dayOfYear": 215,
+    "quote": "Waiting well means using the in-between time for something useful.",
+    "category": "patience",
+    "actionPrompt": "Use your next waiting moment for a short useful task."
+  },
+  {
+    "dayOfYear": 216,
+    "quote": "Momentum near the end is fragile. Protect it from new distractions.",
+    "category": "finishing",
+    "actionPrompt": "Silence notifications until your current task is finished."
+  },
+  {
+    "dayOfYear": 217,
+    "quote": "It takes courage to change direction after you have told everyone the plan.",
+    "category": "courage",
+    "actionPrompt": "Reconsider one plan that no longer makes sense."
+  },
+  {
+    "dayOfYear": 218,
+    "quote": "Invest in who you are becoming, not only in what you are producing.",
+    "category": "growth",
+    "actionPrompt": "Spend thirty minutes on self-development, not output."
+  },
+  {
+    "dayOfYear": 219,
+    "quote": "Reading is a conversation with someone who took the time to think carefully.",
+    "category": "reading",
+    "actionPrompt": "Choose a book that clearly took serious thought to write."
+  },
+  {
+    "dayOfYear": 220,
+    "quote": "Start where you are, not where you think you should already be.",
+    "category": "beginnings",
+    "actionPrompt": "Write down your honest starting point for one goal."
+  },
+  {
+    "dayOfYear": 221,
+    "quote": "An honest 'no' is braver and kinder than a resentful 'yes'.",
+    "category": "courage",
+    "actionPrompt": "Decline one request you do not have capacity for."
+  },
+  {
+    "dayOfYear": 222,
+    "quote": "What you tolerate often shapes your days more than what you plan.",
+    "category": "reflection",
+    "actionPrompt": "Name one small thing you tolerate that you could change."
+  },
+  {
+    "dayOfYear": 223,
+    "quote": "Give people time to grow, the same way you would want it for yourself.",
+    "category": "patience",
+    "actionPrompt": "Offer patience to someone who is still learning."
+  },
+  {
+    "dayOfYear": 224,
+    "quote": "Discipline is not harshness. It is care that keeps a schedule.",
+    "category": "discipline",
+    "actionPrompt": "Plan a kind but firm schedule for tomorrow."
+  },
+  {
+    "dayOfYear": 225,
+    "quote": "Being gentle with yourself on hard days is how you last through the long ones.",
+    "category": "resilience",
+    "actionPrompt": "Choose one gentle thing to do for yourself this evening."
+  },
+  {
+    "dayOfYear": 226,
+    "quote": "You can respect the lesson without replaying the mistake forever.",
+    "category": "failure",
+    "actionPrompt": "Write the lesson in one line, then close the notebook."
+  },
+  {
+    "dayOfYear": 227,
+    "quote": "Posture changes how you feel. Sit like someone paying attention.",
+    "category": "health",
+    "actionPrompt": "Adjust your posture and relax your shoulders."
+  },
+  {
+    "dayOfYear": 228,
+    "quote": "Frustration is a sign you care. Let it slow you down, not stop you.",
+    "category": "patience",
+    "actionPrompt": "When frustrated, pause for two minutes, then continue."
+  },
+  {
+    "dayOfYear": 229,
+    "quote": "Leave the work a little better than you found it.",
+    "category": "work",
+    "actionPrompt": "Improve one shared document, file, or space."
+  },
+  {
+    "dayOfYear": 230,
+    "quote": "Doing one thing at a time is slower only in theory.",
+    "category": "focus",
+    "actionPrompt": "Finish the current task before opening a new one."
+  },
+  {
+    "dayOfYear": 231,
+    "quote": "Teach what you know, and you will discover what you missed.",
+    "category": "learning",
+    "actionPrompt": "Share something you know with a colleague or friend."
+  },
+  {
+    "dayOfYear": 232,
+    "quote": "Estimate honestly. Most things take longer than planned, so leave room.",
+    "category": "time",
+    "actionPrompt": "Add a twenty-minute buffer to today's plan."
+  },
+  {
+    "dayOfYear": 233,
+    "quote": "Review the week before planning the next one. The past has advice to give.",
+    "category": "reflection",
+    "actionPrompt": "Do a short weekly review before planning tomorrow."
+  },
+  {
+    "dayOfYear": 234,
+    "quote": "Fiction trains empathy. It lets you live other lives for a while.",
+    "category": "reading",
+    "actionPrompt": "Read a chapter of a novel today."
+  },
+  {
+    "dayOfYear": 235,
+    "quote": "Resilience grows in the moments you choose to try again.",
+    "category": "resilience",
+    "actionPrompt": "Try again on something that did not work yesterday."
+  },
+  {
+    "dayOfYear": 236,
+    "quote": "Keep the promise small enough that you can keep it on a hard day.",
+    "category": "consistency",
+    "actionPrompt": "Lower today's target so you can reliably meet it."
+  },
+  {
+    "dayOfYear": 237,
+    "quote": "The days can feel long while the weeks slip by. Notice them.",
+    "category": "time",
+    "actionPrompt": "Write one thing you want this week to be remembered for."
+  },
+  {
+    "dayOfYear": 238,
+    "quote": "The unknown is not automatically dangerous. It is just unfamiliar.",
+    "category": "courage",
+    "actionPrompt": "Visit a new place or take a new route today."
+  },
+  {
+    "dayOfYear": 239,
+    "quote": "Good learners stay comfortable saying 'I do not know yet.'",
+    "category": "learning",
+    "actionPrompt": "Say 'I don't know yet' once today, then find out."
+  },
+  {
+    "dayOfYear": 240,
+    "quote": "Burnout rarely arrives suddenly. It builds from small signals that were ignored.",
+    "category": "health",
+    "actionPrompt": "Cancel or delay one thing if you are running on empty."
+  },
+  {
+    "dayOfYear": 241,
+    "quote": "Changing your mind as you learn more about yourself is not inconsistency. It is honesty.",
+    "category": "self-respect",
+    "actionPrompt": "Revise one goal that no longer reflects what you want."
+  },
+  {
+    "dayOfYear": 242,
+    "quote": "Nobody sees your failures as clearly as you do. Most people are busy with their own.",
+    "category": "failure",
+    "actionPrompt": "Take one step you have avoided out of fear of looking foolish."
+  },
+  {
+    "dayOfYear": 243,
+    "quote": "Surround yourself with people who make growing feel normal.",
+    "category": "growth",
+    "actionPrompt": "Reach out to someone who inspires you to improve."
+  },
+  {
+    "dayOfYear": 244,
+    "quote": "Credit shared generously makes the next project easier for everyone.",
+    "category": "work",
+    "actionPrompt": "Thank someone specifically for their contribution."
+  },
+  {
+    "dayOfYear": 245,
+    "quote": "Steady beats sudden, most of the time.",
+    "category": "consistency",
+    "actionPrompt": "Do a moderate amount of work today rather than a heroic burst."
+  },
+  {
+    "dayOfYear": 246,
+    "quote": "Treat your time like it belongs to someone you respect.",
+    "category": "self-respect",
+    "actionPrompt": "Say no to one thing that wastes your time."
+  },
+  {
+    "dayOfYear": 247,
+    "quote": "A finished draft can be improved. An idea that stays in your head cannot.",
+    "category": "finishing",
+    "actionPrompt": "Finish a draft today and leave the editing for tomorrow."
+  },
+  {
+    "dayOfYear": 248,
+    "quote": "A fresh week is an invitation, not an obligation.",
+    "category": "beginnings",
+    "actionPrompt": "Choose one intention for this week and write it down."
+  },
+  {
+    "dayOfYear": 249,
+    "quote": "A goal that takes years should not be judged by a single week.",
+    "category": "patience",
+    "actionPrompt": "Look at your progress over three months, not three days."
+  },
+  {
+    "dayOfYear": 250,
+    "quote": "Know what you are trying to do before you start doing it.",
+    "category": "focus",
+    "actionPrompt": "Write one sentence describing the goal of your next work session."
+  },
+  {
+    "dayOfYear": 251,
+    "quote": "When the plan meets a bad day, shrink the plan. Do not drop it.",
+    "category": "discipline",
+    "actionPrompt": "Cut today's task in half and still do it."
+  },
+  {
+    "dayOfYear": 252,
+    "quote": "Exercise is a gift to your future self and to your present mood.",
+    "category": "health",
+    "actionPrompt": "Do a short workout, even if it lasts only five minutes."
+  },
+  {
+    "dayOfYear": 253,
+    "quote": "The satisfaction of completion is earned in the unglamorous final steps.",
+    "category": "finishing",
+    "actionPrompt": "Do the boring final step you keep skipping."
+  },
+  {
+    "dayOfYear": 254,
+    "quote": "Be curious about your setbacks before you are critical of them.",
+    "category": "reflection",
+    "actionPrompt": "Describe one recent setback as if explaining it to a friend."
+  },
+  {
+    "dayOfYear": 255,
+    "quote": "Beginning is a skill. The more often you practice it, the less it costs.",
+    "category": "beginnings",
+    "actionPrompt": "Start one small thing today that you could finish within an hour."
+  },
+  {
+    "dayOfYear": 256,
+    "quote": "Bravery is often just the decision to go first.",
+    "category": "courage",
+    "actionPrompt": "Be the first to say hello, share, or offer an idea."
+  },
+  {
+    "dayOfYear": 257,
+    "quote": "Deadlines are useful fences. Build them for your own projects too.",
+    "category": "time",
+    "actionPrompt": "Set a personal deadline for one open-ended project."
+  },
+  {
+    "dayOfYear": 258,
+    "quote": "An idea that failed can still hold a piece of the one that works.",
+    "category": "failure",
+    "actionPrompt": "Revisit an old failed idea and look for one salvageable part."
+  },
+  {
+    "dayOfYear": 259,
+    "quote": "Knowledge becomes useful when it meets a real problem.",
+    "category": "learning",
+    "actionPrompt": "Use a new concept to solve one real problem."
+  },
+  {
+    "dayOfYear": 260,
+    "quote": "Silence is not empty. It is where concentration settles.",
+    "category": "focus",
+    "actionPrompt": "Work for thirty minutes without music or background noise."
+  },
+  {
+    "dayOfYear": 261,
+    "quote": "Showing up is ordinary. Showing up for a year is remarkable.",
+    "category": "consistency",
+    "actionPrompt": "Mark today on a calendar after completing your habit."
+  },
+  {
+    "dayOfYear": 262,
+    "quote": "Most of self-discipline is simply making the right thing the easy thing.",
+    "category": "discipline",
+    "actionPrompt": "Lay out what you need for your next good habit."
+  },
+  {
+    "dayOfYear": 263,
+    "quote": "When you are stuck, make the problem smaller until it moves.",
+    "category": "work",
+    "actionPrompt": "Split one stuck task into three smaller parts."
+  },
+  {
+    "dayOfYear": 264,
+    "quote": "A clean space, a kept word, a rested body. These are forms of self-respect.",
+    "category": "self-respect",
+    "actionPrompt": "Tidy one small area of your home."
+  },
+  {
+    "dayOfYear": 265,
+    "quote": "Uncertainty is uncomfortable, but it also means the ending is not written yet.",
+    "category": "resilience",
+    "actionPrompt": "Focus on one thing you can control today."
+  },
+  {
+    "dayOfYear": 266,
+    "quote": "Reading with a question in mind turns pages into answers.",
+    "category": "reading",
+    "actionPrompt": "Write one question before you start reading today."
+  },
+  {
+    "dayOfYear": 267,
+    "quote": "Every expert you admire once knew less than you do right now.",
+    "category": "growth",
+    "actionPrompt": "Take one beginner lesson in a skill you want."
+  },
+  {
+    "dayOfYear": 268,
+    "quote": "Half-finished work does not fail loudly. It fades quietly.",
+    "category": "finishing",
+    "actionPrompt": "Review your unfinished list and pick one item to finish or drop."
+  },
+  {
+    "dayOfYear": 269,
+    "quote": "Pressure reveals what you have practiced. Practice calm on easy days.",
+    "category": "resilience",
+    "actionPrompt": "Practice a calming technique while things are easy."
+  },
+  {
+    "dayOfYear": 270,
+    "quote": "Screens at night borrow from tomorrow's energy.",
+    "category": "health",
+    "actionPrompt": "Turn off screens thirty minutes before bed."
+  },
+  {
+    "dayOfYear": 271,
+    "quote": "Test yourself before you feel ready. Recalling strengthens memory more than rereading.",
+    "category": "learning",
+    "actionPrompt": "Close your notes and write down what you remember."
+  },
+  {
+    "dayOfYear": 272,
+    "quote": "Your voice matters, even in rooms where it feels small.",
+    "category": "courage",
+    "actionPrompt": "Share one opinion you usually keep to yourself."
+  },
+  {
+    "dayOfYear": 273,
+    "quote": "Some answers only come when you stop asking loudly and start listening.",
+    "category": "reflection",
+    "actionPrompt": "Take a quiet walk and let your mind wander."
+  },
+  {
+    "dayOfYear": 274,
+    "quote": "Timing matters, but so does simply beginning within the window you have.",
+    "category": "time",
+    "actionPrompt": "Use the next free hour for your most meaningful task."
+  },
+  {
+    "dayOfYear": 275,
+    "quote": "Honesty with yourself is the foundation of every other kind of honesty.",
+    "category": "self-respect",
+    "actionPrompt": "Write down one truth you have been avoiding."
+  },
+  {
+    "dayOfYear": 276,
+    "quote": "Rhythm is kinder than willpower. Build one and lean on it.",
+    "category": "consistency",
+    "actionPrompt": "Set a fixed start time for tomorrow's work."
+  },
+  {
+    "dayOfYear": 277,
+    "quote": "Your first attempt is data, not a verdict.",
+    "category": "beginnings",
+    "actionPrompt": "Try something new and note one thing you learned from it."
+  },
+  {
+    "dayOfYear": 278,
+    "quote": "Meaningful work is not always exciting. It is usually steady.",
+    "category": "work",
+    "actionPrompt": "Spend an hour on meaningful work without checking messages."
+  },
+  {
+    "dayOfYear": 279,
+    "quote": "Start at the time you set, not the time you feel like starting.",
+    "category": "discipline",
+    "actionPrompt": "Begin your next task exactly at the planned minute."
+  },
+  {
+    "dayOfYear": 280,
+    "quote": "Growth asks for honesty about where you are, not shame about it.",
+    "category": "growth",
+    "actionPrompt": "Write where you currently stand on one goal, without judgment."
+  },
+  {
+    "dayOfYear": 281,
+    "quote": "Calm hands do better work than rushed ones.",
+    "category": "patience",
+    "actionPrompt": "Do your next task at a deliberately unhurried pace."
+  },
+  {
+    "dayOfYear": 282,
+    "quote": "It did not work this time. That sentence has a lot of hope in it.",
+    "category": "failure",
+    "actionPrompt": "Plan one change for your next attempt."
+  },
+  {
+    "dayOfYear": 283,
+    "quote": "Twenty minutes with a book can be a quiet refuge in a noisy day.",
+    "category": "reading",
+    "actionPrompt": "Find a quiet corner and read for twenty minutes."
+  },
+  {
+    "dayOfYear": 284,
+    "quote": "Priorities are proven by what you do first.",
+    "category": "focus",
+    "actionPrompt": "Start your day with your top priority, not your inbox."
+  },
+  {
+    "dayOfYear": 285,
+    "quote": "Every confident person you know once did something for the first time with shaking hands.",
+    "category": "courage",
+    "actionPrompt": "Do one first-time thing today, however small."
+  },
+  {
+    "dayOfYear": 286,
+    "quote": "Honest self-review is kinder in the long run than comfortable self-deception.",
+    "category": "reflection",
+    "actionPrompt": "Rate one habit honestly from 1 to 10 and note why."
+  },
+  {
+    "dayOfYear": 287,
+    "quote": "Letting go of a task on purpose is also a way of finishing it.",
+    "category": "finishing",
+    "actionPrompt": "Remove one task from your list that no longer matters."
+  },
+  {
+    "dayOfYear": 288,
+    "quote": "Nothing grows in a plan that never leaves the page.",
+    "category": "beginnings",
+    "actionPrompt": "Move one idea from your notes into action today."
+  },
+  {
+    "dayOfYear": 289,
+    "quote": "You can feel overwhelmed and still take one next step.",
+    "category": "resilience",
+    "actionPrompt": "Pick the single next step and ignore the rest for an hour."
+  },
+  {
+    "dayOfYear": 290,
+    "quote": "Attention scattered across ten things rarely changes any of them.",
+    "category": "focus",
+    "actionPrompt": "Choose one area of life to give extra attention this week."
+  },
+  {
+    "dayOfYear": 291,
+    "quote": "A good day is often just a well-used morning and a gently kept evening.",
+    "category": "time",
+    "actionPrompt": "Plan a calm evening routine for tonight."
+  },
+  {
+    "dayOfYear": 292,
+    "quote": "Take care of your health before it asks loudly for attention.",
+    "category": "health",
+    "actionPrompt": "Book a checkup you have been postponing."
+  },
+  {
+    "dayOfYear": 293,
+    "quote": "Skipping a day will not ruin you. Letting one skip become a habit might.",
+    "category": "consistency",
+    "actionPrompt": "Restart one paused routine today, gently."
+  },
+  {
+    "dayOfYear": 294,
+    "quote": "Show your process, not only your results. People trust what they can follow.",
+    "category": "work",
+    "actionPrompt": "Write down the steps you took on one task."
+  },
+  {
+    "dayOfYear": 295,
+    "quote": "Share what you read. Ideas grow when they are discussed.",
+    "category": "reading",
+    "actionPrompt": "Tell someone about an idea from a book you are reading."
+  },
+  {
+    "dayOfYear": 296,
+    "quote": "Saying no to the trivial is how you make room for the important.",
+    "category": "discipline",
+    "actionPrompt": "Decline or postpone one low-value request."
+  },
+  {
+    "dayOfYear": 297,
+    "quote": "Not every answer is ready when you are. Some need another season.",
+    "category": "patience",
+    "actionPrompt": "Set aside one question you cannot answer yet and revisit it later."
+  },
+  {
+    "dayOfYear": 298,
+    "quote": "Being a work in progress is not a flaw. It is the point.",
+    "category": "growth",
+    "actionPrompt": "Acknowledge one thing you are still improving at."
+  },
+  {
+    "dayOfYear": 299,
+    "quote": "Learn from people a few steps ahead of you. Their path is still fresh in their minds.",
+    "category": "learning",
+    "actionPrompt": "Ask someone slightly more experienced for one tip."
+  },
+  {
+    "dayOfYear": 300,
+    "quote": "You can forgive yourself and still take responsibility. The two work together.",
+    "category": "self-respect",
+    "actionPrompt": "Forgive yourself for one past mistake, then fix what you can."
+  },
+  {
+    "dayOfYear": 301,
+    "quote": "The finish line is often closer than it feels when you are tired.",
+    "category": "finishing",
+    "actionPrompt": "Count how many steps remain on a project. Take one."
+  },
+  {
+    "dayOfYear": 302,
+    "quote": "Mistakes made while trying are different from mistakes made while not caring.",
+    "category": "failure",
+    "actionPrompt": "Acknowledge the effort behind one of your recent mistakes."
+  },
+  {
+    "dayOfYear": 303,
+    "quote": "Unlearning a bad habit is learning too, and often the more valuable kind.",
+    "category": "learning",
+    "actionPrompt": "Identify one outdated method you still use."
+  },
+  {
+    "dayOfYear": 304,
+    "quote": "Your best ideas usually come after the obvious ones are out of the way.",
+    "category": "work",
+    "actionPrompt": "List ten ideas for a problem and look closely at the last three."
+  },
+  {
+    "dayOfYear": 305,
+    "quote": "A library card is one of the best deals you will ever get.",
+    "category": "reading",
+    "actionPrompt": "Borrow a book from a library, physical or digital."
+  },
+  {
+    "dayOfYear": 306,
+    "quote": "Your calendar shows your real priorities more clearly than your intentions do.",
+    "category": "reflection",
+    "actionPrompt": "Look at last week's calendar. Does it match what matters to you?"
+  },
+  {
+    "dayOfYear": 307,
+    "quote": "Order in small things makes room for clarity in large ones.",
+    "category": "discipline",
+    "actionPrompt": "Make your bed or clear your desk before you begin."
+  },
+  {
+    "dayOfYear": 308,
+    "quote": "The way you treat yourself quietly teaches others how to treat you.",
+    "category": "self-respect",
+    "actionPrompt": "Stand up for your own needs once today."
+  },
+  {
+    "dayOfYear": 309,
+    "quote": "A single deep hour can outweigh a whole distracted day.",
+    "category": "focus",
+    "actionPrompt": "Schedule one hour of deep work for tomorrow."
+  },
+  {
+    "dayOfYear": 310,
+    "quote": "Stretch goals work best when the next step is still reachable.",
+    "category": "growth",
+    "actionPrompt": "Break one big goal into a step you can do this week."
+  },
+  {
+    "dayOfYear": 311,
+    "quote": "Sometimes holding steady is the achievement.",
+    "category": "resilience",
+    "actionPrompt": "Keep your basics in place today: sleep, food, movement."
+  },
+  {
+    "dayOfYear": 312,
+    "quote": "A setback in one area is not a verdict on your whole life.",
+    "category": "failure",
+    "actionPrompt": "Name one area of life that is going well right now."
+  },
+  {
+    "dayOfYear": 313,
+    "quote": "Instant results are rare for anything worth keeping.",
+    "category": "patience",
+    "actionPrompt": "Choose one long-term goal over one quick reward today."
+  },
+  {
+    "dayOfYear": 314,
+    "quote": "Regular practice turns hard things into familiar things.",
+    "category": "consistency",
+    "actionPrompt": "Spend fifteen minutes on the hardest part of a skill you are building."
+  },
+  {
+    "dayOfYear": 315,
+    "quote": "Delivering on time is often about reducing scope, not increasing effort.",
+    "category": "finishing",
+    "actionPrompt": "Cut one nonessential part of a project so you can finish it."
+  },
+  {
+    "dayOfYear": 316,
+    "quote": "It is braver to be seen trying than to wait until you are sure to look good.",
+    "category": "courage",
+    "actionPrompt": "Practice something new in front of others."
+  },
+  {
+    "dayOfYear": 317,
+    "quote": "Energy matters as much as time. Put your hardest work where you are sharpest.",
+    "category": "time",
+    "actionPrompt": "Move your hardest task to your most energetic hour."
+  },
+  {
+    "dayOfYear": 318,
+    "quote": "Energy is not unlimited. Spend it where it matters and refill it on purpose.",
+    "category": "health",
+    "actionPrompt": "Schedule one activity that refills your energy this week."
+  },
+  {
+    "dayOfYear": 319,
+    "quote": "Pause before you react. The space in between is where your choices live.",
+    "category": "reflection",
+    "actionPrompt": "Take three slow breaths before your next reply."
+  },
+  {
+    "dayOfYear": 320,
+    "quote": "Long evenings are made for long books.",
+    "category": "reading",
+    "actionPrompt": "Start a longer book you have been saving for later."
+  },
+  {
+    "dayOfYear": 321,
+    "quote": "Mind and body are one system. Caring for one helps the other.",
+    "category": "health",
+    "actionPrompt": "Pair a short walk with a problem you are thinking through."
+  },
+  {
+    "dayOfYear": 322,
+    "quote": "The version of you that follows through is built one kept commitment at a time.",
+    "category": "discipline",
+    "actionPrompt": "Keep one commitment today exactly as promised."
+  },
+  {
+    "dayOfYear": 323,
+    "quote": "You do not have to feel consistent to be consistent. You only have to return.",
+    "category": "consistency",
+    "actionPrompt": "Return to your routine, whatever mood you are in."
+  },
+  {
+    "dayOfYear": 324,
+    "quote": "Slow is not stuck. Stuck is not moving at all.",
+    "category": "patience",
+    "actionPrompt": "Take one small step on a stalled project."
+  },
+  {
+    "dayOfYear": 325,
+    "quote": "Needing time to recover is human, not weak.",
+    "category": "self-respect",
+    "actionPrompt": "Allow yourself a slower day if you need it."
+  },
+  {
+    "dayOfYear": 326,
+    "quote": "Setbacks sting less when your identity is bigger than any one outcome.",
+    "category": "resilience",
+    "actionPrompt": "Name three roles or values that define you beyond work."
+  },
+  {
+    "dayOfYear": 327,
+    "quote": "Notice the moment you reach for distraction. That moment is the lesson.",
+    "category": "focus",
+    "actionPrompt": "When you feel the urge to switch tasks, wait one minute."
+  },
+  {
+    "dayOfYear": 328,
+    "quote": "Hours spent with people you care about are never the wrong use of time.",
+    "category": "time",
+    "actionPrompt": "Call or visit someone you have been meaning to see."
+  },
+  {
+    "dayOfYear": 329,
+    "quote": "History makes present problems feel less new and more solvable.",
+    "category": "reading",
+    "actionPrompt": "Read about how someone faced a problem similar to yours."
+  },
+  {
+    "dayOfYear": 330,
+    "quote": "Polish is valuable only after the thing works.",
+    "category": "finishing",
+    "actionPrompt": "Get one thing working first. Save the polishing for later."
+  },
+  {
+    "dayOfYear": 331,
+    "quote": "Every season teaches something if you give it a moment of attention.",
+    "category": "reflection",
+    "actionPrompt": "Write down what this season of life is teaching you."
+  },
+  {
+    "dayOfYear": 332,
+    "quote": "Reliability is a rare talent. Be the person whose word holds.",
+    "category": "work",
+    "actionPrompt": "Deliver one promised item on or before its deadline."
+  },
+  {
+    "dayOfYear": 333,
+    "quote": "End the day by finishing something, however small.",
+    "category": "finishing",
+    "actionPrompt": "Complete one small task in the last hour of your day."
+  },
+  {
+    "dayOfYear": 334,
+    "quote": "Measure your progress against your past self, not against someone else's highlights.",
+    "category": "reflection",
+    "actionPrompt": "Compare where you are now with where you were six months ago."
+  },
+  {
+    "dayOfYear": 335,
+    "quote": "Learning does not end with school. It just stops being scheduled for you.",
+    "category": "learning",
+    "actionPrompt": "Put a weekly learning session on your calendar."
+  },
+  {
+    "dayOfYear": 336,
+    "quote": "Starting over takes courage. So does staying when it is hard. Know which one you need.",
+    "category": "courage",
+    "actionPrompt": "Write down whether this moment calls for leaving or staying."
+  },
+  {
+    "dayOfYear": 337,
+    "quote": "Each season of life asks you to grow in a different direction.",
+    "category": "growth",
+    "actionPrompt": "Ask yourself what this season is asking you to develop."
+  },
+  {
+    "dayOfYear": 338,
+    "quote": "Your worst attempt can become your most useful reference point.",
+    "category": "failure",
+    "actionPrompt": "Save one early attempt to compare against future ones."
+  },
+  {
+    "dayOfYear": 339,
+    "quote": "Do not just collect books. Let one of them change a habit.",
+    "category": "reading",
+    "actionPrompt": "Apply one idea from a book you read this year."
+  },
+  {
+    "dayOfYear": 340,
+    "quote": "The dark months are for keeping small lights on.",
+    "category": "resilience",
+    "actionPrompt": "Keep one small ritual that brightens your winter days."
+  },
+  {
+    "dayOfYear": 341,
+    "quote": "Work is not the whole of you, but how you do it reflects what you value.",
+    "category": "work",
+    "actionPrompt": "Name one value you want your work to show."
+  },
+  {
+    "dayOfYear": 342,
+    "quote": "Small wins deserve notice. They are evidence that you keep your word.",
+    "category": "self-respect",
+    "actionPrompt": "Acknowledge one small win from today."
+  },
+  {
+    "dayOfYear": 343,
+    "quote": "Face the small fear today, and tomorrow's larger one gets a little quieter.",
+    "category": "courage",
+    "actionPrompt": "List one fear and one tiny action that faces it."
+  },
+  {
+    "dayOfYear": 344,
+    "quote": "Rejection is often about fit, not worth.",
+    "category": "failure",
+    "actionPrompt": "Send the next application or pitch after a rejection."
+  },
+  {
+    "dayOfYear": 345,
+    "quote": "Finishing the year well is not about a big push. It is about closing what matters.",
+    "category": "finishing",
+    "actionPrompt": "Choose the one thing you want to complete before the year ends."
+  },
+  {
+    "dayOfYear": 346,
+    "quote": "Kairos is the right moment, not just any moment. Watch for it, then act.",
+    "category": "time",
+    "actionPrompt": "When a good opportunity appears today, act on it within an hour."
+  },
+  {
+    "dayOfYear": 347,
+    "quote": "What you pay attention to grows. Choose it carefully.",
+    "category": "focus",
+    "actionPrompt": "Spend your free attention today on something that nourishes you."
+  },
+  {
+    "dayOfYear": 348,
+    "quote": "Small deposits, made often, build the largest accounts.",
+    "category": "consistency",
+    "actionPrompt": "Make one small deposit today: a page, a rep, a coin saved."
+  },
+  {
+    "dayOfYear": 349,
+    "quote": "Evenings shape mornings. Put the day to bed with intention.",
+    "category": "discipline",
+    "actionPrompt": "Set a fixed time tonight to put your phone away."
+  },
+  {
+    "dayOfYear": 350,
+    "quote": "Tie off the loose ends before the year ties them off for you.",
+    "category": "finishing",
+    "actionPrompt": "Handle three small pending items before the week ends."
+  },
+  {
+    "dayOfYear": 351,
+    "quote": "Growth is sometimes adding, and sometimes letting go of what no longer fits.",
+    "category": "growth",
+    "actionPrompt": "Remove one commitment that no longer fits who you are."
+  },
+  {
+    "dayOfYear": 352,
+    "quote": "Patience with a hard problem is often what separates solving it from abandoning it.",
+    "category": "patience",
+    "actionPrompt": "Return to a hard problem for one more focused attempt."
+  },
+  {
+    "dayOfYear": 353,
+    "quote": "Tomorrow is another attempt, and it does not need to remember today's mistakes.",
+    "category": "resilience",
+    "actionPrompt": "Write one fresh intention for tomorrow."
+  },
+  {
+    "dayOfYear": 354,
+    "quote": "Depth in one area makes breadth in others easier to build.",
+    "category": "learning",
+    "actionPrompt": "Choose one topic to go deeper on this month."
+  },
+  {
+    "dayOfYear": 355,
+    "quote": "A year is finished one ordinary day at a time.",
+    "category": "finishing",
+    "actionPrompt": "Finish today's most important task before evening."
+  },
+  {
+    "dayOfYear": 356,
+    "quote": "Gratitude is not pretending things are fine. It is noticing what still is.",
+    "category": "reflection",
+    "actionPrompt": "Write down three specific things you are grateful for."
+  },
+  {
+    "dayOfYear": 357,
+    "quote": "Closing a chapter well makes the next one easier to open.",
+    "category": "finishing",
+    "actionPrompt": "Write a short wrap-up note for something you just completed."
+  },
+  {
+    "dayOfYear": 358,
+    "quote": "The person you were a year ago would be surprised by some of what you handle now.",
+    "category": "reflection",
+    "actionPrompt": "Write down one way you have grown since last year."
+  },
+  {
+    "dayOfYear": 359,
+    "quote": "Every completed thing becomes quiet proof that you can complete the next.",
+    "category": "finishing",
+    "actionPrompt": "List three things you finished this month."
+  },
+  {
+    "dayOfYear": 360,
+    "quote": "A year holds more than you remember. Look back slowly.",
+    "category": "reflection",
+    "actionPrompt": "Go through this year's notes or photos and list the highlights."
+  },
+  {
+    "dayOfYear": 361,
+    "quote": "Ending well is a form of respect for the effort you already put in.",
+    "category": "finishing",
+    "actionPrompt": "Tidy up and document one project before moving on."
+  },
+  {
+    "dayOfYear": 362,
+    "quote": "Reflection turns experience into understanding. Without it, experience is just time passing.",
+    "category": "reflection",
+    "actionPrompt": "Answer in writing: what did this month teach me?"
+  },
+  {
+    "dayOfYear": 363,
+    "quote": "Close the tabs, file the notes, put the tools away. Endings deserve a little care.",
+    "category": "finishing",
+    "actionPrompt": "Spend five minutes clearing your workspace when you stop today."
+  },
+  {
+    "dayOfYear": 364,
+    "quote": "A strong body is built slowly, the same way a good life is.",
+    "category": "health",
+    "actionPrompt": "Add one small strength exercise to your day."
+  },
+  {
+    "dayOfYear": 365,
+    "quote": "Close the year with honesty and kindness, in equal measure.",
+    "category": "reflection",
+    "actionPrompt": "Write a short letter to yourself about this year."
+  }
+]
