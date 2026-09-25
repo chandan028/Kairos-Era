@@ -17,8 +17,8 @@ android {
         applicationId = "com.kairosera"
         minSdk = 26
         targetSdk = 35
-        versionCode = 7
-        versionName = "0.5.1"
+        versionCode = 8
+        versionName = "0.6.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -90,6 +90,8 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    // App lock: the phone's fingerprint, face or screen lock, one API on Android 8 to 15.
+    implementation(libs.androidx.biometric)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)

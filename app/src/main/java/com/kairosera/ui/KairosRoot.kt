@@ -126,6 +126,7 @@ object Routes {
     const val SETTINGS = "settings"
     const val TRASH = "trash"
     const val PRIVACY = "privacy"
+    const val BACKUP = "backup"
     const val ABOUT = "about"
     const val HOME_CARDS = "home_cards"
     const val TRACKER = "tracker"
@@ -183,7 +184,7 @@ fun KairosRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchReq
         Routes.TRACKER, Routes.TRACKER_EDIT -> Routes.TRACK
         Routes.BOOK, Routes.BOOK_EDIT -> Routes.TRACK
         Routes.JOURNAL_EDIT -> Routes.JOURNAL
-        Routes.READ, Routes.SETTINGS, Routes.TRASH, Routes.PRIVACY, Routes.ABOUT, Routes.STATS, Routes.CALENDAR, Routes.DAY -> Routes.MORE
+        Routes.READ, Routes.SETTINGS, Routes.TRASH, Routes.PRIVACY, Routes.BACKUP, Routes.ABOUT, Routes.STATS, Routes.CALENDAR, Routes.DAY -> Routes.MORE
         else -> r
     }
 
@@ -338,6 +339,7 @@ private fun KairosNavHost(nav: NavHostController, settings: AppSettings, onQuick
                 onTrash = { nav.navigate(Routes.TRASH) },
                 onPrivacy = { nav.navigate(Routes.PRIVACY) },
                 onAbout = { nav.navigate(Routes.ABOUT) },
+                onBackup = { nav.navigate(Routes.BACKUP) },
                 onCalendar = { nav.navigate(Routes.calendar()) },
                 onStatistics = { nav.navigate(Routes.STATS) },
                 onJournal = { nav.navigateTopLevel(Routes.JOURNAL) },
@@ -425,9 +427,10 @@ private fun KairosNavHost(nav: NavHostController, settings: AppSettings, onQuick
                 onClose = { nav.popBackStack() },
             )
         }
-        composable(Routes.SETTINGS) { SettingsScreen(onBack = { nav.popBackStack() }, onHomeCards = { nav.navigate(Routes.HOME_CARDS) }, onPrivacy = { nav.navigate(Routes.PRIVACY) }) }
+        composable(Routes.SETTINGS) { SettingsScreen(onBack = { nav.popBackStack() }, onHomeCards = { nav.navigate(Routes.HOME_CARDS) }, onPrivacy = { nav.navigate(Routes.PRIVACY) }, onBackup = { nav.navigate(Routes.BACKUP) }) }
         composable(Routes.TRASH) { TrashScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.PRIVACY) { PrivacyPolicyScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.BACKUP) { com.kairosera.feature.backup.BackupScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.ABOUT) { AboutScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.HOME_CARDS) { HomeCardsScreen(settings = settings, onBack = { nav.popBackStack() }) }
     }

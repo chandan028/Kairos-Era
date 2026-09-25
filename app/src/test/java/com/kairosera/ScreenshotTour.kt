@@ -184,6 +184,29 @@ class ScreenshotTour {
             rule.onNodeWithText("Permissions and why").performScrollTo(); rule.mainClock.advanceTimeBy(500); shot("23c-privacy-permissions")
             rule.onNode(hasContentDescription("Back")).performClick()
         }
+        step("backup") {
+            scrollTo(hasText("Backup and restore")); rule.onNodeWithText("Backup and restore").performClick()
+            waitForText("Create backup"); rule.mainClock.advanceTimeBy(800); shot("24-backup")
+            rule.onNode(hasContentDescription("Back")).performClick()
+        }
+        step("settings security") {
+            scrollTo(hasText("Settings")); rule.onNodeWithText("Settings").performClick(); waitForText("Language")
+            rule.onNodeWithText("Add example content").performScrollTo(); rule.mainClock.advanceTimeBy(500); shot("26-settings-security")
+            rule.onNode(hasContentDescription("Back")).performClick()
+        }
+        step("lock") {
+            val bm = c.appContext.getSystemService(android.hardware.biometrics.BiometricManager::class.java)
+            org.robolectric.shadow.api.Shadow.extract<org.robolectric.shadows.ShadowBiometricManager>(bm).apply {
+                setCanAuthenticate(true)
+                setAuthenticatorType(android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_WEAK or android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+            }
+            kotlinx.coroutines.runBlocking { c.settings.setLock(true) }
+            rule.mainClock.advanceTimeBy(500)
+            c.lock.lockNow(); rule.mainClock.advanceTimeBy(800); shot("25-lock")
+            c.lock.unlock()
+            kotlinx.coroutines.runBlocking { c.settings.setLock(false) }
+            rule.mainClock.advanceTimeBy(500)
+        }
         step("widgets") { widgets() }
     }
 

@@ -22,6 +22,14 @@ import com.kairosera.core.ui.theme.KairosTheme
 import com.kairosera.ui.KairosRoot
 import com.kairosera.ui.LaunchRequest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import android.os.Build
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import com.kairosera.core.security.DeviceAuth
+import com.kairosera.feature.lock.LockScreen
 import java.time.LocalDate
 
 /** AppCompatActivity (not ComponentActivity) so the per-app language switch works on Android 8-12. */
@@ -38,26 +46,73 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) launchRequest = parse(intent)
 
         val container = (application as KairosApp).container
-        val settingsFlow = container.settings.settings.map<AppSettings, AppSettings?> { it }
+        val lock = container.lock
+        // The lock is configured before the settings reach the screen, so locked content never shows for a frame.
+        val settingsFlow = container.settings.settings
+            .onEach { s ->
+                lock.configure(s.lockEnabled, s.lockAfterSeconds)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) setRecentsScreenshotEnabled(!s.lockEnabled)
+            }
+            .map<AppSettings, AppSettings?> { it }
         // The brand moment plays once per cold start, never when opened from a reminder or widget action.
         val playSplash = savedInstanceState == null && launchRequest == null
         setContent {
             val settings by settingsFlow.collectAsStateWithLifecycle(initialValue = null)
             val current = settings
+            val locked by lock.locked.collectAsStateWithLifecycle()
             var splash by rememberSaveable { mutableStateOf(playSplash) }
             KairosTheme(themeMode = current?.themeMode ?: com.kairosera.core.settings.ThemeMode.SYSTEM, dynamicColor = current?.dynamicColor ?: false) {
                 Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
                     if (current != null) {
-                        KairosRoot(
-                            settings = current,
-                            launchRequest = launchRequest,
-                            onLaunchRequestHandled = { launchRequest = null },
-                        )
+                        // While locked, the app stays composed (so navigation is kept) but is hidden from screen readers.
+                        Box(if (locked) Modifier.fillMaxSize().clearAndSetSemantics { } else Modifier.fillMaxSize()) {
+                            KairosRoot(
+                                settings = current,
+                                launchRequest = launchRequest,
+                                onLaunchRequestHandled = { launchRequest = null },
+                            )
+                        }
+                    }
+                    if (locked && current != null) {
+                        val available = remember(locked) { DeviceAuth.isAvailable(this@MainActivity) }
+                        LockScreen(available = available, onUnlock = ::unlock, onLeave = { moveTaskToBack(true) })
+                        LaunchedEffect(splash, available) { if (!splash && available) unlock() }
                     }
                     if (splash) SplashOverlay(onFinished = { splash = false })
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        (application as KairosApp).container.lock.onAppShown()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (application as KairosApp).container.lock.onAppHidden()
+    }
+
+    /** Asks for the phone's own unlock. If the phone no longer has a screen lock, the app lock turns itself off. */
+    private fun unlock() {
+        val container = (application as KairosApp).container
+        val lock = container.lock
+        if (lock.authenticating || !lock.locked.value) return
+        if (!DeviceAuth.isAvailable(this)) {
+            // Reached only by the person tapping "Continue without app lock" on the lock screen.
+            lock.unlock()
+            container.appScope.launch { container.settings.setLock(false) }
+            return
+        }
+        lock.authenticating = true
+        DeviceAuth.prompt(
+            this,
+            title = getString(R.string.lock_prompt_title),
+            subtitle = getString(R.string.lock_prompt_subtitle),
+            onSuccess = { lock.authenticating = false; lock.unlock() },
+            onFailure = { lock.authenticating = false },
+        )
     }
 
     override fun onNewIntent(intent: Intent) {

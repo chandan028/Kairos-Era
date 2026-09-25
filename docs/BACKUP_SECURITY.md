@@ -12,12 +12,19 @@ Decision:
 
 Trade-off: a user who resets or replaces their phone does not get their data back automatically. That is why the app's own backup matters.
 
-## The app's own backup (phase 4)
+## The app's own backup (0.6.0)
 
-- Format: a `.kairos` file (zip) with `manifest.json` (`backupVersion`, `appVersion`, `createdAt`, `checksum`) and one JSON file per data type.
-- Saved only where the user picks, through Android's file picker. No storage permission is needed.
-- Import validates the checksum and version first, then offers **Merge**, **Restore** or **Cancel**. Restore first writes an automatic safety snapshot so it can be undone.
-- Optional passphrase encryption; the app says plainly that a forgotten passphrase can't be recovered.
+Settings › Backup and restore (also in More). Code: `core/backup`.
+
+- **Format:** one `.kairos` file. A fixed header (magic `KAIROSBK`, format version, KDF id, iteration count, salt, nonce) followed by AES-256-GCM ciphertext. The plaintext is gzip of a JSON manifest (`backupVersion`, `appVersion`, `schemaVersion`, `createdAt`, item counts, portable settings) and a SQLite copy of the database. Nothing about the contents is readable without the passphrase, and changing any byte, header included, makes opening fail.
+- **Always encrypted.** A passphrase of at least 8 characters is required; the file will usually live outside the phone (a computer, a USB drive, a cloud folder), so an unencrypted option was left out on purpose. The key comes from PBKDF2-HMAC-SHA256 with 600,000 iterations and is never stored.
+- **What is included:** every data table except `scheduled_notifications`, which is derived and rebuilt after a restore. Portable preferences (name, theme, sounds, snooze, Home layout, favourite quotes). Not included: onboarding progress, the app lock and the last-backup time, which belong to the phone.
+- **Saved only where the person picks**, through Android's file picker. No storage permission.
+- **Restore** decrypts and checks first without touching anything: the database copy is upgraded by the app's own Room migrations (so a backup from an older version works), then `integrity_check` and `foreign_key_check` must pass. A backup from a newer app version is refused. The person sees the backup's date, version and item counts before choosing **Replace my data**, and confirms once more.
+- **Undo:** before replacing anything, the current data is written to `files/safety/before-restore.kairosdb` in private storage. **Undo last restore** puts it back. Only the latest snapshot is kept.
+- **All or nothing:** the replacement runs in one database transaction with deferred foreign keys, so a failure leaves the current data exactly as it was.
+- **Merge** (keeping both sets) is not offered yet: ids would clash across tables, and a wrong merge is worse than none. Restore with Undo covers moving to a new phone and going back to an earlier state.
+- Tests: `BackupCryptoTest` (round trip, wrong passphrase, tampering, other files, format version) and `BackupManagerTest` (exact restore and undo, a version 2 backup upgraded on restore, newer and damaged backups refused without changes).
 
 ## Data-loss rules
 

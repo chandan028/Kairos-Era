@@ -8,6 +8,8 @@
         SCHEDULE_EXACT_ALARM: user-granted special access for on-time task reminders; reminders still work
         (possibly a few minutes late) without it.
         RECEIVE_BOOT_COMPLETED: rebuild the reminder schedule after a restart.
+        USE_BIOMETRIC / USE_FINGERPRINT (merged from androidx.biometric): the optional app lock. Android does the
+        check; the app never receives biometric data.
     -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />

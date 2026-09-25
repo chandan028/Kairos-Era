@@ -30,7 +30,7 @@ import java.time.LocalDate
 
 /** Manual dependency wiring. Small enough that a DI framework would add more than it saves. */
 class AppContainer(context: Context) {
-    private val appContext = context.applicationContext
+    val appContext: Context = context.applicationContext
 
     val appScope = CoroutineScope(
         SupervisorJob() + Dispatchers.Default + CoroutineExceptionHandler { _, e -> SafeLog.error("app_scope_failure", e) },
@@ -66,6 +66,9 @@ class AppContainer(context: Context) {
     }
 
     private val remindersChanged: suspend () -> Unit = { scheduler.rebuild("data_changed") }
+
+    val backup by lazy { com.kairosera.core.backup.BackupManager(appContext, database, settings, clock) { scheduler.rebuild("restored") } }
+    val lock = com.kairosera.core.security.AppLock()
 
     val observeDayPlan by lazy { ObserveDayPlan(tasks) }
     val saveTask by lazy { SaveTask(tasks, clock, remindersChanged) }

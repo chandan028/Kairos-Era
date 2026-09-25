@@ -47,6 +47,7 @@ import com.kairosera.R
 import com.kairosera.core.settings.AppSettings
 import com.kairosera.core.settings.ThemeMode
 import com.kairosera.core.ui.components.SectionLabel
+import com.kairosera.core.security.DeviceAuth
 import com.kairosera.feature.tasks.SELECTABLE_SOUNDS
 import com.kairosera.feature.tasks.soundLabel
 import com.kairosera.ui.appContainer
@@ -54,7 +55,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit, onPrivacy: () -> Unit = {}) {
+fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit, onPrivacy: () -> Unit = {}, onBackup: () -> Unit = {}) {
     val c = appContainer()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -71,7 +72,7 @@ fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit, onPrivacy: () ->
     var nameDraft by remember(settings.name) { mutableStateOf(settings.name) }
 
     SubScreen(stringResource(R.string.settings), onBack) {
-        Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Column(Modifier.verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 112.dp)) {
             // General
             SectionLabel(stringResource(R.string.settings_general), Modifier.padding(top = 8.dp, bottom = 8.dp))
             Text(stringResource(R.string.settings_language), style = MaterialTheme.typography.titleSmall)
@@ -173,6 +174,51 @@ fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit, onPrivacy: () ->
                 }
             }
 
+            // Privacy and security
+            SectionLabel(stringResource(R.string.settings_security), Modifier.padding(top = 24.dp, bottom = 8.dp))
+            val lockAvailable = remember(refresh) { DeviceAuth.isAvailable(context) }
+            val lockPrompt = stringResource(R.string.lock_enable_prompt)
+            val lockSubtitle = stringResource(R.string.lock_prompt_subtitle)
+            SwitchRow(
+                stringResource(R.string.lock_setting),
+                stringResource(if (lockAvailable || settings.lockEnabled) R.string.lock_setting_summary else R.string.lock_setting_unavailable),
+                settings.lockEnabled,
+            ) { on ->
+                val activity = context as? androidx.fragment.app.FragmentActivity
+                when {
+                    !on -> scope.launch { c.settings.setLock(false) }
+                    // Turning the lock on proves the phone's unlock works first, so no one gets locked out.
+                    lockAvailable && activity != null -> {
+                        c.lock.authenticating = true
+                        DeviceAuth.prompt(
+                            activity, lockPrompt, lockSubtitle,
+                            onSuccess = { c.lock.authenticating = false; scope.launch { c.settings.setLock(true) } },
+                            onFailure = { c.lock.authenticating = false },
+                        )
+                    }
+                    else -> startSafely(context, Intent(Settings.ACTION_SECURITY_SETTINGS))
+                }
+            }
+            if (settings.lockEnabled) {
+                Text(stringResource(R.string.lock_after), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(start = 16.dp, top = 4.dp))
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(horizontal = 16.dp)) {
+                    listOf(0 to R.string.lock_after_now, 60 to R.string.lock_after_1, 300 to R.string.lock_after_5, 900 to R.string.lock_after_15).forEach { (secs, label) ->
+                        FilterChip(selected = settings.lockAfterSeconds == secs, onClick = { scope.launch { c.settings.setLockAfterSeconds(secs) } }, label = { Text(stringResource(label)) })
+                    }
+                }
+                Text(stringResource(R.string.lock_note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
+            }
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.backup_title)) },
+                supportingContent = { Text(stringResource(R.string.backup_summary)) },
+                modifier = Modifier.clickable(onClick = onBackup),
+            )
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.privacy_policy)) },
+                supportingContent = { Text(stringResource(R.string.privacy_policy_summary)) },
+                modifier = Modifier.clickable(onClick = onPrivacy),
+            )
+
             // Data
             SectionLabel(stringResource(R.string.settings_data), Modifier.padding(top = 24.dp, bottom = 8.dp))
             ListItem(
@@ -184,11 +230,6 @@ fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit, onPrivacy: () ->
                 headlineContent = { Text(stringResource(R.string.remove_examples)) },
                 supportingContent = { Text(stringResource(R.string.remove_examples_summary)) },
                 modifier = Modifier.clickable { confirmRemoveSamples = true },
-            )
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.privacy_policy)) },
-                supportingContent = { Text(stringResource(R.string.privacy_policy_summary)) },
-                modifier = Modifier.clickable(onClick = onPrivacy),
             )
             HorizontalDivider(Modifier.padding(vertical = 16.dp))
             Text(stringResource(R.string.settings_footer), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
