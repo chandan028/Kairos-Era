@@ -14,3 +14,7 @@
     public static int d(...);
     public static int i(...);
 }
+# Keep line numbers so a release crash report (class names and frames only) can be decoded
+# with this build's mapping.txt; source file names are replaced with a fixed placeholder.
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
