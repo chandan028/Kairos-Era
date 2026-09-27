@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Reminder sounds are looked up by name for notification channel URIs, so resource
+     shrinking cannot see the references. Keep them in release builds. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@raw/kairos_bell,@raw/soft_chime,@raw/focus_tone" />

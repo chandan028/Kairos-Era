@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- AppCompat parent so AppCompatActivity (per-app language on Android 8-12) works; Compose draws everything else. -->
+    <style name="Base.Theme.Kairos" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <!-- values-v27 adds display-cutout support (the attribute does not exist on Android 8.0). -->
+    <style name="Theme.Kairos" parent="Base.Theme.Kairos" />
+
+    <style name="Theme.Kairos.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/brand_navy</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.Kairos</item>
+    </style>
+</resources>

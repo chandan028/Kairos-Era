@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand primitives. Compose reads its own copies in core/ui/theme/Theme.kt; these serve XML (icon, splash, widgets, notifications). -->
+    <color name="brand_navy">#1E2D4F</color>
+    <color name="brand_navy_deep">#0F1829</color>
+    <color name="brand_sun">#E8B04B</color>
+    <color name="brand_cream">#F5EFE3</color>
+    <color name="brand_cream_card">#FDFAF4</color>
+    <color name="brand_mountain">#5E7AAE</color>
+    <color name="brand_mountain_light">#8FA6CF</color>
+    <color name="ink">#1A2233</color>
+    <color name="ink_muted">#5B6170</color>
+    <color name="tone_green">#36724E</color>
+    <color name="window_background">#F5EFE3</color>
+</resources>
