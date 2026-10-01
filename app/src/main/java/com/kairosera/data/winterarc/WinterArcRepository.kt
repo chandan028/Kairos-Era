@@ -88,7 +88,8 @@ class WinterArcRepository(
     /** Starts a new challenge (or restarts it) with the chosen habits. Earlier logs stay in the database. */
     suspend fun startArc(start: LocalDate, enabled: Set<HabitKind>): Long = db.withTransaction {
         ensureHabits()
-        HabitKind.entries.forEach { k -> setHabitActive(k, k in enabled) }
+        // Only the built-in habits are chosen here; custom habits keep their own on/off switch.
+        HabitKind.BUILT_IN.forEach { k -> setHabitActive(k, k in enabled) }
         val bookId = ensureCurrentBook()
         val prev = dao.latestArc()
         if (prev != null && prev.status != ArcStatus.ENDED.name) {
@@ -130,7 +131,7 @@ class WinterArcRepository(
 
     /** Starts over from [start] with the same habits; history stays in the database and in Statistics. */
     suspend fun reset(start: LocalDate) {
-        val enabled = dao.habits().filter { it.active }.mapNotNull { HabitKind.fromKey(it.id) }.toSet().ifEmpty { HabitKind.entries.toSet() }
+        val enabled = dao.habits().filter { it.active }.mapNotNull { HabitKind.fromKey(it.id) }.toSet().ifEmpty { HabitKind.BUILT_IN.toSet() }
         startArc(start, enabled)
     }
 
@@ -144,32 +145,80 @@ class WinterArcRepository(
     val habits: Flow<List<Habit>> = dao.observeHabits().map { rows ->
         val byId = rows.associateBy { it.id }
         // Habits not yet seeded show with defaults, so the dashboard never starts empty.
-        HabitKind.entries.map { k -> byId[k.name]?.toDomain(k) ?: Habit(k) }.sortedBy { it.sortOrder }
+        val builtIn = HabitKind.BUILT_IN.map { k -> byId[k.name]?.toDomain(k) ?: Habit(k) }
+        val custom = rows.filter { Habit.isCustomId(it.id) }.map { it.toCustom() }
+        (builtIn + custom).sortedBy { it.sortOrder }
     }
 
     suspend fun ensureHabits() {
-        dao.insertHabits(HabitKind.entries.map { k ->
+        dao.insertHabits(HabitKind.BUILT_IN.map { k ->
             WaHabitEntity(k.name, k.category, k.type.name, k.defaultTarget, k.unit, true, k.ordinal)
         })
     }
 
-    suspend fun setHabitActive(kind: HabitKind, active: Boolean) {
+    suspend fun setHabitActive(kind: HabitKind, active: Boolean) = setHabitActive(kind.name, active)
+
+    suspend fun setHabitActive(id: String, active: Boolean) {
         ensureHabits()
-        val row = dao.habits().first { it.id == kind.name }
+        val row = dao.habits().firstOrNull { it.id == id } ?: return
         dao.upsertHabit(row.copy(active = active))
     }
 
-    suspend fun setTarget(kind: HabitKind, target: Double) {
+    suspend fun setTarget(kind: HabitKind, target: Double) = setTarget(kind.name, target)
+
+    suspend fun setTarget(id: String, target: Double) {
         ensureHabits()
-        val row = dao.habits().first { it.id == kind.name }
+        val row = dao.habits().firstOrNull { it.id == id } ?: return
         dao.upsertHabit(row.copy(target = target))
+    }
+
+    /** Adds a habit of the person's own after the built-in ones. Returns its id. */
+    suspend fun addCustomHabit(name: String, type: HabitType, target: Double, unit: String, icon: String, color: Int): String = db.withTransaction {
+        ensureHabits()
+        val rows = dao.habits()
+        var n = rows.count { Habit.isCustomId(it.id) } + 1
+        while (rows.any { it.id == "${Habit.CUSTOM_PREFIX}$n" }) n++
+        val h = Habit.custom("${Habit.CUSTOM_PREFIX}$n", name, type, target, unit, icon, color, (rows.maxOfOrNull { it.sortOrder } ?: 0).coerceAtLeast(HabitKind.BUILT_IN.size) + 1)
+        dao.upsertHabit(h.toEntity())
+        h.id
+    }
+
+    /** Renames or retargets a custom habit; its history stays. */
+    suspend fun updateCustomHabit(id: String, name: String, type: HabitType, target: Double, unit: String, icon: String, color: Int) = db.withTransaction {
+        val row = dao.habits().firstOrNull { it.id == id && Habit.isCustomId(it.id) } ?: return@withTransaction
+        dao.upsertHabit(Habit.custom(id, name, type, target, unit, icon, color, row.sortOrder).copy(active = row.active).toEntity())
+    }
+
+    /** Removes a custom habit and every day logged for it. Built-in habits can only be switched off. */
+    suspend fun deleteCustomHabit(id: String) = db.withTransaction {
+        if (!Habit.isCustomId(id)) return@withTransaction
+        dao.deleteLogs(id)
+        dao.deleteHabit(id)
+    }
+
+    suspend fun setCustomChecked(id: String, date: LocalDate, done: Boolean) {
+        if (!Habit.isCustomId(id)) return
+        upsertLog(id, date) { it.copy(completed = done, value = if (done) 1.0 else 0.0) }
+    }
+
+    /** Sets a custom amount for the day (0 clears it). */
+    suspend fun setCustomValue(id: String, date: LocalDate, value: Double) {
+        if (!Habit.isCustomId(id)) return
+        upsertLog(id, date) { it.copy(value = value.coerceIn(0.0, 1_000_000.0), completed = false) }
+    }
+
+    suspend fun addCustomValue(id: String, date: LocalDate, delta: Double) {
+        if (!Habit.isCustomId(id)) return
+        upsertLog(id, date) { it.copy(value = (it.value + delta).coerceIn(0.0, 1_000_000.0), completed = false) }
     }
 
     fun observeLogs(from: LocalDate, to: LocalDate): Flow<List<HabitLog>> =
         dao.observeLogs(from.toEpochDay(), to.toEpochDay()).map { l -> l.map { it.toDomain() } }
 
-    private suspend fun upsertLog(kind: HabitKind, date: LocalDate, change: (WaHabitLogEntity) -> WaHabitLogEntity) = db.withTransaction {
-        val old = dao.log(kind.name, date.toEpochDay()) ?: WaHabitLogEntity(kind.name, date.toEpochDay(), 0.0, false, "", 0.0, 0)
+    private suspend fun upsertLog(kind: HabitKind, date: LocalDate, change: (WaHabitLogEntity) -> WaHabitLogEntity) = upsertLog(kind.name, date, change)
+
+    private suspend fun upsertLog(id: String, date: LocalDate, change: (WaHabitLogEntity) -> WaHabitLogEntity) = db.withTransaction {
+        val old = dao.log(id, date.toEpochDay()) ?: WaHabitLogEntity(id, date.toEpochDay(), 0.0, false, "", 0.0, 0)
         dao.upsertLog(change(old).copy(updatedAt = now()))
     }
 
@@ -390,6 +439,13 @@ private fun WinterArcEntity.toDomain() = WinterArc(
 )
 
 private fun WaHabitEntity.toDomain(kind: HabitKind) = Habit(kind = kind, target = target, active = active, sortOrder = sortOrder)
+
+private fun WaHabitEntity.toCustom() = Habit(
+    kind = HabitKind.CUSTOM, target = target, active = active, sortOrder = sortOrder, id = id, name = name,
+    type = HabitType.entries.firstOrNull { it.name == type && it != HabitType.TIME } ?: HabitType.CHECK, unit = unit, icon = icon, color = color,
+)
+
+private fun Habit.toEntity() = WaHabitEntity(id, kind.category, type.name, target, unit, active, sortOrder, name, icon, color)
 
 private fun WaHabitLogEntity.toDomain() = HabitLog(habitId, LocalDate.ofEpochDay(date), value, completed, notes, extra)
 

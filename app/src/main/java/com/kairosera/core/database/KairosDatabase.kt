@@ -48,11 +48,11 @@ abstract class KairosDatabase : RoomDatabase() {
     abstract fun winterArcDao(): WinterArcDao
 
     companion object {
-        const val VERSION = 4
+        const val VERSION = 5
         const val NAME = "kairos.db"
 
         /** Ordered list of every migration. Append; never edit a shipped one. */
-        val MIGRATIONS = arrayOf<androidx.room.migration.Migration>(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4)
+        val MIGRATIONS = arrayOf<androidx.room.migration.Migration>(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4, Migrations.MIGRATION_4_5)
 
         fun build(context: Context): KairosDatabase =
             Room.databaseBuilder(context, KairosDatabase::class.java, NAME)

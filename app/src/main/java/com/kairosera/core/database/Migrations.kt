@@ -52,6 +52,15 @@ object Migrations {
         }
     }
 
+    /** v5 lets people add their own Winter Arc habits: three columns with defaults, existing rows keep their values. */
+    val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `wa_habits` ADD COLUMN `name` TEXT NOT NULL DEFAULT ''")
+            db.execSQL("ALTER TABLE `wa_habits` ADD COLUMN `icon` TEXT NOT NULL DEFAULT ''")
+            db.execSQL("ALTER TABLE `wa_habits` ADD COLUMN `color` INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
     // Copied from app/schemas/.../4.json: the six Winter Arc tables. Nothing existing changes.
     private val WINTER_ARC_V4 = listOf(
         "CREATE TABLE IF NOT EXISTS `winter_arcs` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `startDate` INTEGER NOT NULL, `endDate` INTEGER NOT NULL, `durationDays` INTEGER NOT NULL, `status` TEXT NOT NULL, `pauses` TEXT NOT NULL, `bookId` INTEGER, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL)",

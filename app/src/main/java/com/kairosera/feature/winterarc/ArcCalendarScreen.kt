@@ -141,11 +141,11 @@ fun ArcCalendarScreen(vm: ArcViewModel, initialDate: LocalDate?, onBack: (() -> 
                 } else {
                     ArcCard(Modifier.fillMaxWidth(), padding = 12.dp) {
                         d.summary.habits.forEach { h ->
-                            val tone = Arc.tone(h.kind)
+                            val tone = Arc.tone(h)
                             Row(Modifier.fillMaxWidth().padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
-                                HabitBadge(h.kind.icon(), tone, size = 32.dp)
+                                HabitBadge(h.iconVector(), tone, size = 32.dp)
                                 Spacer(Modifier.width(10.dp))
-                                Text(stringResource(h.kind.longLabel()), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                                Text(h.longName(), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
                                 Text(habitValue(h, d), style = MaterialTheme.typography.labelLarge, color = if (h.done) tone.strong else Kairos.colors.muted, fontWeight = FontWeight.SemiBold)
                                 Spacer(Modifier.width(8.dp))
                                 Text(if (h.done) "✓" else "—", color = if (h.done) tone.strong else Kairos.colors.muted, fontWeight = FontWeight.Bold)

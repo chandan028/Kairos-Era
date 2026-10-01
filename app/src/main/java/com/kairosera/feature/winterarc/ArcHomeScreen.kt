@@ -2,6 +2,9 @@ package com.kairosera.feature.winterarc
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -21,6 +24,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.PauseCircle
 import androidx.compose.material.icons.outlined.Settings
@@ -38,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -79,7 +84,8 @@ fun ArcHomeScreen(
 ) {
     val day = vm.home.collectAsStateWithLifecycle().value
     if (day == null) { LoadingState(); return }
-    var sheet by rememberSaveable { mutableStateOf<HabitKind?>(null) }
+    var sheet by rememberSaveable { mutableStateOf<String?>(null) }
+    var adding by rememberSaveable { mutableStateOf(false) }
     val locale = currentLocale()
     val dateFmt = remember(locale) { DateTimeFormatter.ofPattern("EEE, d MMM yyyy", locale) }
 
@@ -93,16 +99,17 @@ fun ArcHomeScreen(
                 Spacer(Modifier.height(16.dp))
                 HabitGrid(
                     day = day,
-                    onOpen = { k ->
-                        when (k) {
+                    onOpen = { h ->
+                        when (h.kind) {
                             HabitKind.STUDY -> onOpenStudy()
                             HabitKind.SPEAK -> onOpenSpeak()
                             HabitKind.DEEP_WORK -> onOpenFocus()
-                            else -> sheet = k
+                            else -> sheet = h.habitId
                         }
                     },
-                    onToggle = { k, done -> vm.setChecked(k, day.date, done) },
+                    onToggle = { h -> vm.toggle(h, day.date) },
                     onQuickWater = { vm.addWater(day.date, 500) },
+                    onAdd = { adding = true },
                 )
                 Spacer(Modifier.height(12.dp))
                 Text(
@@ -115,28 +122,29 @@ fun ArcHomeScreen(
             }
         }
     }
-    sheet?.let { k ->
-        HabitSheet(kind = k, date = day.date, vm = vm, onDismiss = { sheet = null }, onOpenFocus = onOpenFocus)
+    sheet?.let { id ->
+        HabitSheet(habitId = id, date = day.date, vm = vm, onDismiss = { sheet = null }, onOpenFocus = onOpenFocus)
     }
+    if (adding) CustomHabitDialog(existing = null, onDismiss = { adding = false }, onSave = { vm.addCustomHabit(it); adding = false })
 }
 
 @Composable
 private fun Hero(date: String, onOpenCalendar: () -> Unit, onOpenSettings: () -> Unit) {
     Box(Modifier.fillMaxWidth().heightIn(min = 330.dp)) {
         Image(
-            painter = painterResource(R.drawable.onboarding_sunrise),
+            painter = painterResource(R.drawable.arc_winter_hero),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             alignment = BiasAlignment(0f, 0.25f),
             modifier = Modifier.matchParentSize(),
         )
-        // Night at the top for the header, clear sky in the middle, and a fade into the page below.
+        // Polar night at the top for the header, the snowy valley in the middle, and a frosty fade into the page.
         Box(
             Modifier.matchParentSize().background(
                 Brush.verticalGradient(
-                    0f to Color(0xCC0B1322),
-                    0.45f to Color(0x550B1322),
-                    0.8f to Color(0x220B1322),
+                    0f to Color(0xCC071426),
+                    0.45f to Color(0x44071426),
+                    0.8f to Color(0x1A071426),
                     1f to MaterialTheme.colorScheme.background,
                 ),
             ),
@@ -208,7 +216,7 @@ private fun Note(text: String) {
 }
 
 @Composable
-private fun HabitGrid(day: ArcDay, onOpen: (HabitKind) -> Unit, onToggle: (HabitKind, Boolean) -> Unit, onQuickWater: () -> Unit) {
+private fun HabitGrid(day: ArcDay, onOpen: (HabitDay) -> Unit, onToggle: (HabitDay) -> Unit, onQuickWater: () -> Unit, onAdd: () -> Unit) {
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         val columns = when {
             maxWidth >= 600.dp -> 5
@@ -216,10 +224,12 @@ private fun HabitGrid(day: ArcDay, onOpen: (HabitKind) -> Unit, onToggle: (Habit
             else -> 3
         }
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            day.summary.habits.chunked(columns).forEach { row ->
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            // The last cell is always "Add habit", so a person's own habits sit right beside the built-in ones.
+            (day.summary.habits.map<HabitDay, HabitDay?> { it } + null).chunked(columns).forEach { row ->
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.height(IntrinsicSize.Min)) {
                     row.forEach { h ->
-                        HabitTile(h, day, Modifier.weight(1f), onOpen = { onOpen(h.kind) }, onToggle = { onToggle(h.kind, !h.done) }, onQuickWater = onQuickWater)
+                        if (h == null) AddHabitTile(Modifier.weight(1f).fillMaxHeight(), onAdd)
+                        else HabitTile(h, day, Modifier.weight(1f), onOpen = { onOpen(h) }, onToggle = { onToggle(h) }, onQuickWater = onQuickWater)
                     }
                     repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
                 }
@@ -230,8 +240,8 @@ private fun HabitGrid(day: ArcDay, onOpen: (HabitKind) -> Unit, onToggle: (Habit
 
 @Composable
 private fun HabitTile(h: HabitDay, day: ArcDay, modifier: Modifier, onOpen: () -> Unit, onToggle: () -> Unit, onQuickWater: () -> Unit) {
-    val tone = Arc.tone(h.kind)
-    val label = stringResource(h.kind.shortLabel())
+    val tone = Arc.tone(h)
+    val label = h.shortName()
     val value = habitValue(h, day)
     Box(modifier) {
         ArcCard(
@@ -242,13 +252,13 @@ private fun HabitTile(h: HabitDay, day: ArcDay, modifier: Modifier, onOpen: () -
         ) {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Spacer(Modifier.height(4.dp))
-                if (h.kind.type == HabitType.AMOUNT && h.kind != HabitKind.STUDY && h.kind != HabitKind.DEEP_WORK && h.kind != HabitKind.READING) {
+                if (h.type == HabitType.AMOUNT && h.kind != HabitKind.STUDY && h.kind != HabitKind.DEEP_WORK && h.kind != HabitKind.READING) {
                     ProgressRing(h.progress, tone.strong, size = 44.dp, stroke = 4.dp, track = tone.strong.copy(alpha = 0.15f)) {
-                        Icon(h.kind.icon(), contentDescription = null, tint = tone.strong, modifier = Modifier.size(22.dp))
+                        Icon(h.iconVector(), contentDescription = null, tint = tone.strong, modifier = Modifier.size(22.dp))
                     }
                 } else {
                     Box(Modifier.size(44.dp), contentAlignment = Alignment.Center) {
-                        Icon(h.kind.icon(), contentDescription = null, tint = tone.strong, modifier = Modifier.size(30.dp))
+                        Icon(h.iconVector(), contentDescription = null, tint = tone.strong, modifier = Modifier.size(30.dp))
                     }
                 }
                 Spacer(Modifier.height(8.dp))
@@ -260,11 +270,11 @@ private fun HabitTile(h: HabitDay, day: ArcDay, modifier: Modifier, onOpen: () -
         // One-tap controls sit in the corner: a check for yes/no habits, +500 ml for water.
         if (day.editable) {
             when {
-                h.kind.type == HabitType.CHECK && h.kind != HabitKind.SPEAK ->
+                h.type == HabitType.CHECK && h.kind != HabitKind.SPEAK ->
                     CheckDot(h.done, tone, label, onToggle, Modifier.align(Alignment.TopEnd), size = 22.dp)
                 h.kind == HabitKind.WATER ->
                     Box(Modifier.align(Alignment.TopEnd).padding(6.dp).clip(androidx.compose.foundation.shape.CircleShape)) {
-                        androidx.compose.material3.Surface(onClick = onQuickWater, color = tone.strong, contentColor = if (Arc.isDark) Color(0xFF0D1729) else Color.White, shape = androidx.compose.foundation.shape.CircleShape) {
+                        androidx.compose.material3.Surface(onClick = onQuickWater, color = tone.strong, contentColor = Arc.onPrimary, shape = androidx.compose.foundation.shape.CircleShape) {
                             Text(stringResource(R.string.wa_water_add, 500).replace(" ml", "").replace(" ಮಿಲೀ", ""), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(horizontal = 7.dp, vertical = 5.dp).semantics { contentDescription = "" })
                         }
                     }
@@ -288,6 +298,42 @@ fun habitValue(h: HabitDay, day: ArcDay): String {
             val t = time(WakeTime.toTime(h.value.toInt()))
             stringResource(if (h.done) R.string.wa_wake_ok else R.string.wa_wake_late, t)
         }
+        HabitKind.CUSTOM -> if (h.type == HabitType.AMOUNT) customAmount(h.value, h.target, h.habit.unit, locale)
+            else stringResource(if (h.done) R.string.wa_done else R.string.wa_not_yet)
         else -> stringResource(if (h.done) R.string.wa_done else R.string.wa_not_yet)
+    }
+}
+
+/** "12 / 50 reps" for a custom amount habit. */
+fun customAmount(value: Double, target: Double, unit: String, locale: java.util.Locale): String {
+    val nf = java.text.NumberFormat.getNumberInstance(locale).apply { maximumFractionDigits = 1 }
+    return "${nf.format(value)} / ${nf.format(target)}" + if (unit.isNotBlank()) " $unit" else ""
+}
+
+/** The last tile of the grid: a quiet dashed "+" that opens the add-habit dialog. */
+@Composable
+private fun AddHabitTile(modifier: Modifier, onAdd: () -> Unit) {
+    val label = stringResource(R.string.wa_add_habit)
+    val stroke = Kairos.colors.muted.copy(alpha = 0.5f)
+    Box(
+        modifier
+            .clip(MaterialTheme.shapes.medium)
+            .drawBehind {
+                drawRoundRect(
+                    color = stroke,
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(18.dp.toPx()),
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.5.dp.toPx(), pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(10f, 8f))),
+                )
+            }
+            .clickable(onClickLabel = label, role = androidx.compose.ui.semantics.Role.Button, onClick = onAdd)
+            .heightIn(min = 112.dp)
+            .padding(12.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(Icons.Outlined.Add, contentDescription = null, tint = Arc.primary, modifier = Modifier.size(30.dp))
+            Spacer(Modifier.height(6.dp))
+            Text(label, style = MaterialTheme.typography.labelLarge, color = Arc.primary, textAlign = TextAlign.Center, maxLines = 2)
+        }
     }
 }

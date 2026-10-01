@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Winter Arc widget colors (night): polar night with ice-blue accents. -->
 <resources>
-    <color name="arc_w_card">#16213A</color>
-    <color name="arc_w_line">#26365A</color>
-    <color name="arc_w_ink">#EEF2FA</color>
-    <color name="arc_w_muted">#A3AEC4</color>
-    <color name="arc_w_track">#24324F</color>
-    <color name="arc_w_blue">#8DB6F5</color>
-    <color name="arc_w_blue_soft">#1F3355</color>
-    <color name="arc_w_green">#6CC48A</color>
-    <color name="arc_w_yellow">#E9C46A</color>
-    <color name="arc_w_red">#E5837A</color>
-    <color name="arc_w_gray">#3A4A6B</color>
-    <color name="arc_w_orange">#F0A060</color>
-    <color name="arc_w_purple">#B39DF0</color>
+    <color name="arc_w_card">#11213A</color>
+    <color name="arc_w_card2">#0A1628</color>
+    <color name="arc_w_line">#213654</color>
+    <color name="arc_w_ink">#E6F0FA</color>
+    <color name="arc_w_muted">#97ABC3</color>
+    <color name="arc_w_track">#1A2C45</color>
+    <color name="arc_w_blue">#8DCFFF</color>
+    <color name="arc_w_blue_soft">#16344F</color>
+    <color name="arc_w_green">#7FD9B4</color>
+    <color name="arc_w_yellow">#EBCB74</color>
+    <color name="arc_w_red">#EE8FA2</color>
+    <color name="arc_w_gray">#3E516D</color>
+    <color name="arc_w_orange">#F4B48A</color>
+    <color name="arc_w_purple">#BDB0F5</color>
 </resources>

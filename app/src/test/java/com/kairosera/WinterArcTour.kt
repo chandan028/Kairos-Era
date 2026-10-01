@@ -1,7 +1,10 @@
 package com.kairosera
 
 import android.graphics.Bitmap
+import androidx.compose.ui.test.hasScrollToIndexAction
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -9,11 +12,14 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.kairosera.domain.winterarc.FocusSession
 import com.kairosera.domain.winterarc.HabitKind
+import com.kairosera.domain.winterarc.HabitType
 import com.kairosera.domain.winterarc.StudyCategory
 import com.kairosera.domain.winterarc.StudyTask
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Rule
@@ -78,40 +84,13 @@ class WinterArcTour {
 
     private fun back() = rule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
 
-    private fun seed(c: AppContainer) = runBlocking {
-        val today = LocalDate.now()
-        c.settings.completeOnboarding("Chandan", emptySet())
-        val repo = c.winterArc
-        repo.startArc(today.minusDays(11), HabitKind.entries.toSet())
-        c.winterPrefs.setOnboarded()
-        for (i in 11 downTo 0) {
-            val d = today.minusDays(i.toLong())
-            val good = i % 4 != 1
-            repo.addWater(d, if (good) 3000 else 1500)
-            repo.setSteps(d, if (good) 10_400 else 6_240)
-            repo.setChecked(HabitKind.ZERO_SUGAR, d, good)
-            repo.setChecked(HabitKind.COLD_SHOWER, d, i % 3 != 0)
-            repo.setChecked(HabitKind.DIGITAL_DETOX, d, true)
-            repo.setWake(d, if (good) LocalTime.of(4, 32) else LocalTime.of(5, 27))
-            if (i > 0) repo.logReading(d, if (good) 32 else 15, 12)
-            if (i > 0 && good) repo.saveFocus(FocusSession(date = d, durationSeconds = 125 * 60, completed = true, task = "Project work"))
-            if (i == 0) break
-        }
-        listOf("Java Collections deep dive" to StudyCategory.JAVA, "Arrays & Hashing practice" to StudyCategory.DSA, "LLM basics" to StudyCategory.AI_LLM)
-            .forEachIndexed { n, (title, cat) ->
-                repo.saveStudyTask(StudyTask(date = today, title = title, category = cat, durationMinutes = 45, completed = n == 0, position = n, source = StudyTask.SOURCE_MANUAL))
-            }
-        repo.addWater(today, 1500)
-    }
-
-    // Preferences are process-wide in tests; leave Winter Arc off for the test classes that follow.
     @After
-    fun tearDown(): Unit = runBlocking { (rule.activity.application as KairosApp).container.winterPrefs.clear(); Unit }
+    fun tearDown(): Unit = ArcSeed.reset((rule.activity.application as KairosApp).container)
 
     @Test(timeout = 300_000)
     fun tour() {
         val c = (rule.activity.application as KairosApp).container
-        seed(c)
+        ArcSeed.seed(c)
         rule.mainClock.advanceTimeBy(2500)
         waitForText("Discipline today")
         shot("01-home")
@@ -121,6 +100,23 @@ class WinterArcTour {
         navTab("Habits"); waitForText("Sleep discipline", timeoutMs = 10_000); shot("02-habits")
         rule.onAllNodesWithText("Water Drink").onFirst().performClick(); rule.mainClock.advanceTimeBy(800); shot("02b-water-sheet")
         back(); rule.mainClock.advanceTimeBy(800)
+
+        // Custom habits: the seeded ones show in the list, a new one can be added, and its sheet opens.
+        navTab("Habits"); waitForText("Sleep discipline")
+        rule.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Push-ups"))
+        rule.onAllNodesWithText("Push-ups").onFirst().performClick(); waitForText("Set today's amount"); shot("02c-custom-sheet")
+        back(); rule.mainClock.advanceTimeBy(800)
+        navTab("Habits"); waitForText("Sleep discipline")
+        rule.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Add habit"))
+        shot("02d-habits-custom")
+        // Robolectric never idles on a dialog holding a text field (a plain Material AlertDialog with one
+        // hangs too), so the add dialog itself isn't opened here; adding goes through the repository and
+        // the list must pick it up live.
+        runBlocking { c.winterArc.addCustomHabit("Meditate", HabitType.AMOUNT, 15.0, "min", "yoga", 3) }
+        waitForText("Meditate"); waitForText("0 / 15 min")
+        val meditate = runBlocking { c.winterArc.habits.first().first { it.name == "Meditate" }.id }
+        runBlocking { c.winterArc.deleteCustomHabit(meditate) }
+        rule.waitUntil(10_000) { rule.onAllNodesWithText("Meditate").fetchSemanticsNodes().isEmpty() }
 
         navTab("Study"); waitForText("Study Plan"); shot("03-study")
         rule.onNodeWithText("This Week").performClick(); rule.mainClock.advanceTimeBy(600); shot("03b-study-week")
@@ -134,7 +130,13 @@ class WinterArcTour {
         rule.onAllNodesWithText("Edit this day", substring = true).onFirst().performScrollTo(); shot("05b-calendar-day")
 
         navTab("Stats"); waitForText("habits completed"); shot("06-stats")
-        rule.onNodeWithText("Month").performClick(); waitForText("/ 310 habits"); shot("06b-stats-month")
+        rule.onNodeWithText("Month").performClick()
+        // Wait for the month's numbers, not the week's still on screen (12 habits × 7 days).
+        rule.waitUntil(15_000) {
+            rule.onAllNodesWithText(" habits", substring = true).fetchSemanticsNodes()
+                .any { n -> n.config.getOrElseNullable(androidx.compose.ui.semantics.SemanticsProperties.Text) { null }?.joinToString().orEmpty().let { "/ " in it && "/ 84 habits" !in it } }
+        }
+        shot("06b-stats-month")
         rule.onNodeWithText("All Time").performClick(); rule.mainClock.advanceTimeBy(600)
         rule.onAllNodesWithText("See all 90 days", substring = true).onFirst().performScrollTo()
         shot("06c-stats-all")
@@ -150,5 +152,45 @@ class WinterArcTour {
         rule.onAllNodesWithText("Speak", substring = true).onFirst().performClick()
         rule.waitUntil(15_000) { rule.onAllNodes(hasContentDescription("Another topic")).fetchSemanticsNodes().isNotEmpty() }
         shot("09-speak")
+    }
+}
+
+/** Twelve days of Winter Arc history, two custom habits included. Shared by the tours. */
+internal object ArcSeed {
+    /** Preferences are process-wide in tests: leave onboarding and Winter Arc as a fresh install has them. */
+    fun reset(c: AppContainer): Unit = runBlocking {
+        c.winterPrefs.clear()
+        c.settings.clearAll()
+        Unit
+    }
+
+    fun seed(c: AppContainer) = runBlocking {
+        val today = LocalDate.now()
+        c.settings.completeOnboarding("Chandan", emptySet())
+        val repo = c.winterArc
+        repo.startArc(today.minusDays(11), HabitKind.BUILT_IN.toSet())
+        c.winterPrefs.setOnboarded()
+        val pushUps = repo.addCustomHabit("Push-ups", HabitType.AMOUNT, 50.0, "reps", "fitness", 6)
+        val journal = repo.addCustomHabit("Journal", HabitType.CHECK, 1.0, "", "journal", 4)
+        for (i in 11 downTo 0) {
+            val d = today.minusDays(i.toLong())
+            val good = i % 4 != 1
+            repo.addWater(d, if (good) 3000 else 1500)
+            repo.setSteps(d, if (good) 10_400 else 6_240)
+            repo.setChecked(HabitKind.ZERO_SUGAR, d, good)
+            repo.setChecked(HabitKind.COLD_SHOWER, d, i % 3 != 0)
+            repo.setChecked(HabitKind.DIGITAL_DETOX, d, true)
+            repo.setWake(d, if (good) LocalTime.of(4, 32) else LocalTime.of(5, 27))
+            repo.setCustomValue(pushUps, d, if (good) 50.0 else 30.0)
+            if (i % 2 == 0) repo.setCustomChecked(journal, d, true)
+            if (i > 0) repo.logReading(d, if (good) 32 else 15, 12)
+            if (i > 0 && good) repo.saveFocus(FocusSession(date = d, durationSeconds = 125 * 60, completed = true, task = "Project work"))
+            if (i == 0) break
+        }
+        listOf("Java Collections deep dive" to StudyCategory.JAVA, "Arrays & Hashing practice" to StudyCategory.DSA, "LLM basics" to StudyCategory.AI_LLM)
+            .forEachIndexed { n, (title, cat) ->
+                repo.saveStudyTask(StudyTask(date = today, title = title, category = cat, durationMinutes = 45, completed = n == 0, position = n, source = StudyTask.SOURCE_MANUAL))
+            }
+        repo.addWater(today, 1500)
     }
 }

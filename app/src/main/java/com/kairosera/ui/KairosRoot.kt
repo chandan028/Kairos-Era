@@ -491,7 +491,7 @@ private fun KairosNavHost(nav: NavHostController, settings: AppSettings, onQuick
                 onStartWinterArc = { nav.navigate(Routes.ARC_ONBOARDING) },
             )
         }
-        composable(Routes.ARC_ONBOARDING) { com.kairosera.feature.winterarc.ArcOnboarding(onCancel = { nav.popBackStack() }, onDone = { nav.popBackStack() }) }
+        composable(Routes.ARC_ONBOARDING) { com.kairosera.core.ui.theme.WinterArcTheme { com.kairosera.feature.winterarc.ArcOnboarding(onCancel = { nav.popBackStack() }, onDone = { nav.popBackStack() }) } }
         composable(Routes.TRASH) { TrashScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.PRIVACY) { PrivacyPolicyScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.BACKUP) { com.kairosera.feature.backup.BackupScreen(onBack = { nav.popBackStack() }) }

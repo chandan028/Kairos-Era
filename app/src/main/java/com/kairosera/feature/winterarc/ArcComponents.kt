@@ -137,7 +137,7 @@ fun CheckDot(checked: Boolean, tone: Tone, label: String, onToggle: (() -> Unit)
                 .border(2.dp, if (checked) tone.strong else tone.strong.copy(alpha = 0.55f), CircleShape),
             contentAlignment = Alignment.Center,
         ) {
-            if (checked) Icon(Icons.Filled.Check, contentDescription = null, tint = if (Arc.isDark) Color(0xFF0D1729) else Color.White, modifier = Modifier.size(size * 0.62f))
+            if (checked) Icon(Icons.Filled.Check, contentDescription = null, tint = if (Arc.isDark) Color(0xFF07182B) else Color.White, modifier = Modifier.size(size * 0.62f))
         }
     }
 }
@@ -250,7 +250,7 @@ fun QuickChip(text: String, tone: Tone, onClick: () -> Unit, modifier: Modifier 
         modifier = modifier.heightIn(min = 44.dp),
         shape = RoundedCornerShape(14.dp),
         color = if (filled) tone.strong else tone.soft,
-        contentColor = if (filled) (if (Arc.isDark) Color(0xFF0D1729) else Color.White) else tone.strong,
+        contentColor = if (filled) (if (Arc.isDark) Color(0xFF07182B) else Color.White) else tone.strong,
     ) {
         Box(Modifier.padding(horizontal = 14.dp, vertical = 10.dp), contentAlignment = Alignment.Center) {
             Text(text, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, maxLines = 1)

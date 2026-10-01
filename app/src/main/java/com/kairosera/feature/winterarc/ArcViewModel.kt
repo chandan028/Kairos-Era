@@ -48,12 +48,23 @@ data class ArcDay(
     val focus: List<FocusSession>,
 ) {
     val editable: Boolean get() = !date.isAfter(today)
-    fun habit(kind: HabitKind) = summary.habits.firstOrNull { it.kind == kind }
+    fun habit(kind: HabitKind) = summary.habits.firstOrNull { it.kind == kind && kind != HabitKind.CUSTOM }
+    fun habit(id: String) = summary.habits.firstOrNull { it.habitId == id }
     fun target(kind: HabitKind) = habits.firstOrNull { it.kind == kind }?.target ?: kind.defaultTarget
     val dayNumber: Int get() = arc?.dayNumber(date, today) ?: 1
     val rawDay: Int get() = arc?.rawDayNumber(date, today) ?: 1
     val duration: Int get() = arc?.durationDays ?: WinterArc.DEFAULT_DURATION
 }
+
+/** What the add/edit habit dialog collects. */
+data class CustomHabitDraft(
+    val name: String,
+    val type: com.kairosera.domain.winterarc.HabitType,
+    val target: Double,
+    val unit: String,
+    val icon: String,
+    val color: Int,
+)
 
 /** Many days at once, for the calendar, stats and the 90-day view. */
 data class ArcRange(
@@ -111,12 +122,12 @@ class ArcViewModel(private val c: AppContainer) : ViewModel() {
         .catch { e -> SafeLog.error("arc_home_failed", e) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    /** Reading streak and per-habit streaks need a little history: the last 120 days. */
-    val habitStreaks: StateFlow<Map<HabitKind, Int>> = today.flatMapLatest { t ->
+    /** Per-habit streaks by habit id; they need a little history: the last 120 days. */
+    val habitStreaks: StateFlow<Map<String, Int>> = today.flatMapLatest { t ->
         combine(repo.observeDays(t.minusDays(120), t), repo.habits) { days, habits ->
             val dates = (120 downTo 0).map { t.minusDays(it.toLong()) }
             habits.associate { h ->
-                h.kind to ArcStats.habitStreak(dates, { d -> HabitRules.evaluate(h, days[d] ?: DayInputs(d)).done }, t)
+                h.id to ArcStats.habitStreak(dates, { d -> HabitRules.evaluate(h, days[d] ?: DayInputs(d)).done }, t)
             }
         }
     }.catch { emit(emptyMap()) }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
@@ -152,8 +163,19 @@ class ArcViewModel(private val c: AppContainer) : ViewModel() {
     fun reset(d: LocalDate) = act("reset") { repo.reset(d); c.winterReminders.rebuild() }
     fun exit() = act("exit") { c.winterPrefs.setEnabled(false); c.winterReminders.rebuild() }
     fun setReminder(r: ArcReminder, config: ReminderConfig) = act("reminder") { c.winterPrefs.setReminder(r, config); c.winterReminders.rebuild() }
-    fun setHabitActive(kind: HabitKind, on: Boolean) = act("habit_active") { repo.setHabitActive(kind, on) }
+    fun setHabitActive(id: String, on: Boolean) = act("habit_active") { repo.setHabitActive(id, on) }
     fun setTarget(kind: HabitKind, target: Double) = act("habit_target") { repo.setTarget(kind, target) }
+
+    fun addCustomHabit(draft: CustomHabitDraft) = act("custom_add") { repo.addCustomHabit(draft.name, draft.type, draft.target, draft.unit, draft.icon, draft.color) }
+    fun updateCustomHabit(id: String, draft: CustomHabitDraft) = act("custom_edit") { repo.updateCustomHabit(id, draft.name, draft.type, draft.target, draft.unit, draft.icon, draft.color) }
+    fun deleteCustomHabit(id: String) = act("custom_delete") { repo.deleteCustomHabit(id) }
+    fun setCustomChecked(id: String, date: LocalDate, done: Boolean) { if (okDate(date)) act("custom_check") { repo.setCustomChecked(id, date, done) } }
+    fun setCustomValue(id: String, date: LocalDate, value: Double) { if (okDate(date)) act("custom_value") { repo.setCustomValue(id, date, value) } }
+    fun addCustomValue(id: String, date: LocalDate, delta: Double) { if (okDate(date)) act("custom_add_value") { repo.addCustomValue(id, date, delta) } }
+
+    /** One tap on a habit's check: built-in or custom. */
+    fun toggle(h: com.kairosera.domain.winterarc.HabitDay, date: LocalDate) =
+        if (h.habit.isCustom) setCustomChecked(h.habitId, date, !h.done) else setChecked(h.kind, date, !h.done)
     fun setStepSensor(on: Boolean) = act("step_sensor") { c.winterPrefs.setStepSensor(on) }
 
     suspend fun studyTask(id: Long): StudyTask? = runCatching { repo.studyTask(id) }.getOrNull()

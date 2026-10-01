@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Stop
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,6 +51,7 @@ import com.kairosera.core.ui.components.LocalToaster
 import com.kairosera.core.ui.components.currentLocale
 import com.kairosera.core.ui.theme.Kairos
 import com.kairosera.domain.winterarc.HabitKind
+import com.kairosera.domain.winterarc.HabitType
 import com.kairosera.domain.winterarc.WakeTime
 import kotlinx.coroutines.delay
 import java.time.LocalDate
@@ -61,28 +63,43 @@ import java.time.LocalTime
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HabitSheet(kind: HabitKind, date: LocalDate, vm: ArcViewModel, onDismiss: () -> Unit, onOpenFocus: () -> Unit) {
+fun HabitSheet(habitId: String, date: LocalDate, vm: ArcViewModel, onDismiss: () -> Unit, onOpenFocus: () -> Unit) {
     val day by remember(date) { vm.day(date) }.collectAsStateWithLifecycle(initialValue = null)
     val streaks by vm.habitStreaks.collectAsStateWithLifecycle()
     val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = state, containerColor = MaterialTheme.colorScheme.background) {
         val d = day ?: return@ModalBottomSheet
-        val h = d.habit(kind) ?: return@ModalBottomSheet
-        val tone = Arc.tone(kind)
+        val h = d.habit(habitId) ?: return@ModalBottomSheet
+        val kind = h.kind
+        val tone = Arc.tone(h)
+        var editing by rememberSaveable { mutableStateOf(false) }
+        if (editing) {
+            CustomHabitDialog(
+                existing = h.habit,
+                onDismiss = { editing = false },
+                onSave = { vm.updateCustomHabit(habitId, it); editing = false },
+                onDelete = { editing = false; vm.deleteCustomHabit(habitId); onDismiss() },
+            )
+        }
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp).navigationBarsPadding()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                if (kind == HabitKind.WATER || kind == HabitKind.STEPS || kind == HabitKind.READING) {
+                if (kind == HabitKind.WATER || kind == HabitKind.STEPS || kind == HabitKind.READING || (h.habit.isCustom && h.type == HabitType.AMOUNT)) {
                     ProgressRing(h.progress, tone.strong, size = 56.dp, stroke = 5.dp, track = tone.soft) {
-                        androidx.compose.material3.Icon(kind.icon(), contentDescription = null, tint = tone.strong)
+                        androidx.compose.material3.Icon(h.iconVector(), contentDescription = null, tint = tone.strong)
                     }
-                } else HabitBadge(kind.icon(), tone, size = 56.dp)
+                } else HabitBadge(h.iconVector(), tone, size = 56.dp)
                 Spacer(Modifier.width(14.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(kind.longLabel()), style = MaterialTheme.typography.titleLarge)
+                    Text(h.longName(), style = MaterialTheme.typography.titleLarge)
                     Text(habitValue(h, d), style = MaterialTheme.typography.bodyLarge, color = tone.strong, fontWeight = FontWeight.SemiBold)
                 }
+                if (h.habit.isCustom) {
+                    androidx.compose.material3.IconButton(onClick = { editing = true }) {
+                        androidx.compose.material3.Icon(Icons.Outlined.Edit, contentDescription = stringResource(R.string.wa_edit_habit_title), tint = Kairos.colors.muted)
+                    }
+                }
             }
-            val streak = streaks[kind] ?: 0
+            val streak = streaks[habitId] ?: 0
             if (streak > 0) {
                 Spacer(Modifier.height(6.dp))
                 Text(stringResource(R.string.wa_streak_days, streak), style = MaterialTheme.typography.bodySmall, color = Kairos.colors.muted)
@@ -93,8 +110,9 @@ fun HabitSheet(kind: HabitKind, date: LocalDate, vm: ArcViewModel, onDismiss: ()
                 return@Column
             }
             when (kind) {
-                HabitKind.WATER -> WaterControls(vm, date, h.value)
-                HabitKind.STEPS -> StepsControls(vm, date, h.value.toInt(), d.inputs.logs[kind.name]?.extra ?: 0.0, d.inputs.logs[kind.name]?.completed == true)
+                HabitKind.CUSTOM -> CustomControls(vm, date, h)
+                HabitKind.WATER -> WaterControls(vm, date, h.value, h.target)
+                HabitKind.STEPS -> StepsControls(vm, date, h.value.toInt(), h.target.toInt(), d.inputs.logs[kind.name]?.extra ?: 0.0, d.inputs.logs[kind.name]?.completed == true)
                 HabitKind.READING -> ReadingControls(vm, date, d.target(kind).toInt(), d.inputs.readingMinutes)
                 HabitKind.WAKE_EARLY -> WakeControls(vm, date, if (h.logged) h.value.toInt() else null)
                 HabitKind.DEEP_WORK -> ArcButton(stringResource(R.string.wa_start_focus), { onDismiss(); onOpenFocus() }, icon = Icons.Outlined.PlayArrow, color = tone.strong)
@@ -113,23 +131,22 @@ fun HabitSheet(kind: HabitKind, date: LocalDate, vm: ArcViewModel, onDismiss: ()
                 }
             }
             Spacer(Modifier.height(20.dp))
-            LastDays(vm, kind, date)
+            LastDays(vm, habitId, tone, date)
         }
     }
 }
 
 @Composable
-private fun LastDays(vm: ArcViewModel, kind: HabitKind, date: LocalDate) {
+private fun LastDays(vm: ArcViewModel, habitId: String, tone: com.kairosera.core.ui.theme.Tone, date: LocalDate) {
     val from = date.minusDays(13)
     val days = remember(date) { (0L..13L).map { from.plusDays(it) } }
-    val tone = Arc.tone(kind)
     val states = days.map { d -> remember(d) { vm.day(d) }.collectAsStateWithLifecycle(initialValue = null).value }
     Text(stringResource(R.string.wa_last_14), style = MaterialTheme.typography.labelLarge, color = Kairos.colors.muted)
     Spacer(Modifier.height(8.dp))
     Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
         states.forEachIndexed { i, s ->
-            val done = s?.habit(kind)?.done == true
-            val logged = s?.habit(kind)?.logged == true
+            val done = s?.habit(habitId)?.done == true
+            val logged = s?.habit(habitId)?.logged == true
             DaySquare(
                 when {
                     done -> tone.strong
@@ -146,7 +163,7 @@ private fun LastDays(vm: ArcViewModel, kind: HabitKind, date: LocalDate) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun WaterControls(vm: ArcViewModel, date: LocalDate, current: Double) {
+private fun WaterControls(vm: ArcViewModel, date: LocalDate, current: Double, target: Double) {
     val tone = Arc.tone(HabitKind.WATER)
     var last by remember { mutableIntStateOf(0) }
     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -156,7 +173,6 @@ private fun WaterControls(vm: ArcViewModel, date: LocalDate, current: Double) {
     }
     Spacer(Modifier.height(10.dp))
     val locale = currentLocale()
-    val target = HabitKind.WATER.defaultTarget
     Text(
         if (current >= target) stringResource(R.string.wa_water_goal_met) else stringResource(R.string.wa_water_left, ArcFormat.litres(target - current, locale)),
         style = MaterialTheme.typography.bodyMedium, color = Kairos.colors.muted,
@@ -170,10 +186,10 @@ private fun WaterControls(vm: ArcViewModel, date: LocalDate, current: Double) {
 }
 
 @Composable
-private fun StepsControls(vm: ArcViewModel, date: LocalDate, steps: Int, km: Double, ran: Boolean) {
+private fun StepsControls(vm: ArcViewModel, date: LocalDate, steps: Int, target: Int, km: Double, ran: Boolean) {
     val tone = Arc.tone(HabitKind.STEPS)
     val locale = currentLocale()
-    val remaining = (HabitKind.STEPS.defaultTarget.toInt() - steps).coerceAtLeast(0)
+    val remaining = (target - steps).coerceAtLeast(0)
     if (remaining > 0) Text(stringResource(R.string.wa_steps_remaining, ArcFormat.count(remaining, locale)), color = Kairos.colors.muted)
     Spacer(Modifier.height(10.dp))
     var editing by remember { mutableStateOf(false) }

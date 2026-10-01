@@ -1,5 +1,6 @@
 package com.kairosera.core.database
 
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.Index
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 
 /*
  * Schema v4: Winter Arc. New tables only (MIGRATION_3_4), so nothing that existed is touched.
+ * Schema v5 adds name, icon and color to wa_habits for custom habits (MIGRATION_4_5).
  * Reading is not duplicated here: Winter Arc reads and writes the Read section's books and
  * reading sessions. Daily summaries are always derived, never stored.
  */
@@ -35,7 +37,7 @@ data class WinterArcEntity(
 
 @Entity(tableName = "wa_habits")
 data class WaHabitEntity(
-    /** HabitKind name. */
+    /** HabitKind name, or "CUSTOM_…" for a habit the person added. */
     @PrimaryKey val id: String,
     val category: String,
     val type: String,
@@ -43,6 +45,10 @@ data class WaHabitEntity(
     val unit: String,
     val active: Boolean,
     val sortOrder: Int,
+    /** Custom habits only (v5): the name, icon key and color index. Empty for built-in habits. */
+    @ColumnInfo(defaultValue = "") val name: String = "",
+    @ColumnInfo(defaultValue = "") val icon: String = "",
+    @ColumnInfo(defaultValue = "0") val color: Int = 0,
 )
 
 @Entity(tableName = "wa_habit_logs", primaryKeys = ["habitId", "date"], indices = [Index("date")])
@@ -127,6 +133,12 @@ interface WinterArcDao {
 
     @Query("DELETE FROM wa_habit_logs WHERE habitId = :habitId AND date = :date")
     suspend fun deleteLog(habitId: String, date: Long)
+
+    @Query("DELETE FROM wa_habits WHERE id = :id")
+    suspend fun deleteHabit(id: String)
+
+    @Query("DELETE FROM wa_habit_logs WHERE habitId = :habitId")
+    suspend fun deleteLogs(habitId: String)
 
     @Query("SELECT * FROM wa_study_tasks WHERE date BETWEEN :from AND :to ORDER BY date, position, id")
     fun observeStudy(from: Long, to: Long): Flow<List<WaStudyTaskEntity>>

@@ -26,6 +26,9 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -68,7 +71,8 @@ fun ArcHabitsScreen(
     var date by rememberSaveable { mutableStateOf((initialDate ?: today).toEpochDay()) }
     val selected = LocalDate.ofEpochDay(date)
     val day by remember(date) { vm.day(selected) }.collectAsStateWithLifecycle(initialValue = null)
-    var sheet by rememberSaveable { mutableStateOf<HabitKind?>(null) }
+    var sheet by rememberSaveable { mutableStateOf<String?>(null) }
+    var adding by rememberSaveable { mutableStateOf(false) }
     val book by vm.book.collectAsStateWithLifecycle()
 
     Column(Modifier.fillMaxSize()) {
@@ -90,26 +94,40 @@ fun ArcHabitsScreen(
                 }
                 ArcBar(s.fraction, Arc.primary, Modifier.padding(horizontal = 4.dp))
             }
-            items(d.summary.habits, key = { it.kind.name }) { h ->
+            items(d.summary.habits, key = { it.habitId }) { h ->
                 HabitRow(
                     h, d, book?.title,
                     onOpen = {
                         when (h.kind) {
                             HabitKind.STUDY -> onOpenStudy(selected)
-                            HabitKind.SPEAK -> if (selected == today) onOpenSpeak() else sheet = h.kind
-                            else -> sheet = h.kind
+                            HabitKind.SPEAK -> if (selected == today) onOpenSpeak() else sheet = h.habitId
+                            else -> sheet = h.habitId
                         }
                     },
-                    onToggle = { vm.setChecked(h.kind, selected, !h.done) },
+                    onToggle = { vm.toggle(h, selected) },
+                    onAddOne = { vm.addCustomValue(h.habitId, selected, customStep(h.target)) },
                     onWater = { vm.addWater(selected, 500) },
                     onFocus = onOpenFocus,
                     onSpeak = onOpenSpeak,
                     onWakeNow = { vm.setWake(selected, java.time.LocalTime.now().withSecond(0).withNano(0)) },
                 )
             }
+            item(key = "add") {
+                OutlinedButton(
+                    onClick = { adding = true },
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Arc.primary),
+                ) {
+                    Icon(Icons.Outlined.Add, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.wa_add_habit))
+                }
+            }
         }
     }
-    sheet?.let { k -> HabitSheet(kind = k, date = selected, vm = vm, onDismiss = { sheet = null }, onOpenFocus = onOpenFocus) }
+    sheet?.let { id -> HabitSheet(habitId = id, date = selected, vm = vm, onDismiss = { sheet = null }, onOpenFocus = onOpenFocus) }
+    if (adding) CustomHabitDialog(existing = null, onDismiss = { adding = false }, onSave = { vm.addCustomHabit(it); adding = false })
 }
 
 @Composable
@@ -151,10 +169,11 @@ private fun HabitRow(
     onFocus: () -> Unit,
     onSpeak: () -> Unit,
     onWakeNow: () -> Unit,
+    onAddOne: () -> Unit,
 ) {
-    val tone = Arc.tone(h.kind)
+    val tone = Arc.tone(h)
     val locale = currentLocale()
-    val label = stringResource(h.kind.longLabel())
+    val label = h.longName()
     val subtitle = when (h.kind) {
         HabitKind.WATER -> stringResource(R.string.wa_sub_water, ArcFormat.litres(day.target(h.kind), locale) + " L")
         HabitKind.STEPS -> stringResource(R.string.wa_sub_steps, ArcFormat.count(day.target(h.kind).toInt(), locale))
@@ -163,16 +182,17 @@ private fun HabitRow(
         HabitKind.DEEP_WORK -> stringResource(R.string.wa_sub_deep_work)
         HabitKind.WAKE_EARLY -> stringResource(R.string.wa_sub_wake)
         HabitKind.SPEAK -> stringResource(R.string.wa_sub_speak)
+        HabitKind.CUSTOM -> stringResource(R.string.wa_sub_custom)
         else -> stringResource(R.string.wa_sub_daily)
     }
     ArcCard(Modifier.fillMaxWidth(), color = tone.soft.copy(alpha = if (Arc.isDark) 1f else 0.7f), onClick = onOpen, padding = 12.dp) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            HabitBadge(h.kind.icon(), tone, size = 44.dp)
+            HabitBadge(h.iconVector(), tone, size = 44.dp)
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(label, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(subtitle, style = MaterialTheme.typography.bodySmall, color = Kairos.colors.muted, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                if (h.kind.type == HabitType.AMOUNT) {
+                if (h.type == HabitType.AMOUNT) {
                     Spacer(Modifier.height(6.dp))
                     ArcBar(h.progress, tone.strong, height = 5.dp, track = tone.strong.copy(alpha = 0.15f))
                 }
@@ -185,7 +205,8 @@ private fun HabitRow(
                 h.kind == HabitKind.DEEP_WORK -> PlayAction(tone, stringResource(R.string.wa_start_focus), onFocus)
                 h.kind == HabitKind.SPEAK && day.date == day.today && !h.done -> PlayAction(tone, stringResource(R.string.wa_speak_start), onSpeak)
                 h.kind == HabitKind.WAKE_EARLY && !h.logged && day.date == day.today -> RoundAction("⏰", tone, onWakeNow)
-                h.kind.type == HabitType.CHECK && h.kind != HabitKind.SPEAK -> CheckDot(h.done, tone, label, onToggle)
+                h.kind == HabitKind.CUSTOM && h.type == HabitType.AMOUNT -> RoundAction("+" + plainNumber(customStep(h.target), locale), tone, onAddOne)
+                h.type == HabitType.CHECK && h.kind != HabitKind.SPEAK -> CheckDot(h.done, tone, label, onToggle)
                 else -> CheckDot(h.done, tone, label, null)
             }
         }

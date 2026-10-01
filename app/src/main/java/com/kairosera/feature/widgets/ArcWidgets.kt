@@ -149,11 +149,22 @@ class ArcHabitsWidget : ArcWidget() {
         setTextViewText(R.id.day, if (s.on) ctx.getString(R.string.wa_day_of, s.dayNumber, s.duration) else ctx.getString(R.string.wa_widget_off))
         setProgressBar(R.id.bar, 100, s.summary.completionPercentage, false)
         val cells = listOf(R.id.h0, R.id.h1, R.id.h2, R.id.h3, R.id.h4, R.id.h5, R.id.h6, R.id.h7, R.id.h8, R.id.h9)
+        val all = s.summary.habits
+        // Ten cells; with more habits than that, the last cell says how many more there are.
+        val overflow = all.size > cells.size
         cells.forEachIndexed { i, id ->
-            val h = s.summary.habits.getOrNull(i)
+            val h = all.getOrNull(i)
             setViewVisibility(id, if (h == null) View.INVISIBLE else View.VISIBLE)
             if (h == null) return@forEachIndexed
-            val label = ctx.getString(h.kind.gridLabel())
+            if (overflow && i == cells.lastIndex) {
+                val rest = all.drop(i)
+                setTextViewText(id, "+${rest.size}\n${rest.count { it.done }} ✓")
+                setInt(id, "setBackgroundResource", R.drawable.arc_w_chip_off)
+                setTextColor(id, context.getColor(R.color.arc_w_muted))
+                setContentDescription(id, ctx.getString(R.string.wa_completed_of, rest.count { it.done }, rest.size))
+                return@forEachIndexed
+            }
+            val label = if (h.habit.isCustom) h.habit.name else ctx.getString(h.kind.gridLabel())
             setTextViewText(id, (if (h.done) "✓\n" else "") + label)
             setInt(id, "setBackgroundResource", if (h.done) R.drawable.arc_w_chip_on else R.drawable.arc_w_chip_off)
             setTextColor(id, context.getColor(if (h.done) R.color.arc_w_blue else R.color.arc_w_muted))

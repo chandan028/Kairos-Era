@@ -149,6 +149,16 @@ WA_EN = {
 "wa_widget_speak_desc": "Today's speaking topic.", "wa_widget_book_desc": "Your book and today's reading.",
 "wa_widget_week_desc": "Your streak and this week.",
 "wa_widget_book_today": "%1$d / %2$d min today", "wa_widget_steps_left": "%1$s to go",
+# Custom habits (1.2)
+"wa_custom_habit": "Your habit", "wa_add_habit": "Add habit", "wa_add_habit_title": "Add your own habit", "wa_edit_habit_title": "Edit habit",
+"wa_habit_name": "Name", "wa_habit_name_hint": "e.g. Push-ups, Journal, Meditate", "wa_habit_track_how": "How do you track it?",
+"wa_habit_type_check": "Yes / No", "wa_habit_type_amount": "Amount", "wa_habit_target": "Daily target", "wa_habit_unit": "Unit",
+"wa_habit_unit_hint": "reps, pages, km", "wa_habit_check_note": "Tick it once a day when it's done.", "wa_habit_icon": "Icon", "wa_habit_color": "Color",
+"wa_habit_delete": "Delete habit", "wa_habit_delete_title": "Delete “%1$s”?",
+"wa_habit_delete_body": "This removes the habit and every day you logged for it. Built-in habits can only be switched off.",
+"wa_custom_goal_met": "Target reached for today.", "wa_custom_left": "%1$s to go", "wa_custom_set": "Set today's amount",
+"wa_custom_target": "Target: %1$s a day", "wa_sub_custom": "Your own habit",
+"wa_ob_commit_custom": "You can add your own habits any time from Home or Habits.",
 }
 
 WA_KN = {
@@ -300,4 +310,14 @@ WA_KN = {
 "wa_widget_speak_desc": "ಇಂದಿನ ಮಾತಿನ ವಿಷಯ.", "wa_widget_book_desc": "ನಿಮ್ಮ ಪುಸ್ತಕ ಮತ್ತು ಇಂದಿನ ಓದು.",
 "wa_widget_week_desc": "ನಿಮ್ಮ ಸರಣಿ ಮತ್ತು ಈ ವಾರ.",
 "wa_widget_book_today": "ಇಂದು %1$d / %2$d ನಿಮಿಷ", "wa_widget_steps_left": "ಇನ್ನೂ %1$s",
+# Custom habits (1.2)
+"wa_custom_habit": "ನಿಮ್ಮ ಅಭ್ಯಾಸ", "wa_add_habit": "ಅಭ್ಯಾಸ ಸೇರಿಸಿ", "wa_add_habit_title": "ನಿಮ್ಮದೇ ಅಭ್ಯಾಸ ಸೇರಿಸಿ", "wa_edit_habit_title": "ಅಭ್ಯಾಸ ತಿದ್ದಿ",
+"wa_habit_name": "ಹೆಸರು", "wa_habit_name_hint": "ಉದಾ: ಪುಷ್-ಅಪ್, ದಿನಚರಿ, ಧ್ಯಾನ", "wa_habit_track_how": "ಇದನ್ನು ಹೇಗೆ ದಾಖಲಿಸುತ್ತೀರಿ?",
+"wa_habit_type_check": "ಹೌದು / ಇಲ್ಲ", "wa_habit_type_amount": "ಪ್ರಮಾಣ", "wa_habit_target": "ದೈನಂದಿನ ಗುರಿ", "wa_habit_unit": "ಘಟಕ",
+"wa_habit_unit_hint": "ಬಾರಿ, ಪುಟ, ಕಿ.ಮೀ", "wa_habit_check_note": "ಮುಗಿದಾಗ ದಿನಕ್ಕೆ ಒಮ್ಮೆ ಗುರುತು ಹಾಕಿ.", "wa_habit_icon": "ಚಿಹ್ನೆ", "wa_habit_color": "ಬಣ್ಣ",
+"wa_habit_delete": "ಅಭ್ಯಾಸ ಅಳಿಸಿ", "wa_habit_delete_title": "“%1$s” ಅಳಿಸಬೇಕೇ?",
+"wa_habit_delete_body": "ಇದು ಈ ಅಭ್ಯಾಸವನ್ನು ಮತ್ತು ಅದಕ್ಕೆ ದಾಖಲಿಸಿದ ಎಲ್ಲ ದಿನಗಳನ್ನು ಅಳಿಸುತ್ತದೆ. ಅಂತರ್ನಿರ್ಮಿತ ಅಭ್ಯಾಸಗಳನ್ನು ಆಫ್ ಮಾತ್ರ ಮಾಡಬಹುದು.",
+"wa_custom_goal_met": "ಇಂದಿನ ಗುರಿ ತಲುಪಿದ್ದೀರಿ.", "wa_custom_left": "ಇನ್ನೂ %1$s ಬಾಕಿ", "wa_custom_set": "ಇಂದಿನ ಪ್ರಮಾಣ ಹೊಂದಿಸಿ",
+"wa_custom_target": "ಗುರಿ: ದಿನಕ್ಕೆ %1$s", "wa_sub_custom": "ನಿಮ್ಮದೇ ಅಭ್ಯಾಸ",
+"wa_ob_commit_custom": "ಮುಖಪುಟ ಅಥವಾ ಅಭ್ಯಾಸಗಳಿಂದ ಯಾವಾಗ ಬೇಕಾದರೂ ನಿಮ್ಮದೇ ಅಭ್ಯಾಸಗಳನ್ನು ಸೇರಿಸಬಹುದು.",
 }

@@ -38,7 +38,7 @@ class ArcWidgetsTest {
         val app = ApplicationProvider.getApplicationContext<KairosApp>()
         val c = app.container
         val today = LocalDate.now()
-        c.winterArc.startArc(today.minusDays(5), HabitKind.entries.toSet())
+        c.winterArc.startArc(today.minusDays(5), HabitKind.BUILT_IN.toSet())
         c.winterPrefs.setOnboarded()
         for (i in 5 downTo 0) {
             val d = today.minusDays(i.toLong())

@@ -1,5 +1,7 @@
 package com.kairosera.ui
 
+import androidx.compose.foundation.background
+import com.kairosera.core.ui.theme.WinterArcTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -102,6 +104,21 @@ private enum class ArcTab(val route: String, val base: String, val label: Int, v
  */
 @Composable
 fun WinterArcRoot(
+    settings: AppSettings,
+    launchRequest: LaunchRequest?,
+    onLaunchRequestHandled: () -> Unit,
+    onOpenEveryday: () -> Unit,
+) {
+    // Winter Arc wears its own frost-and-polar-night palette; the everyday app keeps navy and cream.
+    WinterArcTheme {
+        Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+            WinterArcContent(settings, launchRequest, onLaunchRequestHandled, onOpenEveryday)
+        }
+    }
+}
+
+@Composable
+private fun WinterArcContent(
     settings: AppSettings,
     launchRequest: LaunchRequest?,
     onLaunchRequestHandled: () -> Unit,

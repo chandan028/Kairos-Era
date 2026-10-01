@@ -49,7 +49,7 @@ class WinterArcTest {
     }
 
     @Test fun waterAndBinaryRules() {
-        val habits = HabitKind.entries.map { Habit(it) }
+        val habits = HabitKind.BUILT_IN.map { Habit(it) }
         val day = DayInputs(
             date = start,
             logs = mapOf(
@@ -87,8 +87,37 @@ class WinterArcTest {
         assertFalse(HabitRules.evaluate(h, DayInputs(start, studyMinutes = 75, studyTasksTotal = 3, studyTasksDone = 2)).done)
     }
 
+    @Test fun customHabitsCountLikeBuiltIns() {
+        val pushUps = Habit.custom("CUSTOM_1", "  Push-ups  ", HabitType.AMOUNT, 50.0, "reps", "fitness", 2, 10)
+        val journal = Habit.custom("CUSTOM_2", "Journal", HabitType.CHECK, 9.0, "pages", "edit", 0, 11)
+        assertEquals("Push-ups", pushUps.name)
+        assertEquals(1.0, journal.target, 0.0)
+        assertEquals("", journal.unit)
+
+        val logs = mapOf(
+            "CUSTOM_1" to HabitLog("CUSTOM_1", start, value = 30.0),
+            "CUSTOM_2" to HabitLog("CUSTOM_2", start, value = 1.0, completed = true),
+        )
+        val day = DayInputs(start, logs = logs)
+        val p = HabitRules.evaluate(pushUps, day)
+        assertFalse(p.done)
+        assertTrue(p.logged)
+        assertEquals(0.6f, p.progress, 0.001f)
+        assertEquals("CUSTOM_1", p.habitId)
+        assertTrue(HabitRules.evaluate(journal, day).done)
+        assertTrue(HabitRules.evaluate(pushUps, day.copy(logs = logs + ("CUSTOM_1" to HabitLog("CUSTOM_1", start, value = 50.0)))).done)
+
+        val habits = HabitKind.BUILT_IN.map { Habit(it) } + pushUps + journal
+        val s = HabitRules.summarize(habits, day)
+        assertEquals(12, s.totalHabits)
+        assertEquals(1, s.completedHabits)
+        assertEquals(10, HabitRules.completeThreshold(12))
+        assertEquals(null, HabitKind.fromKey("CUSTOM_1"))
+        assertEquals(null, HabitKind.fromKey("CUSTOM"))
+    }
+
     @Test fun disabledHabitsLeaveTheTotal() {
-        val habits = HabitKind.entries.map { Habit(it, active = it != HabitKind.COLD_SHOWER) }
+        val habits = HabitKind.BUILT_IN.map { Habit(it, active = it != HabitKind.COLD_SHOWER) }
         assertEquals(9, HabitRules.summarize(habits, DayInputs(start)).totalHabits)
         assertEquals(8, HabitRules.completeThreshold(10))
         assertEquals(8, HabitRules.completeThreshold(9))

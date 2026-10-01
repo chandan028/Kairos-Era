@@ -45,6 +45,8 @@ import com.kairosera.core.ui.components.rememberMediumDateFormatter
 import com.kairosera.core.ui.theme.Kairos
 import com.kairosera.domain.winterarc.ArcStats
 import com.kairosera.domain.winterarc.DayState
+import com.kairosera.domain.winterarc.Habit
+import com.kairosera.domain.winterarc.HabitType
 import com.kairosera.domain.winterarc.HabitKind
 import com.kairosera.domain.winterarc.HabitRules
 import com.kairosera.domain.winterarc.WinterArc
@@ -91,27 +93,40 @@ fun ArcStatsScreen(vm: ArcViewModel, onBack: (() -> Unit)?, onOpen90: () -> Unit
             Spacer(Modifier.height(12.dp))
             val locale = currentLocale()
             val cards = buildList {
-                val active = r.habits.filter { it.active }.map { it.kind }.toSet()
+                val active = r.habits.filter { it.active }
+                val kinds = active.map { it.kind }.toSet()
+                fun habit(k: HabitKind) = r.habits.first { it.kind == k }
                 fun target(k: HabitKind) = r.habits.firstOrNull { it.kind == k }?.target ?: k.defaultTarget
                 val n = totals.periodDays
-                if (HabitKind.WATER in active) add(Triple(HabitKind.WATER, stringResource(R.string.wa_stat_water, ArcFormat.litres(totals.waterMl, locale), ArcFormat.litres(target(HabitKind.WATER) * n, locale)), R.string.wa_h_water))
-                if (HabitKind.STEPS in active) add(Triple(HabitKind.STEPS, stringResource(R.string.wa_stat_steps, ArcFormat.compact(totals.steps), ArcFormat.compact((target(HabitKind.STEPS) * n).toInt())), R.string.wa_h_steps))
-                if (HabitKind.STUDY in active) add(Triple(HabitKind.STUDY, stringResource(R.string.wa_stat_hours, ArcFormat.hours(totals.studyMin), ArcFormat.hours((target(HabitKind.STUDY) * n).toInt())), R.string.wa_h_study))
-                if (HabitKind.READING in active) add(Triple(HabitKind.READING, stringResource(R.string.wa_stat_days, totals.doneDays(HabitKind.READING), n), R.string.wa_h_reading))
-                if (HabitKind.DEEP_WORK in active) add(Triple(HabitKind.DEEP_WORK, stringResource(R.string.wa_stat_hours, ArcFormat.hours(totals.focusMin), ArcFormat.hours((target(HabitKind.DEEP_WORK) * n).toInt())), R.string.wa_h_deep_work))
-                if (HabitKind.SPEAK in active) add(Triple(HabitKind.SPEAK, stringResource(R.string.wa_stat_days, totals.doneDays(HabitKind.SPEAK), n), R.string.wa_h_speak))
+                if (HabitKind.WATER in kinds) add(StatCard(habit(HabitKind.WATER), stringResource(R.string.wa_stat_water, ArcFormat.litres(totals.waterMl, locale), ArcFormat.litres(target(HabitKind.WATER) * n, locale))))
+                if (HabitKind.STEPS in kinds) add(StatCard(habit(HabitKind.STEPS), stringResource(R.string.wa_stat_steps, ArcFormat.compact(totals.steps), ArcFormat.compact((target(HabitKind.STEPS) * n).toInt()))))
+                if (HabitKind.STUDY in kinds) add(StatCard(habit(HabitKind.STUDY), stringResource(R.string.wa_stat_hours, ArcFormat.hours(totals.studyMin), ArcFormat.hours((target(HabitKind.STUDY) * n).toInt()))))
+                if (HabitKind.READING in kinds) add(StatCard(habit(HabitKind.READING), stringResource(R.string.wa_stat_days, totals.doneDays(HabitKind.READING.name), n)))
+                if (HabitKind.DEEP_WORK in kinds) add(StatCard(habit(HabitKind.DEEP_WORK), stringResource(R.string.wa_stat_hours, ArcFormat.hours(totals.focusMin), ArcFormat.hours((target(HabitKind.DEEP_WORK) * n).toInt()))))
+                if (HabitKind.SPEAK in kinds) add(StatCard(habit(HabitKind.SPEAK), stringResource(R.string.wa_stat_days, totals.doneDays(HabitKind.SPEAK.name), n)))
+                // A person's own habits: the total for amounts, days done for checks.
+                active.filter { it.isCustom }.sortedBy { it.sortOrder }.forEach { h ->
+                    add(
+                        StatCard(
+                            h,
+                            if (h.type == HabitType.AMOUNT) customAmount(totals.amount(h.id), h.target * n, h.unit, locale)
+                            else stringResource(R.string.wa_stat_days, totals.doneDays(h.id), n),
+                        ),
+                    )
+                }
             }
             cards.chunked(2).forEach { pair ->
                 Row(Modifier.fillMaxWidth().padding(bottom = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    pair.forEach { (k, value, label) ->
-                        ArcCard(Modifier.weight(1f), color = Arc.tone(k).soft, padding = 14.dp) {
+                    pair.forEach { card ->
+                        val tone = Arc.tone(card.habit)
+                        ArcCard(Modifier.weight(1f), color = tone.soft, padding = 14.dp) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                HabitBadge(k.icon(), Arc.tone(k), size = 28.dp)
+                                HabitBadge(card.habit.iconVector(), tone, size = 28.dp)
                                 Spacer(Modifier.width(8.dp))
-                                Text(stringResource(label), style = MaterialTheme.typography.labelLarge, color = Kairos.colors.muted, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(card.habit.shortName(), style = MaterialTheme.typography.labelLarge, color = Kairos.colors.muted, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                             Spacer(Modifier.height(8.dp))
-                            Text(value, style = MaterialTheme.typography.titleMedium, color = Arc.tone(k).strong, maxLines = 1)
+                            Text(card.value, style = MaterialTheme.typography.titleMedium, color = tone.strong, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }
                     }
                     if (pair.size == 1) Spacer(Modifier.weight(1f))
@@ -156,9 +171,13 @@ private class Totals(
     val steps: Int,
     val studyMin: Int,
     val focusMin: Int,
-    private val done: Map<HabitKind, Int>,
+    /** Days done, by habit id. */
+    private val done: Map<String, Int>,
+    /** Summed amounts of custom habits, by habit id. */
+    private val amounts: Map<String, Double>,
 ) {
-    fun doneDays(k: HabitKind) = done[k] ?: 0
+    fun doneDays(id: String) = done[id] ?: 0
+    fun amount(id: String) = amounts[id] ?: 0.0
 
     companion object {
         fun of(r: ArcRange): Totals {
@@ -167,10 +186,10 @@ private class Totals(
             val period = all.filter(inArc)
             val elapsed = period.filter { !it.isAfter(r.today) }
             val active = r.habits.count { it.active }
-            val done = HashMap<HabitKind, Int>()
+            val done = HashMap<String, Int>()
             var habitsDone = 0
             elapsed.forEach { d ->
-                r.summary(d).habits.forEach { h -> if (h.done) { habitsDone++; done[h.kind] = (done[h.kind] ?: 0) + 1 } }
+                r.summary(d).habits.forEach { h -> if (h.done) { habitsDone++; done[h.habitId] = (done[h.habitId] ?: 0) + 1 } }
             }
             return Totals(
                 days = elapsed,
@@ -182,10 +201,15 @@ private class Totals(
                 studyMin = elapsed.sumOf { r.inputsOn(it).studyMinutes },
                 focusMin = elapsed.sumOf { r.inputsOn(it).focusMinutes },
                 done = done,
+                amounts = r.habits.filter { it.isCustom && it.type == HabitType.AMOUNT }.associate { h ->
+                    h.id to elapsed.sumOf { r.inputsOn(it).logs[h.id]?.value ?: 0.0 }
+                },
             )
         }
     }
 }
+
+private data class StatCard(val habit: Habit, val value: String)
 
 @Composable
 private fun WeekGrid(r: ArcRange) {
@@ -204,12 +228,12 @@ private fun WeekGrid(r: ArcRange) {
     val doneLabel = stringResource(R.string.wa_done)
     val notLabel = stringResource(R.string.wa_not_yet)
     r.habits.filter { it.active }.sortedBy { it.sortOrder }.forEach { habit ->
-        val tone = Arc.tone(habit.kind)
+        val tone = Arc.tone(habit)
         Row(Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
             Row(Modifier.weight(2.2f), verticalAlignment = Alignment.CenterVertically) {
-                HabitBadge(habit.kind.icon(), tone, size = 24.dp)
+                HabitBadge(habit.iconVector(), tone, size = 24.dp)
                 Spacer(Modifier.width(6.dp))
-                Text(stringResource(habit.kind.shortLabel()), style = MaterialTheme.typography.labelMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(habit.shortName(), style = MaterialTheme.typography.labelMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             dates.forEach { d ->
                 val future = d.isAfter(r.today)
@@ -235,14 +259,14 @@ private fun RateList(r: ArcRange, totals: Totals) {
     val n = totals.days.size
     if (n == 0) { Text(stringResource(R.string.wa_no_data), color = Kairos.colors.muted); return }
     r.habits.filter { it.active }.sortedBy { it.sortOrder }.forEach { habit ->
-        val tone = Arc.tone(habit.kind)
-        val done = totals.doneDays(habit.kind)
+        val tone = Arc.tone(habit)
+        val done = totals.doneDays(habit.id)
         Row(Modifier.fillMaxWidth().padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
-            HabitBadge(habit.kind.icon(), tone, size = 24.dp)
+            HabitBadge(habit.iconVector(), tone, size = 24.dp)
             Spacer(Modifier.width(8.dp))
             Column(Modifier.weight(1f)) {
                 Row {
-                    Text(stringResource(habit.kind.shortLabel()), style = MaterialTheme.typography.labelLarge, modifier = Modifier.weight(1f))
+                    Text(habit.shortName(), style = MaterialTheme.typography.labelLarge, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text("$done / $n", style = MaterialTheme.typography.labelMedium, color = Kairos.colors.muted)
                 }
                 Spacer(Modifier.height(4.dp))

@@ -66,7 +66,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 /**
- * First switch-on: four calm steps over the sunrise. Start, choose the start date, choose the
+ * First switch-on: four calm steps over a winter night. Start, choose the start date, choose the
  * daily commitments, confirm. Nothing is saved until "Enter Winter Arc".
  */
 @Composable
@@ -75,20 +75,20 @@ fun ArcOnboarding(onCancel: () -> Unit, onDone: () -> Unit) {
     val scope = rememberCoroutineScope()
     var step by rememberSaveable { mutableIntStateOf(0) }
     var start by rememberSaveable { mutableLongStateOf(LocalDate.now().toEpochDay()) }
-    var enabled by rememberSaveable { mutableStateOf(HabitKind.entries.map { it.name }.toSet()) }
+    var enabled by rememberSaveable { mutableStateOf(HabitKind.BUILT_IN.map { it.name }.toSet()) }
     var busy by remember { mutableStateOf(false) }
     BackHandler { if (step == 0) onCancel() else step-- }
 
-    Box(Modifier.fillMaxSize().background(Color(0xFF0B1322))) {
+    Box(Modifier.fillMaxSize().background(Color(0xFF071426))) {
         Image(
-            painterResource(R.drawable.onboarding_sunrise), null,
+            painterResource(R.drawable.arc_winter_hero), null,
             contentScale = ContentScale.Crop, alignment = BiasAlignment(0f, 0.2f), modifier = Modifier.fillMaxSize(),
         )
         Box(
             Modifier.fillMaxSize().background(
                 Brush.verticalGradient(
-                    if (step == 0) listOf(Color(0xAA0B1322), Color(0x220B1322), Color(0xEE0B1322))
-                    else listOf(Color(0xDD0B1322), Color(0xCC0B1322), Color(0xF20B1322)),
+                    if (step == 0) listOf(Color(0xAA071426), Color(0x22071426), Color(0xEE071426))
+                    else listOf(Color(0xDD071426), Color(0xCC071426), Color(0xF2071426)),
                 ),
             ),
         )
@@ -171,7 +171,7 @@ private fun Choice(text: String, selected: Boolean, onClick: () -> Unit) {
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
         color = if (selected) Color.White else Color.White.copy(alpha = 0.12f),
-        contentColor = if (selected) Color(0xFF0B1322) else Color.White,
+        contentColor = if (selected) Color(0xFF071426) else Color.White,
         modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
     ) {
         Text(text, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(horizontal = 18.dp, vertical = 16.dp))
@@ -185,7 +185,7 @@ private fun CommitStep(enabled: Set<String>, onToggle: (HabitKind, Boolean) -> U
     Spacer(Modifier.height(6.dp))
     Text(stringResource(R.string.wa_ob_commit_body), color = Color.White.copy(alpha = 0.8f), style = MaterialTheme.typography.bodyMedium)
     Spacer(Modifier.height(12.dp))
-    HabitKind.entries.forEach { k ->
+    HabitKind.BUILT_IN.forEach { k ->
         val on = k.name in enabled
         Row(
             Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
@@ -193,7 +193,7 @@ private fun CommitStep(enabled: Set<String>, onToggle: (HabitKind, Boolean) -> U
                 .padding(vertical = 4.dp, horizontal = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Checkbox(checked = on, onCheckedChange = null, colors = CheckboxDefaults.colors(checkedColor = Color(0xFF8DB6F5), uncheckedColor = Color.White.copy(alpha = 0.7f), checkmarkColor = Color(0xFF0B1322)))
+            Checkbox(checked = on, onCheckedChange = null, colors = CheckboxDefaults.colors(checkedColor = Color(0xFF8DCFFF), uncheckedColor = Color.White.copy(alpha = 0.7f), checkmarkColor = Color(0xFF071426)))
             Spacer(Modifier.width(10.dp))
             Box(Modifier.size(32.dp).clip(RoundedCornerShape(10.dp)).background(Color.White.copy(alpha = 0.12f)), contentAlignment = Alignment.Center) {
                 Icon(k.icon(), contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
@@ -202,6 +202,8 @@ private fun CommitStep(enabled: Set<String>, onToggle: (HabitKind, Boolean) -> U
             Text(stringResource(k.commitLabel()), color = Color.White, style = MaterialTheme.typography.bodyLarge)
         }
     }
+    Spacer(Modifier.height(10.dp))
+    Text(stringResource(R.string.wa_ob_commit_custom), color = Color.White.copy(alpha = 0.75f), style = MaterialTheme.typography.bodyMedium)
 }
 
 @Composable
@@ -213,5 +215,5 @@ private fun ReadyStep(start: LocalDate) {
     Spacer(Modifier.height(10.dp))
     Text(fmt.format(start), color = Color.White, fontFamily = SerifFamily, fontSize = 36.sp, lineHeight = 44.sp, modifier = Modifier.semantics { heading() })
     Spacer(Modifier.height(18.dp))
-    Text(stringResource(R.string.wa_day_short, 1, 90), color = Color(0xFF8DB6F5), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Start)
+    Text(stringResource(R.string.wa_day_short, 1, 90), color = Color(0xFF8DCFFF), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Start)
 }

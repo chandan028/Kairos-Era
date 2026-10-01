@@ -24,6 +24,9 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -82,6 +85,8 @@ fun ArcSettingsScreen(
     var pickReset by remember { mutableStateOf(false) }
     var confirmExit by remember { mutableStateOf(false) }
     var editTarget by rememberSaveable { mutableStateOf<HabitKind?>(null) }
+    var editCustom by rememberSaveable { mutableStateOf<String?>(null) }
+    var addCustom by rememberSaveable { mutableStateOf(false) }
     var pickBook by remember { mutableStateOf(false) }
     var editReminder by rememberSaveable { mutableStateOf<ArcReminder?>(null) }
 
@@ -106,29 +111,35 @@ fun ArcSettingsScreen(
             ArcSectionTitle(stringResource(R.string.wa_settings_habits))
             ArcCard(Modifier.fillMaxWidth(), padding = 4.dp) {
                 habits.sortedBy { it.sortOrder }.forEach { h ->
-                    val tone = Arc.tone(h.kind)
+                    val tone = Arc.tone(h)
                     val locale = currentLocale()
                     val targetText = when (h.kind) {
+                        HabitKind.CUSTOM -> if (h.type == HabitType.AMOUNT) stringResource(R.string.wa_custom_target, plainNumber(h.target, locale) + if (h.unit.isNotBlank()) " ${h.unit}" else "")
+                            else stringResource(R.string.wa_sub_daily)
                         HabitKind.WATER -> ArcFormat.litres(h.target, locale) + " L"
                         HabitKind.STEPS -> ArcFormat.count(h.target.toInt(), locale)
                         HabitKind.READING, HabitKind.STUDY, HabitKind.DEEP_WORK -> stringResource(R.string.wa_minutes_est, h.target.toInt()).removePrefix("≈ ")
                         HabitKind.WAKE_EARLY -> "< 5:00"
                         else -> stringResource(R.string.wa_sub_daily)
                     }
-                    val editable = h.kind.type != HabitType.CHECK && h.kind != HabitKind.WAKE_EARLY
+                    val editable = h.isCustom || (h.kind.type != HabitType.CHECK && h.kind != HabitKind.WAKE_EARLY)
                     ListItem(
-                        leadingContent = { HabitBadge(h.kind.icon(), tone, size = 36.dp) },
-                        headlineContent = { Text(stringResource(h.kind.longLabel())) },
+                        leadingContent = { HabitBadge(h.iconVector(), tone, size = 36.dp) },
+                        headlineContent = { Text(h.longName()) },
                         supportingContent = {
                             Text(
                                 if (h.kind == HabitKind.READING) (book?.title ?: com.kairosera.data.winterarc.WinterArcRepository.DEFAULT_BOOK_TITLE) + " · " + targetText
                                 else targetText,
                             )
                         },
-                        trailingContent = { Switch(checked = h.active, onCheckedChange = { vm.setHabitActive(h.kind, it) }) },
+                        trailingContent = { Switch(checked = h.active, onCheckedChange = { vm.setHabitActive(h.id, it) }) },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         modifier = Modifier.clickable(enabled = editable || h.kind == HabitKind.READING) {
-                            if (h.kind == HabitKind.READING) pickBook = true else editTarget = h.kind
+                            when {
+                                h.isCustom -> editCustom = h.id
+                                h.kind == HabitKind.READING -> pickBook = true
+                                else -> editTarget = h.kind
+                            }
                         },
                     )
                     if (h.kind == HabitKind.READING) {
@@ -136,6 +147,11 @@ fun ArcSettingsScreen(
                             Text(stringResource(R.string.wa_target))
                         }
                     }
+                }
+                TextButton(onClick = { addCustom = true }, modifier = Modifier.padding(start = 8.dp)) {
+                    Icon(Icons.Outlined.Add, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.wa_add_habit))
                 }
                 androidx.compose.foundation.layout.Box(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) { StepSensorRow(vm) }
             }
@@ -171,6 +187,17 @@ fun ArcSettingsScreen(
         }
     }
 
+    if (addCustom) CustomHabitDialog(existing = null, onDismiss = { addCustom = false }, onSave = { vm.addCustomHabit(it); addCustom = false })
+    editCustom?.let { id ->
+        val h = habits.firstOrNull { it.id == id }
+        if (h == null) editCustom = null
+        else CustomHabitDialog(
+            existing = h,
+            onDismiss = { editCustom = null },
+            onSave = { vm.updateCustomHabit(id, it); editCustom = null },
+            onDelete = { editCustom = null; vm.deleteCustomHabit(id) },
+        )
+    }
     if (pickStart) {
         KDatePickerDialog(initial = arc?.startDate ?: today, onDismiss = { pickStart = false }, onPick = { pickStart = false; vm.setStartDate(it) })
     }

@@ -102,8 +102,9 @@ data class WinterArc(
 enum class HabitType { AMOUNT, CHECK, TIME }
 
 /**
- * The ten Winter Arc habits. Keys are stored in the database, so never rename an entry.
- * Display names come from string resources; the private habit is only ever "Digital Detox".
+ * The ten built-in Winter Arc habits, plus [CUSTOM] for the ones a person adds themselves. Keys are
+ * stored in the database, so never rename an entry. Display names come from string resources; the
+ * private habit is only ever "Digital Detox". A custom habit carries its own name, type and target.
  */
 enum class HabitKind(val type: HabitType, val defaultTarget: Double, val unit: String, val category: String) {
     WATER(HabitType.AMOUNT, 3000.0, "ml", "health"),
@@ -116,20 +117,55 @@ enum class HabitKind(val type: HabitType, val defaultTarget: Double, val unit: S
     WAKE_EARLY(HabitType.TIME, 300.0, "min_of_day", "discipline"),
     DIGITAL_DETOX(HabitType.CHECK, 1.0, "", "discipline"),
     SPEAK(HabitType.CHECK, 1.0, "", "mind"),
+    CUSTOM(HabitType.CHECK, 1.0, "", "custom"),
     ;
 
     companion object {
-        fun fromKey(key: String): HabitKind? = entries.firstOrNull { it.name == key }
+        /** The habits Winter Arc ships with, in their default order. */
+        val BUILT_IN: List<HabitKind> = entries.filter { it != CUSTOM }
+
+        /** A built-in habit by its stored key; custom habit ids return null. */
+        fun fromKey(key: String): HabitKind? = BUILT_IN.firstOrNull { it.name == key }
     }
 }
 
+/**
+ * One habit. Built-in habits are identified by their kind; custom ones by [id] ("CUSTOM_…") and
+ * carry their own [name], [type] (a yes/no check or an amount toward [target] in [unit]), and an
+ * [icon] key and [color] index the app draws them with.
+ */
 data class Habit(
     val kind: HabitKind,
     val target: Double = kind.defaultTarget,
     val active: Boolean = true,
     val sortOrder: Int = kind.ordinal,
+    val id: String = kind.name,
+    val name: String = "",
+    val type: HabitType = kind.type,
+    val unit: String = kind.unit,
+    val icon: String = "",
+    val color: Int = 0,
 ) {
-    val id: String get() = kind.name
+    val isCustom: Boolean get() = kind == HabitKind.CUSTOM
+
+    companion object {
+        const val CUSTOM_PREFIX = "CUSTOM_"
+        const val NAME_MAX = 40
+        const val UNIT_MAX = 12
+
+        fun isCustomId(id: String): Boolean = id.startsWith(CUSTOM_PREFIX)
+
+        /** A new custom habit. Amounts need a positive target; checks always target 1. */
+        fun custom(id: String, name: String, type: HabitType, target: Double, unit: String, icon: String, color: Int, sortOrder: Int): Habit {
+            require(isCustomId(id)) { "custom habit ids start with $CUSTOM_PREFIX" }
+            val t = if (type == HabitType.AMOUNT) target.coerceIn(1.0, 1_000_000.0) else 1.0
+            return Habit(
+                kind = HabitKind.CUSTOM, target = t, sortOrder = sortOrder, id = id,
+                name = name.trim().take(NAME_MAX), type = if (type == HabitType.TIME) HabitType.CHECK else type,
+                unit = if (type == HabitType.AMOUNT) unit.trim().take(UNIT_MAX) else "", icon = icon, color = color,
+            )
+        }
+    }
 }
 
 /** One day of one habit. [value]: ml, steps, minutes, or minute-of-day for the wake time. */
@@ -211,12 +247,22 @@ data class DayInputs(
     val spoke: Boolean = false,
 )
 
-/** One habit's state on one day, ready to draw: [progress] is 0..1. */
-data class HabitDay(val kind: HabitKind, val value: Double, val target: Double, val done: Boolean, val logged: Boolean) {
+/** One habit's state on one day, ready to draw: [progress] is 0..1. [habit] says how to draw it. */
+data class HabitDay(
+    val kind: HabitKind,
+    val value: Double,
+    val target: Double,
+    val done: Boolean,
+    val logged: Boolean,
+    val habit: Habit = Habit(kind),
+) {
+    val habitId: String get() = habit.id
+    val type: HabitType get() = habit.type
+
     val progress: Float get() = when {
         done -> 1f
         target <= 0 -> 0f
-        kind.type == HabitType.TIME -> 0f
+        type == HabitType.TIME -> 0f
         else -> (value / target).toFloat().coerceIn(0f, 1f)
     }
 }
@@ -246,34 +292,41 @@ object HabitRules {
         return when (habit.kind) {
             HabitKind.WATER, HabitKind.STEPS -> {
                 val v = log?.value ?: 0.0
-                HabitDay(habit.kind, v, target, v >= target, v > 0)
+                HabitDay(habit.kind, v, target, v >= target, v > 0, habit)
             }
             HabitKind.READING -> {
                 val v = day.readingMinutes.toDouble()
-                HabitDay(habit.kind, v, target, v >= target || log?.completed == true, v > 0 || day.readingPages > 0)
+                HabitDay(habit.kind, v, target, v >= target || log?.completed == true, v > 0 || day.readingPages > 0, habit)
             }
             HabitKind.STUDY -> {
                 // With a plan for the day, finishing every task is the goal. Without one, study time is.
                 if (day.studyTasksTotal > 0) {
-                    HabitDay(habit.kind, day.studyTasksDone.toDouble(), day.studyTasksTotal.toDouble(), day.studyTasksDone >= day.studyTasksTotal, day.studyTasksDone > 0 || day.studyMinutes > 0)
+                    HabitDay(habit.kind, day.studyTasksDone.toDouble(), day.studyTasksTotal.toDouble(), day.studyTasksDone >= day.studyTasksTotal, day.studyTasksDone > 0 || day.studyMinutes > 0, habit)
                 } else {
                     val v = day.studyMinutes.toDouble()
-                    HabitDay(habit.kind, v, target, v >= target || log?.completed == true, v > 0)
+                    HabitDay(habit.kind, v, target, v >= target || log?.completed == true, v > 0, habit)
                 }
             }
             HabitKind.DEEP_WORK -> {
                 val v = day.focusMinutes.toDouble()
-                HabitDay(habit.kind, v, target, v >= target || log?.completed == true, day.focusSessions > 0)
+                HabitDay(habit.kind, v, target, v >= target || log?.completed == true, day.focusSessions > 0, habit)
             }
             HabitKind.WAKE_EARLY -> {
                 val minute = log?.value
                 val logged = log != null && log.value >= 0 && log.notes != CLEARED
-                HabitDay(habit.kind, minute ?: -1.0, target, logged && minute!! < target, logged)
+                HabitDay(habit.kind, minute ?: -1.0, target, logged && minute!! < target, logged, habit)
             }
-            HabitKind.SPEAK -> HabitDay(habit.kind, if (day.spoke) 1.0 else 0.0, 1.0, day.spoke, day.spoke)
+            HabitKind.SPEAK -> HabitDay(habit.kind, if (day.spoke) 1.0 else 0.0, 1.0, day.spoke, day.spoke, habit)
+            HabitKind.CUSTOM -> if (habit.type == HabitType.AMOUNT) {
+                val v = log?.value ?: 0.0
+                HabitDay(habit.kind, v, target, v >= target || log?.completed == true, v > 0 || log?.completed == true, habit)
+            } else {
+                val done = log?.completed == true
+                HabitDay(habit.kind, if (done) 1.0 else 0.0, 1.0, done, log != null, habit)
+            }
             HabitKind.ZERO_SUGAR, HabitKind.COLD_SHOWER, HabitKind.DIGITAL_DETOX -> {
                 val done = log?.completed == true
-                HabitDay(habit.kind, if (done) 1.0 else 0.0, 1.0, done, log != null)
+                HabitDay(habit.kind, if (done) 1.0 else 0.0, 1.0, done, log != null, habit)
             }
         }
     }
