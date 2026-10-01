@@ -34,6 +34,7 @@ import androidx.room.RoomDatabase
         WaStudyTaskEntity::class,
         WaFocusSessionEntity::class,
         WaSpeakingSessionEntity::class,
+        SpeechSessionEntity::class,
     ],
     version = KairosDatabase.VERSION,
     exportSchema = true,
@@ -46,13 +47,14 @@ abstract class KairosDatabase : RoomDatabase() {
     abstract fun bookDao(): BookDao
     abstract fun journalDao(): JournalDao
     abstract fun winterArcDao(): WinterArcDao
+    abstract fun speechDao(): SpeechDao
 
     companion object {
-        const val VERSION = 5
+        const val VERSION = 6
         const val NAME = "kairos.db"
 
         /** Ordered list of every migration. Append; never edit a shipped one. */
-        val MIGRATIONS = arrayOf<androidx.room.migration.Migration>(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4, Migrations.MIGRATION_4_5)
+        val MIGRATIONS = arrayOf<androidx.room.migration.Migration>(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4, Migrations.MIGRATION_4_5, Migrations.MIGRATION_5_6)
 
         fun build(context: Context): KairosDatabase =
             Room.databaseBuilder(context, KairosDatabase::class.java, NAME)

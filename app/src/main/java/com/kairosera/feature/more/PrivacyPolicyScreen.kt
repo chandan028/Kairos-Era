@@ -43,7 +43,7 @@ import com.kairosera.core.ui.theme.Kairos
 import java.time.LocalDate
 
 /** Keep in step with PRIVACY_UPDATED in tools/strings_source.py, which dates the HTML copy. */
-private val PolicyUpdated: LocalDate = LocalDate.of(2026, 9, 25)
+private val PolicyUpdated: LocalDate = LocalDate.of(2026, 10, 1)
 private const val PolicyContact = "wondersparksmedia@gmail.com"
 
 /** Heading and body of each section, in reading order. The HTML copy is generated from the same strings. */

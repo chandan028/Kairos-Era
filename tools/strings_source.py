@@ -904,7 +904,7 @@ PLURALS_KN.update({
 # Each section is pp_h_<key> (heading) + pp_b_<key> (body). Body lines starting with "• " are list items.
 PRIVACY_SECTIONS = ["summary", "stored", "where", "network", "permissions", "visible", "sharing", "backup", "logs", "control", "children", "changes"]
 PRIVACY_CONTACT = "wondersparksmedia@gmail.com"
-PRIVACY_UPDATED = {"en": "25 September 2026", "kn": "25 ಸೆಪ್ಟೆಂಬರ್ 2026"}  # keep in step with PolicyUpdated in PrivacyPolicyScreen.kt
+PRIVACY_UPDATED = {"en": "1 October 2026", "kn": "1 ಅಕ್ಟೋಬರ್ 2026"}  # keep in step with PolicyUpdated in PrivacyPolicyScreen.kt
 
 EN.update({
 "privacy_policy": "Privacy policy",
@@ -1234,3 +1234,8 @@ _sys.path.insert(0, _os.path.dirname(__file__))
 from strings_winter import WA_EN, WA_KN  # noqa: E402
 EN.update(WA_EN)
 KN.update(WA_KN)
+
+# Speaking coach (tools/strings_speech.py); also updates the privacy policy text.
+from strings_speech import SC_EN, SC_KN  # noqa: E402
+EN.update(SC_EN)
+KN.update(SC_KN)
