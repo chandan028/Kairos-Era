@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/arc_w_photo_bg" android:clipToOutline="true">
+    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="centerCrop" android:src="@drawable/arc_winter_hero" android:importantForAccessibility="no" />
+    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/arc_w_scrim" android:scaleType="fitXY" android:importantForAccessibility="no" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="16dp">
+
+        <TextClock android:id="@+id/clock" android:layout_width="match_parent" android:layout_height="wrap_content" android:format12Hour="h:mm" android:format24Hour="HH:mm" android:textColor="#FFFFFF" android:textSize="44sp" android:fontFamily="sans-serif-light" />
+        <TextClock android:id="@+id/date" android:layout_width="match_parent" android:layout_height="wrap_content" android:format12Hour="EEEE, d MMMM" android:format24Hour="EEEE, d MMMM" android:textColor="#D6DEEC" android:textSize="13sp" />
+        <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+        <TextView android:id="@+id/wake" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="14sp" android:textColor="#FFFFFF" android:maxLines="1"/>
+        <TextView android:id="@+id/line" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="12sp" android:textColor="#D6DEEC" android:fontFamily="serif" android:maxLines="2" android:layout_marginTop="2dp"/>
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/arc_w_bg" android:orientation="vertical" android:padding="16dp">
+
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+    <TextView android:id="@+id/label" android:layout_width="0dp" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="@color/arc_w_muted" android:layout_weight="1" android:maxLines="1" android:ellipsize="end"/>
+    
+</LinearLayout>
+<TextView android:id="@+id/value" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="24sp" android:textColor="@color/arc_w_blue" android:maxLines="1" android:layout_marginTop="4dp"/>
+<ProgressBar android:id="@+id/bar" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="8dp" android:layout_marginTop="6dp" android:max="100" android:progress="0" android:progressDrawable="@drawable/arc_w_progress_blue" />
+<FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="8dp">
+<TextView android:id="@+id/add250" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:layout_marginStart="3dp" android:layout_marginEnd="3dp" android:background="@drawable/arc_w_btn_soft" android:gravity="center" android:textColor="@color/arc_w_blue" android:textSize="13sp" android:textStyle="bold" />
+<TextView android:id="@+id/add500" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:layout_marginStart="3dp" android:layout_marginEnd="3dp" android:background="@drawable/arc_w_btn_soft" android:gravity="center" android:textColor="@color/arc_w_blue" android:textSize="13sp" android:textStyle="bold" />
+<TextView android:id="@+id/add1000" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:layout_marginStart="3dp" android:layout_marginEnd="3dp" android:background="@drawable/arc_w_btn_soft" android:gravity="center" android:textColor="@color/arc_w_blue" android:textSize="13sp" android:textStyle="bold" />
+</LinearLayout>
+</LinearLayout>

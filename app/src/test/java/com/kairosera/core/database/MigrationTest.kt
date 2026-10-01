@@ -199,4 +199,38 @@ class MigrationTest {
         journal.restore(id, now)
         assertEquals(1, journal.observeBetween(day, day).first().size)
     }
+
+    @Test
+    fun v3ToV4AddsWinterArcTablesAndKeepsJournal() = runBlocking {
+        createAt(3) {
+            execSQL("INSERT INTO trackers (id, name, icon, colorArgb, description, why, gain, template, frequency, frequencyDays, frequencyTimes, position, createdAt, updatedAt, archivedAt, deletedAt, isSample) VALUES (5, 'Water', 'w', 1, '', '', '', 'CUSTOM', 'DAILY', 0, 0, 0, 1, 1, NULL, NULL, 0)")
+        }
+        val room = openCurrent()
+        val db = room.openHelper.writableDatabase
+        assertEquals(KairosDatabase.VERSION, db.version)
+        db.query("SELECT name FROM trackers WHERE id = 5").use { c -> assertTrue(c.moveToFirst()); assertEquals("Water", c.getString(0)) }
+
+        val dao = room.winterArcDao()
+        dao.upsertLog(WaHabitLogEntity(habitId = "WATER", date = 20730, value = 750.0, completed = false, notes = "", extra = 0.0, updatedAt = 1))
+        assertEquals(750.0, dao.observeLogs(20730, 20730).first().single().value, 0.0)
+        db.query("SELECT COUNT(*) FROM wa_study_tasks").use { c -> c.moveToFirst(); assertEquals(0, c.getInt(0)) }
+    }
+
+    @Test
+    fun v4ToV5KeepsWinterArcHabitsAndAddsCustomColumns() = runBlocking {
+        createAt(4) {
+            execSQL("INSERT INTO wa_habits (id, category, type, target, unit, active, sortOrder) VALUES ('WATER', 'health', 'AMOUNT', 3500.0, 'ml', 1, 0)")
+            execSQL("INSERT INTO wa_habit_logs (habitId, date, value, completed, notes, extra, updatedAt) VALUES ('WATER', 20730, 1250.0, 0, '', 0.0, 1)")
+        }
+        val room = openCurrent()
+        val dao = room.winterArcDao()
+        val water = dao.habits().single()
+        assertEquals(3500.0, water.target, 0.0)
+        assertEquals("", water.name)
+        assertEquals(0, water.color)
+        assertEquals(1250.0, dao.observeLogs(20730, 20730).first().single().value, 0.0)
+
+        dao.upsertHabit(WaHabitEntity("CUSTOM_1", "custom", "AMOUNT", 50.0, "reps", true, 10, name = "Push-ups", icon = "fitness", color = 3))
+        assertEquals("Push-ups", dao.habits().first { it.id == "CUSTOM_1" }.name)
+    }
 }

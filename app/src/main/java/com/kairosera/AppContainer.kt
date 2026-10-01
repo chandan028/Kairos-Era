@@ -46,6 +46,9 @@ class AppContainer(context: Context) {
     val settings = SettingsRepository(appContext)
     val onboarding = OnboardingRepository(appContext)
     val quotes = QuoteRepository(appContext)
+    val winterPrefs = com.kairosera.core.settings.WinterArcPrefs(appContext)
+    val winterArc by lazy { com.kairosera.data.winterarc.WinterArcRepository(appContext, database, books, clock) }
+    val winterReminders by lazy { com.kairosera.feature.winterarc.ArcReminders(appContext, winterPrefs) }
 
     /** The day Kairos Era arrived on this phone. Statistics never count days before it against the person. */
     val installedOn: LocalDate by lazy {
@@ -113,6 +116,8 @@ class AppContainer(context: Context) {
         appContext.cacheDir.listFiles()?.forEach { it.deleteRecursively() }
         com.kairosera.core.diagnostics.CrashReports.clear(appContext)
         onboarding.clear()
+        winterPrefs.clear()
+        winterReminders.cancelAll()
         settings.clearAll()
         lock.unlock()
         seedDefaults()

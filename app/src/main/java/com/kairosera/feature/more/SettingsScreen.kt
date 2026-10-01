@@ -55,7 +55,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit, onPrivacy: () -> Unit = {}, onBackup: () -> Unit = {}) {
+fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit, onPrivacy: () -> Unit = {}, onBackup: () -> Unit = {}, onStartWinterArc: () -> Unit = {}) {
     var deleteStep by remember { mutableIntStateOf(0) }
     val c = appContainer()
     val context = LocalContext.current
@@ -71,6 +71,7 @@ fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit, onPrivacy: () ->
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { refresh++ }
     var confirmRemoveSamples by remember { mutableStateOf(false) }
     var nameDraft by remember(settings.name) { mutableStateOf(settings.name) }
+    val arc by c.winterPrefs.settings.collectAsStateWithLifecycle(initialValue = null)
 
     SubScreen(stringResource(R.string.settings), onBack) {
         Column(Modifier.verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 112.dp)) {
@@ -94,6 +95,16 @@ fun SettingsScreen(onBack: () -> Unit, onHomeCards: () -> Unit, onPrivacy: () ->
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
             )
+
+            // Winter Arc Mode: switching on the first time walks through its short setup.
+            SectionLabel(stringResource(R.string.wa_title), Modifier.padding(top = 24.dp, bottom = 8.dp))
+            SwitchRow(stringResource(R.string.wa_mode), stringResource(R.string.wa_mode_summary), arc?.enabled == true) { on ->
+                when {
+                    !on -> scope.launch { c.winterPrefs.setEnabled(false); runCatching { c.winterReminders.rebuild() } }
+                    arc?.onboarded == true -> scope.launch { c.winterPrefs.setEnabled(true); runCatching { c.winterReminders.rebuild() } }
+                    else -> onStartWinterArc()
+                }
+            }
 
             // Appearance
             SectionLabel(stringResource(R.string.settings_appearance), Modifier.padding(top = 24.dp, bottom = 8.dp))

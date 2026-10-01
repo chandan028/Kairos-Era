@@ -14,6 +14,9 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- ACTIVITY_RECOGNITION: optional, for Winter Arc steps from the phone's own step counter. Asked only when the person turns it on. -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false" />
 
     <application
         android:name=".KairosApp"
@@ -45,6 +48,11 @@
         <!-- Our own alarms and notification actions only; never reachable from other apps. -->
         <receiver
             android:name=".core.notifications.ReminderReceiver"
+            android:exported="false" />
+
+        <!-- Winter Arc reminders: our own alarms only. -->
+        <receiver
+            android:name=".feature.winterarc.ArcReminderReceiver"
             android:exported="false" />
 
         <!-- System broadcasts after which reminders are rebuilt from the database. Actions are validated in code. -->
@@ -111,6 +119,129 @@
                 android:resource="@xml/widget_quick_add_info" />
         </receiver>
 
+        <!-- Winter Arc widgets (same rules as above: not exported, bound by the launcher). -->
+        <receiver
+            android:name=".feature.widgets.ArcDayWidget"
+            android:exported="false"
+            android:label="@string/wa_widget_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_arc_info" />
+        </receiver>
+        <receiver
+            android:name=".feature.widgets.ArcHabitsWidget"
+            android:exported="false"
+            android:label="@string/wa_widget_large_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_arc_large_info" />
+        </receiver>
+        <receiver
+            android:name=".feature.widgets.ArcQuoteWidget"
+            android:exported="false"
+            android:label="@string/wa_widget_quote_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_arc_quote_info" />
+        </receiver>
+        <receiver
+            android:name=".feature.widgets.ArcClockWidget"
+            android:exported="false"
+            android:label="@string/wa_widget_clock_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_arc_clock_info" />
+        </receiver>
+        <receiver
+            android:name=".feature.widgets.ArcWaterWidget"
+            android:exported="false"
+            android:label="@string/wa_widget_water_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_arc_water_info" />
+        </receiver>
+        <receiver
+            android:name=".feature.widgets.ArcStepsWidget"
+            android:exported="false"
+            android:label="@string/wa_widget_steps_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_arc_steps_info" />
+        </receiver>
+        <receiver
+            android:name=".feature.widgets.ArcStudyWidget"
+            android:exported="false"
+            android:label="@string/wa_widget_study_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_arc_study_info" />
+        </receiver>
+        <receiver
+            android:name=".feature.widgets.ArcCalendarWidget"
+            android:exported="false"
+            android:label="@string/wa_widget_calendar_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_arc_calendar_info" />
+        </receiver>
+        <receiver
+            android:name=".feature.widgets.ArcSpeakWidget"
+            android:exported="false"
+            android:label="@string/wa_widget_speak_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_arc_speak_info" />
+        </receiver>
+        <receiver
+            android:name=".feature.widgets.ArcBookWidget"
+            android:exported="false"
+            android:label="@string/wa_widget_book_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_arc_book_info" />
+        </receiver>
+        <receiver
+            android:name=".feature.widgets.ArcStreakWidget"
+            android:exported="false"
+            android:label="@string/wa_widget_week_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_arc_week_info" />
+        </receiver>
+        <receiver android:name=".feature.widgets.ArcWidgetReceiver" android:exported="false" />
         <!-- Checkbox taps from the Today's Tasks widget; only our own PendingIntents reach it. -->
         <receiver
             android:name=".feature.widgets.WidgetActionReceiver"

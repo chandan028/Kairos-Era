@@ -305,3 +305,144 @@ fun KairosTheme(
         MaterialTheme(colorScheme = colors, typography = KairosTypography, shapes = KairosShapes, content = content)
     }
 }
+
+/*
+ * Winter Arc's palette: the same roles as above, re-coloured for a 90-day winter challenge.
+ * Frost and glacier blues by day, a deep polar night after dark, with aurora green for "done".
+ * Only the Winter Arc screens use it; the everyday app keeps navy and cream.
+ */
+private object Frost {
+    val Ink = Color(0xFF10213A)
+    val InkMuted = Color(0xFF51647C)
+    val Page = Color(0xFFEBF2FA)
+    val Card = Color(0xFFF7FAFE)
+    val Line = Color(0xFFD6E2EF)
+    val Glacier = Color(0xFF16406B)
+
+    val Night = Color(0xFF09141F)
+    val NightCard = Color(0xFF11213A)
+    val NightRaised = Color(0xFF172B4A)
+    val NightLine = Color(0xFF213654)
+    val Snow = Color(0xFFE6F0FA)
+    val SnowMuted = Color(0xFF97ABC3)
+}
+
+private val WinterLightKairos = KairosColors(
+    success = Tone(Color(0xFF1C8664), Color(0xFFD5F0E5)),
+    info = Tone(Color(0xFF1E6CB4), Color(0xFFD8E9FA)),
+    motivation = Tone(Color(0xFF7D5C12), Color(0xFFF2E8CC)),
+    learning = Tone(Color(0xFF5B4FB8), Color(0xFFE4E1F7)),
+    activity = Tone(Color(0xFFAE3858), Color(0xFFF8DDE5)),
+    brand = Frost.Glacier,
+    onBrand = Color(0xFFEAF4FF),
+    sun = Color(0xFFCDE9FF),
+    card = Frost.Card,
+    line = Frost.Line,
+    track = Frost.Line,
+    muted = Frost.InkMuted,
+    accent = Color(0xFF4BA6DE),
+    accentText = Color(0xFF17639A),
+    accentSoft = Color(0xFFD6EBF9),
+    calm = Color(0xFF4A7DCA),
+    heat = listOf(Frost.Line, Color(0xFFB2D2EE), Color(0xFF68A6DC), Color(0xFF2B74BD)),
+)
+
+private val WinterDarkKairos = KairosColors(
+    success = Tone(Color(0xFF8BDCBE), Color(0xFF133A31)),
+    info = Tone(Color(0xFF9CC9F5), Color(0xFF17324F)),
+    motivation = Tone(Color(0xFFEFC979), Color(0xFF3A3221)),
+    learning = Tone(Color(0xFFC3BAF2), Color(0xFF2B2A52)),
+    activity = Tone(Color(0xFFF2A2B8), Color(0xFF452432)),
+    brand = Color(0xFF173254),
+    onBrand = Frost.Snow,
+    sun = Color(0xFFCDE9FF),
+    card = Frost.NightCard,
+    line = Frost.NightLine,
+    track = Frost.NightLine,
+    muted = Frost.SnowMuted,
+    accent = Color(0xFF8DCFFF),
+    accentText = Color(0xFF8DCFFF),
+    accentSoft = Color(0xFF16344F),
+    calm = Color(0xFF6E9BE0),
+    heat = listOf(Color(0xFF14253C), Color(0xFF21426A), Color(0xFF3E79B7), Color(0xFF8DCFFF)),
+)
+
+private val WinterLightColors = lightColorScheme(
+    primary = Color(0xFF1B5C98),
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFFD3E6F8),
+    onPrimaryContainer = Color(0xFF0B2E52),
+    secondary = Color(0xFF237FA6),
+    onSecondary = Color.White,
+    secondaryContainer = Color(0xFFD2EDF8),
+    onSecondaryContainer = Color(0xFF073446),
+    tertiary = Color(0xFF1C8664),
+    onTertiary = Color.White,
+    tertiaryContainer = Color(0xFFD5F0E5),
+    onTertiaryContainer = Color(0xFF07291D),
+    background = Frost.Page,
+    onBackground = Frost.Ink,
+    surface = Frost.Page,
+    onSurface = Frost.Ink,
+    surfaceVariant = Color(0xFFDAE5F1),
+    onSurfaceVariant = Frost.InkMuted,
+    surfaceContainerLowest = Color.White,
+    surfaceContainerLow = Frost.Card,
+    surfaceContainer = Frost.Card,
+    surfaceContainerHigh = Frost.Card,
+    surfaceContainerHighest = Color(0xFFDAE5F1),
+    inverseSurface = Frost.Glacier,
+    inverseOnSurface = Frost.Page,
+    inversePrimary = Color(0xFF9CCBFF),
+    outline = Color(0xFFA6B7CB),
+    outlineVariant = Color(0xFFC8D5E4),
+    error = Palette.Error,
+    scrim = Color(0xFF06101D),
+)
+
+private val WinterDarkColors = darkColorScheme(
+    primary = Color(0xFFCDE5FF),
+    onPrimary = Color(0xFF0A1B30),
+    primaryContainer = Color(0xFF23446B),
+    onPrimaryContainer = Color(0xFFDCEBFF),
+    secondary = Color(0xFF8ED6EF),
+    onSecondary = Color(0xFF003646),
+    secondaryContainer = Color(0xFF164556),
+    onSecondaryContainer = Color(0xFFBDEBFA),
+    tertiary = Color(0xFF8BDCBE),
+    onTertiary = Color(0xFF00382A),
+    tertiaryContainer = Color(0xFF133A31),
+    onTertiaryContainer = Color(0xFF8BDCBE),
+    background = Frost.Night,
+    onBackground = Frost.Snow,
+    surface = Frost.Night,
+    onSurface = Frost.Snow,
+    surfaceVariant = Color(0xFF1D2F48),
+    onSurfaceVariant = Frost.SnowMuted,
+    surfaceContainerLowest = Color(0xFF050D17),
+    surfaceContainerLow = Frost.NightCard,
+    surfaceContainer = Frost.NightCard,
+    surfaceContainerHigh = Frost.NightRaised,
+    surfaceContainerHighest = Color(0xFF22385A),
+    inverseSurface = Frost.Snow,
+    inverseOnSurface = Frost.Night,
+    inversePrimary = Frost.Glacier,
+    outline = Color(0xFF6D819A),
+    outlineVariant = Color(0xFF22344D),
+    scrim = Color.Black,
+)
+
+/** True while the Winter Arc palette is in effect, so shared components can follow it. */
+val LocalWinterTheme = staticCompositionLocalOf { false }
+
+/**
+ * Re-colours everything inside it with the winter palette, following the light or dark choice the
+ * surrounding [KairosTheme] already made (so the person's theme setting still applies).
+ */
+@Composable
+fun WinterArcTheme(content: @Composable () -> Unit) {
+    val dark = MaterialTheme.colorScheme.background.let { (0.2126f * it.red + 0.7152f * it.green + 0.0722f * it.blue) < 0.4f }
+    CompositionLocalProvider(LocalKairosColors provides if (dark) WinterDarkKairos else WinterLightKairos, LocalWinterTheme provides true) {
+        MaterialTheme(colorScheme = if (dark) WinterDarkColors else WinterLightColors, typography = KairosTypography, shapes = KairosShapes, content = content)
+    }
+}

@@ -18,6 +18,7 @@ class KairosApp : Application() {
             container.seedDefaults()
             // Startup consistency check: recreate any missing alarm or notification from the database.
             container.scheduler.rebuild("startup")
+            runCatching { container.winterReminders.rebuild() }
             // Keeps placed widgets in step with the app; does nothing when no widget is placed.
             Widgets.startSync(this@KairosApp, container)
         }
