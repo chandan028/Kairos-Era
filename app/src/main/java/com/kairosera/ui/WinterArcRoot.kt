@@ -61,6 +61,9 @@ import com.kairosera.feature.winterarc.ArcFocusScreen
 import com.kairosera.feature.winterarc.ArcHabitsScreen
 import com.kairosera.feature.winterarc.ArcHomeScreen
 import com.kairosera.feature.winterarc.ArcSettingsScreen
+import com.kairosera.feature.speech.CoachSetupScreen
+import com.kairosera.feature.speech.SpeechProgressScreen
+import com.kairosera.feature.speech.SpeechReportScreen
 import com.kairosera.feature.winterarc.ArcSpeakScreen
 import com.kairosera.feature.winterarc.ArcStatsScreen
 import com.kairosera.feature.winterarc.ArcStudyScreen
@@ -82,11 +85,15 @@ private object ArcRoutes {
     const val PRIVACY = "arc_privacy"
     const val BACKUP = "arc_backup"
     const val HOME_CARDS = "arc_home_cards"
+    const val SPEECH_REPORT = "arc_speech_report"
+    const val SPEECH_PROGRESS = "arc_speech_progress"
+    const val SPEECH_SETUP = "arc_speech_setup"
 
     private fun d(date: LocalDate?) = date?.toEpochDay() ?: Long.MIN_VALUE
     fun habits(date: LocalDate?) = "$HABITS?date=${d(date)}"
     fun study(date: LocalDate?) = "$STUDY?date=${d(date)}"
     fun calendar(date: LocalDate?) = "$CALENDAR?date=${d(date)}"
+    fun speechReport(id: Long) = "$SPEECH_REPORT?id=$id"
     fun focus(study: Boolean, task: StudyTask?) = "$FOCUS?study=$study&task=${task?.id ?: -1}"
 }
 
@@ -145,7 +152,8 @@ private fun WinterArcContent(
     val backStack by nav.currentBackStackEntryAsState()
     val raw = backStack?.destination?.route?.substringBefore('?')
     val current = when (raw) {
-        ArcRoutes.NINETY -> ArcRoutes.STATS
+        ArcRoutes.NINETY, ArcRoutes.SPEECH_REPORT, ArcRoutes.SPEECH_PROGRESS -> ArcRoutes.STATS
+        ArcRoutes.SPEECH_SETUP -> ArcRoutes.HOME
         ArcRoutes.SETTINGS, ArcRoutes.APP_SETTINGS, ArcRoutes.PRIVACY, ArcRoutes.BACKUP, ArcRoutes.HOME_CARDS, ArcRoutes.SPEAK -> ArcRoutes.HOME
         else -> raw
     }
@@ -228,9 +236,32 @@ private fun ArcNavHost(nav: NavHostController, vm: ArcViewModel, settings: AppSe
             val date = dateArg(e.arguments?.getLong("date"))
             ArcCalendarScreen(vm, initialDate = date, onBack = if (date != null) back else null, onEditDay = { d -> nav.navigate(ArcRoutes.habits(d)) })
         }
-        composable(ArcRoutes.STATS) { ArcStatsScreen(vm, onBack = null, onOpen90 = { nav.navigate(ArcRoutes.NINETY) }) }
+        composable(ArcRoutes.STATS) {
+            ArcStatsScreen(vm, onBack = null, onOpen90 = { nav.navigate(ArcRoutes.NINETY) }, onOpenSpeechProgress = { nav.navigate(ArcRoutes.SPEECH_PROGRESS) })
+        }
         composable(ArcRoutes.NINETY) { Arc90Screen(vm, onBack = back, onOpenDay = { d -> nav.navigate(ArcRoutes.calendar(d)) }) }
-        composable(ArcRoutes.SPEAK) { ArcSpeakScreen(vm, onBack = back) }
+        composable(ArcRoutes.SPEAK) {
+            ArcSpeakScreen(
+                vm, onBack = back,
+                onOpenReport = { id -> nav.navigate(ArcRoutes.speechReport(id)) },
+                onOpenProgress = { nav.navigate(ArcRoutes.SPEECH_PROGRESS) },
+                onOpenCoachSetup = { nav.navigate(ArcRoutes.SPEECH_SETUP) },
+            )
+        }
+        composable(
+            "${ArcRoutes.SPEECH_REPORT}?id={id}",
+            arguments = listOf(navArgument("id") { type = NavType.LongType; defaultValue = -1L }),
+        ) { e ->
+            SpeechReportScreen(
+                sessionId = e.arguments?.getLong("id") ?: -1L,
+                onBack = back,
+                // Back to the speak screen if it is underneath, otherwise open it.
+                onPractiseAgain = { if (!nav.popBackStack(ArcRoutes.SPEAK, inclusive = false)) nav.navigate(ArcRoutes.SPEAK) },
+                onOpenProgress = { nav.navigate(ArcRoutes.SPEECH_PROGRESS) },
+            )
+        }
+        composable(ArcRoutes.SPEECH_PROGRESS) { SpeechProgressScreen(onBack = back, onOpenReport = { id -> nav.navigate(ArcRoutes.speechReport(id)) }) }
+        composable(ArcRoutes.SPEECH_SETUP) { CoachSetupScreen(onBack = back) }
         composable(
             "${ArcRoutes.FOCUS}?study={study}&task={task}",
             arguments = listOf(

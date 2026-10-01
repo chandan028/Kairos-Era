@@ -50,6 +50,20 @@ class AppContainer(context: Context) {
     val winterArc by lazy { com.kairosera.data.winterarc.WinterArcRepository(appContext, database, books, clock) }
     val winterReminders by lazy { com.kairosera.feature.winterarc.ArcReminders(appContext, winterPrefs) }
 
+    // Speaking coach: Gemma on the phone through LiteRT-LM. One engine for the whole app.
+    val speechPrefs = com.kairosera.core.settings.SpeechCoachPrefs(appContext)
+    val speechSessions: com.kairosera.data.speech.SpeechSessionRepository by lazy { com.kairosera.data.speech.RoomSpeechSessionRepository(database.speechDao()) }
+    val deviceInfo: com.kairosera.ai.DeviceInfo by lazy { com.kairosera.ai.AndroidDeviceInfo(appContext) }
+    val modelStore by lazy { com.kairosera.ai.AppModelStore(appContext) }
+    val modelImporter by lazy { com.kairosera.ai.ModelImporter(modelStore) { deviceInfo.freeBytes(it) } }
+    val audioFiles by lazy { com.kairosera.speech.AudioFileManager(appContext.cacheDir, appContext.filesDir) }
+    val gemma by lazy {
+        com.kairosera.ai.GemmaEngineManager(modelStore, com.kairosera.ai.LiteRtEngineFactory(), deviceInfo, { speechPrefs.current().backend })
+    }
+    /** Replaceable so UI tests can run the whole flow without the 2.6 GB model. */
+    var speechAnalyzer: com.kairosera.ai.SpeechAiAnalyzer? = null
+    fun analyzer(): com.kairosera.ai.SpeechAiAnalyzer = speechAnalyzer ?: com.kairosera.ai.GemmaSpeechAnalyzer(gemma, audioFiles).also { speechAnalyzer = it }
+
     /** The day Kairos Era arrived on this phone. Statistics never count days before it against the person. */
     val installedOn: LocalDate by lazy {
         runCatching {
@@ -117,6 +131,8 @@ class AppContainer(context: Context) {
         com.kairosera.core.diagnostics.CrashReports.clear(appContext)
         onboarding.clear()
         winterPrefs.clear()
+        speechPrefs.clear()
+        audioFiles.clearKept()
         winterReminders.cancelAll()
         settings.clearAll()
         lock.unlock()

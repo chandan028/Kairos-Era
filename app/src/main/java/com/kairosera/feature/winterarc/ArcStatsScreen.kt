@@ -57,7 +57,7 @@ import kotlin.math.roundToInt
 
 /** Week, month and whole-challenge totals with a habit-by-day consistency grid. */
 @Composable
-fun ArcStatsScreen(vm: ArcViewModel, onBack: (() -> Unit)?, onOpen90: () -> Unit) {
+fun ArcStatsScreen(vm: ArcViewModel, onBack: (() -> Unit)?, onOpen90: () -> Unit, onOpenSpeechProgress: () -> Unit = {}) {
     val today by vm.today.collectAsStateWithLifecycle()
     val arc by vm.arc.collectAsStateWithLifecycle()
     var tab by rememberSaveable { mutableIntStateOf(0) }
@@ -146,6 +146,7 @@ fun ArcStatsScreen(vm: ArcViewModel, onBack: (() -> Unit)?, onOpen90: () -> Unit
                     Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null)
                 }
             }
+            SpeechProgressCard(onOpenSpeechProgress)
             Spacer(Modifier.height(96.dp))
         }
     }
@@ -351,6 +352,29 @@ fun Arc90Screen(vm: ArcViewModel, onBack: (() -> Unit)?, onOpenDay: (LocalDate) 
             Spacer(Modifier.height(10.dp))
             Text(stringResource(R.string.wa_complete_rule, HabitRules.completeThreshold(r.habits.count { it.active }), r.habits.count { it.active }), style = MaterialTheme.typography.bodySmall, color = Kairos.colors.muted)
             Spacer(Modifier.height(96.dp))
+        }
+    }
+}
+
+/** Coach scores at a glance; shown once at least one speech has been analysed. */
+@Composable
+private fun SpeechProgressCard(onOpen: () -> Unit) {
+    val vm = com.kairosera.ui.kairosViewModel("speech_reports") { com.kairosera.feature.speech.SpeechReportViewModel(it.speechSessions) }
+    val sessions by vm.all.collectAsStateWithLifecycle(initialValue = emptyList())
+    if (sessions.isEmpty()) return
+    val p = remember(sessions) { com.kairosera.feature.speech.SpeechProgress.of(sessions) }
+    Spacer(Modifier.height(12.dp))
+    val tone = Arc.tone(HabitKind.SPEAK)
+    ArcCard(Modifier.fillMaxWidth(), color = tone.soft, onClick = onOpen) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.sc_progress_title), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    stringResource(R.string.sc_stats_card_summary, p.count, p.average?.let(ScoreFormat::one) ?: "—"),
+                    style = MaterialTheme.typography.bodySmall, color = Kairos.colors.muted,
+                )
+            }
+            Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null)
         }
     }
 }

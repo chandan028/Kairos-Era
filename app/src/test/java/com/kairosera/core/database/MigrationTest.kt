@@ -233,4 +233,44 @@ class MigrationTest {
         dao.upsertHabit(WaHabitEntity("CUSTOM_1", "custom", "AMOUNT", 50.0, "reps", true, 10, name = "Push-ups", icon = "fitness", color = 3))
         assertEquals("Push-ups", dao.habits().first { it.id == "CUSTOM_1" }.name)
     }
+
+    @Test
+    fun v5ToV6AddsSpeechReportsAndKeepsEverythingElse() = runBlocking {
+        createAt(5) {
+            execSQL("INSERT INTO wa_habits (id, category, type, target, unit, active, sortOrder, name, icon, color) VALUES ('SPEAK', 'mind', 'CHECK', 1.0, '', 1, 0, '', '', 0)")
+        }
+        val room = openCurrent()
+        assertEquals("SPEAK", room.winterArcDao().habits().single().id)
+        val repo = com.kairosera.data.speech.RoomSpeechSessionRepository(room.speechDao())
+        assertTrue(repo.observeAll().first().isEmpty())
+        val id = repo.save(speechSession())
+        assertEquals(speechSession().copy(id = id), repo.get(id))
+    }
+
+    @Test
+    fun speechReportsRoundTrip() = runBlocking {
+        createAt(5)
+        val repo = com.kairosera.data.speech.RoomSpeechSessionRepository(openCurrent().speechDao())
+        val older = repo.save(speechSession(at = 1_000))
+        val newer = repo.save(speechSession(at = 2_000).copy(clarityScore = null, fillerWords = null, strengths = emptyList()))
+        assertEquals(listOf(newer, older), repo.observeAll().first().map { it.id })
+        val n = repo.get(newer)!!
+        assertNull(n.clarityScore)
+        assertNull("not_available filler words stay unknown, not empty", n.fillerWords)
+        assertTrue(n.strengths.isEmpty())
+        repo.setAudioPath(older, "/data/rec.wav")
+        assertEquals("/data/rec.wav", repo.get(older)!!.audioPath)
+        repo.delete(older)
+        assertNull(repo.get(older))
+        assertEquals(1, repo.observeAll().first().size)
+    }
+
+    private fun speechSession(at: Long = 1_759_300_000_000) = com.kairosera.data.speech.SpeechSession(
+        date = LocalDate.of(2026, 10, 1), createdAt = Instant.ofEpochMilli(at), topic = "Why mornings matter", speakingSessionId = 3,
+        durationSeconds = 60, overallScore = 7.2, modelOverallScore = 7, clarityScore = 8, structureScore = 6, vocabularyScore = 7,
+        grammarScore = 8, concisenessScore = 7, fillerWords = listOf("um", "like"), strengths = listOf("Clear opening"),
+        improvements = listOf("Add an example", "Pause instead of um"), nextExercise = "Point, example, conclusion.",
+        summary = "Good start.", transcript = "So um today…", wordsPerMinute = 128, fillerSounds = 3, longPauses = 1,
+        voicedSeconds = 51.5, backend = "GPU",
+    )
 }

@@ -61,6 +61,14 @@ object Migrations {
         }
     }
 
+    /** v6 adds the speaking coach's reports. A new table only, so no existing row is touched. */
+    val MIGRATION_5_6 = object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `speech_sessions` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `topic` TEXT NOT NULL, `speakingSessionId` INTEGER, `durationSeconds` INTEGER NOT NULL, `overallScore` REAL, `modelOverallScore` INTEGER, `clarityScore` INTEGER, `structureScore` INTEGER, `vocabularyScore` INTEGER, `grammarScore` INTEGER, `concisenessScore` INTEGER, `fillerWords` TEXT, `strengths` TEXT NOT NULL, `improvements` TEXT NOT NULL, `nextExercise` TEXT NOT NULL, `summary` TEXT NOT NULL, `transcript` TEXT NOT NULL, `wordsPerMinute` INTEGER, `fillerSounds` INTEGER, `longPauses` INTEGER, `voicedSeconds` REAL, `backend` TEXT NOT NULL, `audioPath` TEXT)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_speech_sessions_date` ON `speech_sessions` (`date`)")
+        }
+    }
+
     // Copied from app/schemas/.../4.json: the six Winter Arc tables. Nothing existing changes.
     private val WINTER_ARC_V4 = listOf(
         "CREATE TABLE IF NOT EXISTS `winter_arcs` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `startDate` INTEGER NOT NULL, `endDate` INTEGER NOT NULL, `durationDays` INTEGER NOT NULL, `status` TEXT NOT NULL, `pauses` TEXT NOT NULL, `bookId` INTEGER, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL)",

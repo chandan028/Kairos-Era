@@ -17,6 +17,10 @@
     <!-- ACTIVITY_RECOGNITION: optional, for Winter Arc steps from the phone's own step counter. Asked only when the person turns it on. -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false" />
+    <!-- RECORD_AUDIO: optional, for the speaking coach. Asked only when the person taps Start on Speak 1 Minute.
+         The recording is analysed on the phone by Gemma and never leaves it (there is still no internet permission). -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <application
         android:name=".KairosApp"
@@ -31,6 +35,11 @@
         android:enableOnBackInvokedCallback="true"
         android:theme="@style/Theme.Kairos"
         tools:targetApi="35">
+
+        <!-- LiteRT-LM's GPU backend loads the phone's OpenCL driver (docs/api/kotlin/getting_started.md).
+             Optional: without them Gemma runs on CPU. -->
+        <uses-native-library android:name="libvndksupport.so" android:required="false" />
+        <uses-native-library android:name="libOpenCL.so" android:required="false" />
 
         <activity
             android:name=".MainActivity"
