@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/arc_w_bg" android:orientation="vertical" android:padding="16dp">
+
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+    <TextView android:id="@+id/label" android:layout_width="0dp" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="@color/arc_w_muted" android:layout_weight="1" android:maxLines="1" android:ellipsize="end"/>
+    <TextView android:id="@+id/percent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="@color/arc_w_blue" android:maxLines="1"/>
+</LinearLayout>
+<TextView android:id="@+id/day" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="22sp" android:textColor="@color/arc_w_ink" android:fontFamily="serif" android:maxLines="1" android:layout_marginTop="2dp"/>
+<ProgressBar android:id="@+id/bar" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="8dp" android:layout_marginTop="6dp" android:max="100" android:progress="0" android:progressDrawable="@drawable/arc_w_progress_blue" />
+<LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginTop="8dp" android:orientation="vertical">
+<LinearLayout android:id="@+id/hrow0" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="horizontal">
+<TextView android:id="@+id/h0" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="3dp" android:background="@drawable/arc_w_chip_off" android:gravity="center" android:maxLines="3" android:ellipsize="end" android:padding="4dp" android:textColor="@color/arc_w_ink" android:textSize="11sp" />
+<TextView android:id="@+id/h1" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="3dp" android:background="@drawable/arc_w_chip_off" android:gravity="center" android:maxLines="3" android:ellipsize="end" android:padding="4dp" android:textColor="@color/arc_w_ink" android:textSize="11sp" />
+<TextView android:id="@+id/h2" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="3dp" android:background="@drawable/arc_w_chip_off" android:gravity="center" android:maxLines="3" android:ellipsize="end" android:padding="4dp" android:textColor="@color/arc_w_ink" android:textSize="11sp" />
+<TextView android:id="@+id/h3" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="3dp" android:background="@drawable/arc_w_chip_off" android:gravity="center" android:maxLines="3" android:ellipsize="end" android:padding="4dp" android:textColor="@color/arc_w_ink" android:textSize="11sp" />
+<TextView android:id="@+id/h4" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="3dp" android:background="@drawable/arc_w_chip_off" android:gravity="center" android:maxLines="3" android:ellipsize="end" android:padding="4dp" android:textColor="@color/arc_w_ink" android:textSize="11sp" />
+</LinearLayout>
+<LinearLayout android:id="@+id/hrow1" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="horizontal">
+<TextView android:id="@+id/h5" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="3dp" android:background="@drawable/arc_w_chip_off" android:gravity="center" android:maxLines="3" android:ellipsize="end" android:padding="4dp" android:textColor="@color/arc_w_ink" android:textSize="11sp" />
+<TextView android:id="@+id/h6" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="3dp" android:background="@drawable/arc_w_chip_off" android:gravity="center" android:maxLines="3" android:ellipsize="end" android:padding="4dp" android:textColor="@color/arc_w_ink" android:textSize="11sp" />
+<TextView android:id="@+id/h7" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="3dp" android:background="@drawable/arc_w_chip_off" android:gravity="center" android:maxLines="3" android:ellipsize="end" android:padding="4dp" android:textColor="@color/arc_w_ink" android:textSize="11sp" />
+<TextView android:id="@+id/h8" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="3dp" android:background="@drawable/arc_w_chip_off" android:gravity="center" android:maxLines="3" android:ellipsize="end" android:padding="4dp" android:textColor="@color/arc_w_ink" android:textSize="11sp" />
+<TextView android:id="@+id/h9" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="3dp" android:background="@drawable/arc_w_chip_off" android:gravity="center" android:maxLines="3" android:ellipsize="end" android:padding="4dp" android:textColor="@color/arc_w_ink" android:textSize="11sp" />
+</LinearLayout>
+</LinearLayout>
+</LinearLayout>

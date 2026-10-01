@@ -147,6 +147,7 @@ class MainActivity : AppCompatActivity() {
             ACTION_OPEN_TRACK -> LaunchRequest.OpenTrack
             ACTION_OPEN_QUOTE -> LaunchRequest.OpenQuote
             ACTION_NEW_JOURNAL -> LaunchRequest.NewJournal
+            ACTION_OPEN_ARC -> LaunchRequest.OpenArc(intent.getStringExtra(EXTRA_ARC_TARGET)?.takeIf { it in ARC_TARGETS } ?: ARC_HOME)
             else -> null
         }
     }
@@ -159,6 +160,16 @@ class MainActivity : AppCompatActivity() {
         const val ACTION_OPEN_TRACK = "com.kairosera.action.OPEN_TRACK"
         const val ACTION_OPEN_QUOTE = "com.kairosera.action.OPEN_QUOTE"
         const val ACTION_NEW_JOURNAL = "com.kairosera.action.NEW_JOURNAL"
+        const val ACTION_OPEN_ARC = "com.kairosera.action.OPEN_ARC"
+        const val EXTRA_ARC_TARGET = "arcTarget"
+        const val ARC_HOME = "home"
+        const val ARC_WATER = "water"
+        const val ARC_STUDY = "study"
+        const val ARC_FOCUS = "focus"
+        const val ARC_SPEAK = "speak"
+        const val ARC_READING = "reading"
+        const val ARC_CALENDAR = "calendar"
+        private val ARC_TARGETS = setOf(ARC_HOME, ARC_WATER, ARC_STUDY, ARC_FOCUS, ARC_SPEAK, ARC_READING, ARC_CALENDAR)
         const val EXTRA_DATE = "date"
         const val EXTRA_TASK_ID = "taskId"
         const val EXTRA_NOTIFICATION_ID = "notificationId"

@@ -199,4 +199,20 @@ class MigrationTest {
         journal.restore(id, now)
         assertEquals(1, journal.observeBetween(day, day).first().size)
     }
+
+    @Test
+    fun v3ToV4AddsWinterArcTablesAndKeepsJournal() = runBlocking {
+        createAt(3) {
+            execSQL("INSERT INTO trackers (id, name, icon, colorArgb, description, why, gain, template, frequency, frequencyDays, frequencyTimes, position, createdAt, updatedAt, archivedAt, deletedAt, isSample) VALUES (5, 'Water', 'w', 1, '', '', '', 'CUSTOM', 'DAILY', 0, 0, 0, 1, 1, NULL, NULL, 0)")
+        }
+        val room = openCurrent()
+        val db = room.openHelper.writableDatabase
+        assertEquals(KairosDatabase.VERSION, db.version)
+        db.query("SELECT name FROM trackers WHERE id = 5").use { c -> assertTrue(c.moveToFirst()); assertEquals("Water", c.getString(0)) }
+
+        val dao = room.winterArcDao()
+        dao.upsertLog(WaHabitLogEntity(habitId = "WATER", date = 20730, value = 750.0, completed = false, notes = "", extra = 0.0, updatedAt = 1))
+        assertEquals(750.0, dao.observeLogs(20730, 20730).first().single().value, 0.0)
+        db.query("SELECT COUNT(*) FROM wa_study_tasks").use { c -> c.moveToFirst(); assertEquals(0, c.getInt(0)) }
+    }
 }

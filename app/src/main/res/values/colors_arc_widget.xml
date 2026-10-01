@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Winter Arc widget colors (day). Mirrors feature/winterarc/ArcTheme.kt. -->
+<resources>
+    <color name="arc_w_card">#FFFFFF</color>
+    <color name="arc_w_line">#E3E8F0</color>
+    <color name="arc_w_ink">#14213D</color>
+    <color name="arc_w_muted">#5F6B7E</color>
+    <color name="arc_w_track">#E9EEF5</color>
+    <color name="arc_w_blue">#2F6FD6</color>
+    <color name="arc_w_blue_soft">#E3EEFC</color>
+    <color name="arc_w_green">#3DA35D</color>
+    <color name="arc_w_yellow">#E9B23C</color>
+    <color name="arc_w_red">#E57368</color>
+    <color name="arc_w_gray">#C9D1DD</color>
+    <color name="arc_w_orange">#E07B2E</color>
+    <color name="arc_w_purple">#7C5CC4</color>
+</resources>

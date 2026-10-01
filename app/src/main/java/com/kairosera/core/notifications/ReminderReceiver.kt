@@ -57,6 +57,7 @@ class SystemEventReceiver : BroadcastReceiver() {
             try {
                 if (action == Intent.ACTION_LOCALE_CHANGED) NotificationChannels.ensure(context)
                 container.scheduler.rebuild(action.substringAfterLast('.'))
+                runCatching { container.winterReminders.rebuild() }
                 // A new day, time zone or language changes what every widget should say.
                 com.kairosera.feature.widgets.Widgets.update(context, container)
             } finally {

@@ -44,4 +44,25 @@ object Migrations {
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_journal_entries_deletedAt` ON `journal_entries` (`deletedAt`)")
         }
     }
+
+    /** v4 adds Winter Arc. New tables only, so no existing row is touched. */
+    val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            WINTER_ARC_V4.forEach(db::execSQL)
+        }
+    }
+
+    // Copied from app/schemas/.../4.json: the six Winter Arc tables. Nothing existing changes.
+    private val WINTER_ARC_V4 = listOf(
+        "CREATE TABLE IF NOT EXISTS `winter_arcs` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `startDate` INTEGER NOT NULL, `endDate` INTEGER NOT NULL, `durationDays` INTEGER NOT NULL, `status` TEXT NOT NULL, `pauses` TEXT NOT NULL, `bookId` INTEGER, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL)",
+        "CREATE TABLE IF NOT EXISTS `wa_habits` (`id` TEXT NOT NULL, `category` TEXT NOT NULL, `type` TEXT NOT NULL, `target` REAL NOT NULL, `unit` TEXT NOT NULL, `active` INTEGER NOT NULL, `sortOrder` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "CREATE TABLE IF NOT EXISTS `wa_habit_logs` (`habitId` TEXT NOT NULL, `date` INTEGER NOT NULL, `value` REAL NOT NULL, `completed` INTEGER NOT NULL, `notes` TEXT NOT NULL, `extra` REAL NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`habitId`, `date`))",
+        "CREATE INDEX IF NOT EXISTS `index_wa_habit_logs_date` ON `wa_habit_logs` (`date`)",
+        "CREATE TABLE IF NOT EXISTS `wa_study_tasks` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `title` TEXT NOT NULL, `category` TEXT NOT NULL, `durationMinutes` INTEGER NOT NULL, `completed` INTEGER NOT NULL, `notes` TEXT NOT NULL, `position` INTEGER NOT NULL, `source` TEXT NOT NULL, `spentMinutes` INTEGER NOT NULL, `startMinute` INTEGER, `updatedAt` INTEGER NOT NULL)",
+        "CREATE INDEX IF NOT EXISTS `index_wa_study_tasks_date` ON `wa_study_tasks` (`date`)",
+        "CREATE TABLE IF NOT EXISTS `wa_focus_sessions` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `durationSeconds` INTEGER NOT NULL, `completed` INTEGER NOT NULL, `interruptions` INTEGER NOT NULL, `task` TEXT NOT NULL, `kind` TEXT NOT NULL, `startedAt` INTEGER NOT NULL, `studyTaskId` INTEGER)",
+        "CREATE INDEX IF NOT EXISTS `index_wa_focus_sessions_date` ON `wa_focus_sessions` (`date`)",
+        "CREATE TABLE IF NOT EXISTS `wa_speaking_sessions` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `topic` TEXT NOT NULL, `durationSeconds` INTEGER NOT NULL, `completed` INTEGER NOT NULL, `rating` INTEGER, `updatedAt` INTEGER NOT NULL)",
+        "CREATE INDEX IF NOT EXISTS `index_wa_speaking_sessions_date` ON `wa_speaking_sessions` (`date`)",
+    )
 }

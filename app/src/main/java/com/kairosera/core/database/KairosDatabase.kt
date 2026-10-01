@@ -28,6 +28,12 @@ import androidx.room.RoomDatabase
         ReadingSessionEntity::class,
         BookNoteEntity::class,
         JournalEntryEntity::class,
+        WinterArcEntity::class,
+        WaHabitEntity::class,
+        WaHabitLogEntity::class,
+        WaStudyTaskEntity::class,
+        WaFocusSessionEntity::class,
+        WaSpeakingSessionEntity::class,
     ],
     version = KairosDatabase.VERSION,
     exportSchema = true,
@@ -39,13 +45,14 @@ abstract class KairosDatabase : RoomDatabase() {
     abstract fun studyDao(): StudyDao
     abstract fun bookDao(): BookDao
     abstract fun journalDao(): JournalDao
+    abstract fun winterArcDao(): WinterArcDao
 
     companion object {
-        const val VERSION = 3
+        const val VERSION = 4
         const val NAME = "kairos.db"
 
         /** Ordered list of every migration. Append; never edit a shipped one. */
-        val MIGRATIONS = arrayOf<androidx.room.migration.Migration>(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3)
+        val MIGRATIONS = arrayOf<androidx.room.migration.Migration>(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4)
 
         fun build(context: Context): KairosDatabase =
             Room.databaseBuilder(context, KairosDatabase::class.java, NAME)

@@ -1,5 +1,9 @@
 package com.kairosera.ui
 
+import androidx.compose.material.icons.outlined.AcUnit
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -107,6 +111,8 @@ sealed interface LaunchRequest {
     data object OpenTrack : LaunchRequest
     data object OpenQuote : LaunchRequest
     data object NewJournal : LaunchRequest
+    /** Open a Winter Arc screen (notification or widget); [target] is one of MainActivity.ARC_*. */
+    data class OpenArc(val target: String) : LaunchRequest
 }
 
 private enum class TopLevel(val route: String, val label: Int, val icon: ImageVector, val selectedIcon: ImageVector) {
@@ -141,6 +147,7 @@ object Routes {
     const val STATS = "stats"
     const val CALENDAR = "calendar"
     const val DAY = "day"
+    const val ARC_ONBOARDING = "arc_onboarding"
 
     fun today(date: LocalDate?) = if (date == null) TODAY else "$TODAY?date=${date.toEpochDay()}"
     fun task(id: Long? = null, date: LocalDate? = null) = "$TASK?id=${id ?: -1}&date=${date?.toEpochDay() ?: Long.MIN_VALUE}"
@@ -154,12 +161,59 @@ object Routes {
     fun day(date: LocalDate) = "$DAY/${date.toEpochDay()}"
 }
 
+/**
+ * Chooses between Winter Arc Mode and the everyday app. Winter Arc shows when it is switched on;
+ * "Open everyday Kairos Era" peeks at the everyday app for this session without turning it off.
+ */
 @Composable
 fun KairosRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchRequestHandled: () -> Unit) {
     if (!settings.onboardingDone) {
         OnboardingScreen()
         return
     }
+    val c = appContainer()
+    val arc by c.winterPrefs.settings.collectAsStateWithLifecycle(initialValue = null)
+    val arcSettings = arc ?: return
+    var peekEveryday by rememberSaveable { mutableStateOf(false) }
+    val arcOn = arcSettings.enabled && arcSettings.onboarded
+    LaunchedEffect(arcOn) { if (!arcOn) peekEveryday = false }
+    LaunchedEffect(launchRequest) {
+        when {
+            launchRequest == null -> Unit
+            launchRequest is LaunchRequest.OpenArc -> if (arcOn) peekEveryday = false else onLaunchRequestHandled()
+            arcOn -> peekEveryday = true
+        }
+    }
+    if (arcOn && !peekEveryday) {
+        WinterArcRoot(settings, launchRequest, onLaunchRequestHandled, onOpenEveryday = { peekEveryday = true })
+    } else {
+        Box(Modifier.fillMaxSize()) {
+            ClassicRoot(settings, launchRequest.takeUnless { it is LaunchRequest.OpenArc }, onLaunchRequestHandled)
+            if (arcOn) BackToArcPill(Modifier.align(Alignment.TopCenter)) { peekEveryday = false }
+        }
+    }
+}
+
+@Composable
+private fun BackToArcPill(modifier: Modifier, onClick: () -> Unit) {
+    androidx.compose.material3.Surface(
+        onClick = onClick,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(50),
+        color = com.kairosera.feature.winterarc.Arc.primary,
+        contentColor = com.kairosera.feature.winterarc.Arc.onPrimary,
+        shadowElevation = 3.dp,
+        modifier = modifier.statusBarsPadding().padding(top = 4.dp),
+    ) {
+        Row(Modifier.padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Outlined.AcUnit, contentDescription = null, modifier = Modifier.size(16.dp))
+            Spacer(Modifier.width(6.dp))
+            Text(stringResource(R.string.wa_back_to_arc), style = MaterialTheme.typography.labelLarge)
+        }
+    }
+}
+
+@Composable
+private fun ClassicRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchRequestHandled: () -> Unit) {
     val nav = rememberNavController()
     var reschedule by remember { mutableStateOf<LaunchRequest.Reschedule?>(null) }
     var quickAdd by rememberSaveable { mutableStateOf(false) }
@@ -175,7 +229,7 @@ fun KairosRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchReq
             LaunchRequest.OpenTrack -> nav.navigateTopLevel(Routes.TRACK)
             LaunchRequest.OpenQuote -> nav.navigate(Routes.QUOTE)
             LaunchRequest.NewJournal -> nav.navigate(Routes.journalEdit(date = LocalDate.now()))
-            null -> Unit
+            is LaunchRequest.OpenArc, null -> Unit
         }
         if (launchRequest != null) onLaunchRequestHandled()
     }
@@ -187,7 +241,7 @@ fun KairosRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchReq
         Routes.TRACKER, Routes.TRACKER_EDIT -> Routes.TRACK
         Routes.BOOK, Routes.BOOK_EDIT -> Routes.TRACK
         Routes.JOURNAL_EDIT -> Routes.JOURNAL
-        Routes.READ, Routes.SETTINGS, Routes.TRASH, Routes.PRIVACY, Routes.BACKUP, Routes.DIAGNOSTICS, Routes.ABOUT, Routes.STATS, Routes.CALENDAR, Routes.DAY -> Routes.MORE
+        Routes.READ, Routes.SETTINGS, Routes.ARC_ONBOARDING, Routes.TRASH, Routes.PRIVACY, Routes.BACKUP, Routes.DIAGNOSTICS, Routes.ABOUT, Routes.STATS, Routes.CALENDAR, Routes.DAY -> Routes.MORE
         else -> r
     }
 
@@ -209,7 +263,7 @@ fun KairosRoot(settings: AppSettings, launchRequest: LaunchRequest?, onLaunchReq
         ),
     )
     // Full-screen moments (the daily thought) and focused editors hide the navigation.
-    val immersive = rawRoute?.substringBefore('/') in setOf(Routes.QUOTE, Routes.TASK, Routes.TRACKER_EDIT, Routes.BOOK_EDIT, Routes.JOURNAL_EDIT)
+    val immersive = rawRoute?.substringBefore('/') in setOf(Routes.ARC_ONBOARDING, Routes.QUOTE, Routes.TASK, Routes.TRACKER_EDIT, Routes.BOOK_EDIT, Routes.JOURNAL_EDIT)
     CompositionLocalProvider(LocalToaster provides toaster) {
         NavigationSuiteScaffold(
             layoutType = if (immersive) NavigationSuiteType.None else NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfo()),
@@ -431,7 +485,13 @@ private fun KairosNavHost(nav: NavHostController, settings: AppSettings, onQuick
                 onClose = { nav.popBackStack() },
             )
         }
-        composable(Routes.SETTINGS) { SettingsScreen(onBack = { nav.popBackStack() }, onHomeCards = { nav.navigate(Routes.HOME_CARDS) }, onPrivacy = { nav.navigate(Routes.PRIVACY) }, onBackup = { nav.navigate(Routes.BACKUP) }) }
+        composable(Routes.SETTINGS) {
+            SettingsScreen(
+                onBack = { nav.popBackStack() }, onHomeCards = { nav.navigate(Routes.HOME_CARDS) }, onPrivacy = { nav.navigate(Routes.PRIVACY) }, onBackup = { nav.navigate(Routes.BACKUP) },
+                onStartWinterArc = { nav.navigate(Routes.ARC_ONBOARDING) },
+            )
+        }
+        composable(Routes.ARC_ONBOARDING) { com.kairosera.feature.winterarc.ArcOnboarding(onCancel = { nav.popBackStack() }, onDone = { nav.popBackStack() }) }
         composable(Routes.TRASH) { TrashScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.PRIVACY) { PrivacyPolicyScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.BACKUP) { com.kairosera.feature.backup.BackupScreen(onBack = { nav.popBackStack() }) }

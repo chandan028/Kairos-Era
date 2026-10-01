@@ -244,16 +244,33 @@ object Widgets {
     suspend fun update(context: Context, c: AppContainer) {
         val manager = AppWidgetManager.getInstance(context) ?: return
         val placed = PROVIDERS.associateWith { manager.getAppWidgetIds(ComponentName(context, it)) }.filterValues { it.isNotEmpty() }
+        if (placed.isNotEmpty()) {
+            val snapshot = try {
+                WidgetSnapshot.load(c, LocalDate.now())
+            } catch (e: Exception) {
+                SafeLog.error("widget_load_failed", e)
+                null
+            }
+            if (snapshot != null) placed.forEach { (cls, ids) ->
+                val provider = cls.getDeclaredConstructor().newInstance()
+                ids.forEach { id -> runCatching { manager.updateAppWidget(id, provider.render(context, snapshot)) }.onFailure { SafeLog.error("widget_render_failed", it) } }
+            }
+        }
+        updateArc(context, c, manager)
+    }
+
+    private suspend fun updateArc(context: Context, c: AppContainer, manager: AppWidgetManager) {
+        val placed = ArcWidgets.PROVIDERS.associateWith { manager.getAppWidgetIds(ComponentName(context, it)) }.filterValues { it.isNotEmpty() }
         if (placed.isEmpty()) return
         val snapshot = try {
-            WidgetSnapshot.load(c, LocalDate.now())
+            ArcWidgetSnapshot.load(c, LocalDate.now())
         } catch (e: Exception) {
-            SafeLog.error("widget_load_failed", e)
+            SafeLog.error("arc_widget_load_failed", e)
             return
         }
         placed.forEach { (cls, ids) ->
             val provider = cls.getDeclaredConstructor().newInstance()
-            ids.forEach { id -> runCatching { manager.updateAppWidget(id, provider.render(context, snapshot)) }.onFailure { SafeLog.error("widget_render_failed", it) } }
+            ids.forEach { id -> runCatching { manager.updateAppWidget(id, provider.render(context, snapshot)) }.onFailure { SafeLog.error("arc_widget_render_failed", it) } }
         }
     }
 
@@ -269,13 +286,21 @@ object Widgets {
         val days = flow { while (true) { emit(LocalDate.now()); delay(60_000) } }.distinctUntilChanged()
         sync = c.appScope.launch {
             days.flatMapLatest { date ->
-                combine(
+                val everyday = combine(
                     c.observeDayPlan(date),
                     c.trackers.observeActive(),
                     c.trackers.observeEntries(date, date),
                     c.study.observeAllTopics(),
                     c.books.observeBooks(),
                 ) { _, _, _, _, _ -> date }
+                val arc = combine(
+                    c.winterArc.observeDays(date, date),
+                    c.winterArc.observeStudy(date, date),
+                    c.winterArc.habits,
+                    c.winterArc.arc,
+                    c.winterPrefs.settings,
+                ) { _, _, _, _, _ -> date }
+                combine(everyday, arc) { _, _ -> date }
             }.debounce(400).collect {
                 if (!anyPlaced(app)) { sync?.cancel(); return@collect }
                 update(app, c)
@@ -285,7 +310,7 @@ object Widgets {
 
     fun anyPlaced(context: Context): Boolean {
         val manager = AppWidgetManager.getInstance(context) ?: return false
-        return PROVIDERS.any { manager.getAppWidgetIds(ComponentName(context, it)).isNotEmpty() }
+        return (PROVIDERS + ArcWidgets.PROVIDERS).any { manager.getAppWidgetIds(ComponentName(context, it)).isNotEmpty() }
     }
 
     fun openApp(context: Context, action: String): PendingIntent {
